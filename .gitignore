@@ -1,0 +1,36 @@
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+# Dependencies and local environments
+vendor/
+node_modules/
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+.phpunit.cache/
+# Runtime data and local models
+*.log
+*.sqlite
+*.sqlite3
+*.dump
+*.sql.gz
+/models/
+/model-weights/
+*.gguf
+*.safetensors
+*.pt
+*.pth
+*.onnx
+storage/logs/
+storage/framework/
+# Local tools and build output
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+/dist/
+/tmp/
