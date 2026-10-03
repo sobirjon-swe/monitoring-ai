@@ -34,3 +34,5 @@ storage/framework/
 Thumbs.db
 /dist/
 /tmp/
+/.local/
+/.superpowers/

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:monitoring-ai:analysis-context:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "tenant_id", "project_id", "actor_id", "purpose", "artifact_id", "artifact_version", "evidence_ids", "content", "coverage", "snapshot_hash"],
+  "properties": {
+    "schema_version": {"const": "analysis-context.v1"},
+    "tenant_id": {"$ref": "#/$defs/uuid"},
+    "project_id": {"$ref": "#/$defs/uuid"},
+    "actor_id": {"$ref": "#/$defs/uuid"},
+    "purpose": {"const": "analysis.context"},
+    "artifact_id": {"$ref": "#/$defs/uuid"},
+    "artifact_version": {"type": "string", "minLength": 1, "maxLength": 100},
+    "evidence_ids": {"type": "array", "minItems": 1, "maxItems": 100, "uniqueItems": true, "items": {"$ref": "#/$defs/uuid"}},
+    "content": {
+      "type": "object", "additionalProperties": false, "required": ["synthetic", "text"],
+      "properties": {"synthetic": {"const": true}, "text": {"type": "string", "maxLength": 20000}}
+    },
+    "coverage": {
+      "type": "object", "additionalProperties": false, "required": ["state", "reasons"],
+      "properties": {"state": {"enum": ["partial", "unavailable"]}, "reasons": {"type": "array", "minItems": 1, "maxItems": 20, "items": {"type": "string", "minLength": 1, "maxLength": 200}}}
+    },
+    "snapshot_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  },
+  "$defs": {
+    "uuid": {"type": "string", "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"}
+  }
+}

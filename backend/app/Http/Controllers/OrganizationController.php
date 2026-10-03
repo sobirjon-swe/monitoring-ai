@@ -17,7 +17,7 @@ class OrganizationController extends Controller
         if (! $actor instanceof TrustedActor) {
             throw new AccessDeniedHttpException;
         }
-        $write = ! $request->isMethod('get');
+        $write = $request->isMethod('post') || $request->isMethod('patch');
         $access->authorize($actor, $write ? 'organization.manage' : 'organization.read', ['tenant_id' => $actor->tenantId]);
         $department = $request->route('organization_resource') === 'departments';
 

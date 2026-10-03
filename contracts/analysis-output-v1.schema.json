@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:monitoring-ai:analysis-output:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "analysis_run_id", "tenant_id", "project_id", "purpose", "input_snapshot_hash", "findings"],
+  "properties": {
+    "schema_version": {"const": "analysis-output.v1"},
+    "analysis_run_id": {"$ref": "#/$defs/uuid"},
+    "tenant_id": {"$ref": "#/$defs/uuid"},
+    "project_id": {"$ref": "#/$defs/uuid"},
+    "purpose": {"const": "analysis.context"},
+    "input_snapshot_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "findings": {
+      "type": "array", "maxItems": 50,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["finding_id", "category", "explanation", "evidence_ids", "coverage", "confidence", "review_state"],
+        "properties": {
+          "finding_id": {"$ref": "#/$defs/uuid"},
+          "category": {"enum": ["delivery", "quality", "blocker", "schedule_risk", "evidence_gap"]},
+          "explanation": {"type": "string", "minLength": 1, "maxLength": 4000},
+          "evidence_ids": {"type": "array", "minItems": 1, "maxItems": 100, "uniqueItems": true, "items": {"$ref": "#/$defs/uuid"}},
+          "coverage": {
+            "type": "object", "additionalProperties": false, "required": ["state", "reasons"],
+            "properties": {"state": {"enum": ["partial", "unavailable"]}, "reasons": {"$ref": "#/$defs/reasons"}}
+          },
+          "confidence": {
+            "type": "object", "additionalProperties": false, "required": ["source", "link", "claim", "reasons"],
+            "properties": {
+              "source": {"$ref": "#/$defs/confidence_level"},
+              "link": {"$ref": "#/$defs/confidence_level"},
+              "claim": {"$ref": "#/$defs/confidence_level"},
+              "reasons": {"$ref": "#/$defs/reasons"}
+            }
+          },
+          "review_state": {"const": "pending"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "uuid": {"type": "string", "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"},
+    "confidence_level": {"enum": ["high", "medium", "low", "unknown"]},
+    "reasons": {"type": "array", "minItems": 1, "maxItems": 20, "items": {"type": "string", "minLength": 1, "maxLength": 200}}
+  }
+}

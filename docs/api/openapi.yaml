@@ -1,0 +1,5310 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Monitoring AI local E01 foundation",
+    "version": "1.0.0",
+    "description": "JSON syntax is valid YAML1.2. Local/testing loopback opaque bearer tokens only; production SSO and UI not implemented. Tenant/project scopes and current grants/membership are server-controlled. No T07 HTTP/model endpoint: analysis contracts are synthetic-only internal client. Responses may contain UTC PostgreSQL timestamp text, not uniformly RFC3339. HEAD uses the same read permissions and handler as GET and has an empty body; only POST/PATCH mutate. UTC timestamps preserve up to six fractional digits through validation, timestamptz(6) storage and event/access-time bindings. Periods remain [valid_from,valid_to) at microsecond precision."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000",
+      "description": "Current configurable local development endpoint"
+    }
+  ],
+  "security": [
+    {
+      "LocalBearer": []
+    }
+  ],
+  "paths": {
+    "/api/v1/employees": {
+      "get": {
+        "operationId": "operation1",
+        "summary": "List employees",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "organization.read",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/Employee"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uuid"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "next_cursor"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "operation2",
+        "summary": "Create employees",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "organization.manage",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Created atomically with audit.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Employee"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeCreate"
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "operation1Head",
+        "summary": "Automatic HEAD counterpart",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "organization.read",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/employees/{id}": {
+      "patch": {
+        "operationId": "operation3",
+        "summary": "Update employees",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "organization.manage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Employee"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeUpdate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/departments": {
+      "get": {
+        "operationId": "operation4",
+        "summary": "List departments",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "organization.read",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/Department"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uuid"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "next_cursor"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "operation5",
+        "summary": "Create departments",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "organization.manage",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Created atomically with audit.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Department"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepartmentCreate"
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "operation4Head",
+        "summary": "Automatic HEAD counterpart",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "organization.read",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/departments/{id}": {
+      "patch": {
+        "operationId": "operation6",
+        "summary": "Update departments",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "organization.manage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Department"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepartmentUpdate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me": {
+      "get": {
+        "operationId": "operation7",
+        "summary": "Verified local identity",
+        "description": "Authenticated local token only; no domain grant required. employee_id may be null. Production denies local tokens.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "operation7Head",
+        "summary": "Automatic HEAD counterpart",
+        "description": "Authenticated local token only; no domain grant required. employee_id may be null. Production denies local tokens.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects": {
+      "post": {
+        "operationId": "operation8",
+        "summary": "Create project",
+        "description": "Name only; timezone defaults Asia/Tashkent. A linked actor employee gets current membership; no HTTP grant escalation.",
+        "x-purpose": "project.create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Created atomically with audit.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Project"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}": {
+      "get": {
+        "operationId": "operation9",
+        "summary": "Read project",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "project.read",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Project"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "operation10",
+        "summary": "Update project",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "project.manage",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Project"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectUpdate"
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "operation9Head",
+        "summary": "Automatic HEAD counterpart",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "project.read",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/roles": {
+      "get": {
+        "operationId": "operation11",
+        "summary": "Read roles at event time",
+        "description": "Historical [from,to) roles are bounded to100. Current caller grant and project membership are still required.",
+        "x-purpose": "roles.read",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "employee_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/Role"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "operation12",
+        "summary": "Assign role",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "roles.manage",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created atomically with audit.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Role"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleCreate"
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "operation11Head",
+        "summary": "Automatic HEAD counterpart",
+        "description": "Historical [from,to) roles are bounded to100. Current caller grant and project membership are still required.",
+        "x-purpose": "roles.read",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "employee_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/roles/{id}": {
+      "patch": {
+        "operationId": "operation13",
+        "summary": "End/extend role period",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "roles.manage",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Role"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodUpdate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/memberships": {
+      "post": {
+        "operationId": "operation14",
+        "summary": "Create project membership",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "membership.manage",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created atomically with audit.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Period"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodCreate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/memberships/{id}": {
+      "patch": {
+        "operationId": "operation15",
+        "summary": "End/extend membership period",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "membership.manage",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Period"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeriodUpdate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/source-instances": {
+      "post": {
+        "operationId": "operation16",
+        "summary": "Register local source metadata",
+        "description": "Kind/label only. No URLs, credentials, network calls or connector authorization created.",
+        "x-purpose": "identity.manage",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Created atomically with audit.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Source"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SourceCreate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/source-instances/{source}/identities": {
+      "post": {
+        "operationId": "operation17",
+        "summary": "Create immutable source identity",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "identity.manage",
+        "parameters": [
+          {
+            "name": "source",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created atomically with audit.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Identity"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdentityCreate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identities/{identity}/mappings": {
+      "post": {
+        "operationId": "operation18",
+        "summary": "Propose candidate mapping",
+        "description": "Always candidate/revision1; supplied status/reviewer ignored, no attribution until authenticated human review.",
+        "x-purpose": "identity.manage",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created atomically with audit.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Mapping"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingCreate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity-mappings/{mapping}": {
+      "patch": {
+        "operationId": "operation19",
+        "summary": "Review full mapping revision",
+        "description": "Full approved/rejected review. Reviewer/changed_by authenticated actor; effective period and explicit reason required. Omitted valid_to means open end. History/audit atomic, overlap/stale409.",
+        "x-purpose": "identity.manage",
+        "parameters": [
+          {
+            "name": "mapping",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Mapping"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingReview"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identity-mappings/{mapping}/history": {
+      "get": {
+        "operationId": "operation20",
+        "summary": "List immutable mapping revision history",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "identity.read",
+        "parameters": [
+          {
+            "name": "mapping",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "after_revision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/MappingHistory"
+                      }
+                    },
+                    "next_after_revision": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "next_after_revision"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "operation20Head",
+        "summary": "Automatic HEAD counterpart",
+        "description": "Trusted tenant/actor are server-derived. Extra request fields are ignored; they cannot establish authority.",
+        "x-purpose": "identity.read",
+        "parameters": [
+          {
+            "name": "mapping",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "after_revision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/identities/{identity}/attribution": {
+      "get": {
+        "operationId": "operation21",
+        "summary": "Resolve approved mapping at event time",
+        "description": "Only approved [valid_from,valid_to) mapping; candidate/rejected or out-of-period returns data:null. Current identity.read required.",
+        "x-purpose": "identity.read",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/Attribution"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "operation21Head",
+        "summary": "Automatic HEAD counterpart",
+        "description": "Only approved [valid_from,valid_to) mapping; candidate/rejected or out-of-period returns data:null. Current identity.read required.",
+        "x-purpose": "identity.read",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/up": {
+      "get": {
+        "operationId": "liveness",
+        "summary": "Application liveness only",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Application alive; not database/model/queue/connector readiness.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "const": "ok"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "livenessHead",
+        "summary": "Automatic HEAD counterpart",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Application alive; not database/model/queue/connector readiness.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "LocalBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "opaque local tenant.token.secret",
+        "description": "Local/testing loopback only. CLI explicit bootstrap, hash-only storage, eight-hour expiry."
+      }
+    },
+    "schemas": {
+      "UUID": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "error",
+          "request_id"
+        ]
+      },
+      "Employee": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "UTC PostgreSQL timestamp text; may use a space separator rather than RFC3339."
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "UTC PostgreSQL timestamp text; may use a space separator rather than RFC3339."
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "display_name",
+          "revision",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "Department": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "UTC PostgreSQL timestamp text; may use a space separator rather than RFC3339."
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "UTC PostgreSQL timestamp text; may use a space separator rather than RFC3339."
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "name",
+          "revision",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employee_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "employee_id",
+          "display_name"
+        ]
+      },
+      "Project": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "timezone": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "name",
+          "timezone",
+          "revision"
+        ]
+      },
+      "Period": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employee_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "valid_from": {
+            "type": "string"
+          },
+          "valid_to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "UTC PostgreSQL timestamp text; may use a space separator rather than RFC3339."
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "project_id",
+          "employee_id",
+          "valid_from",
+          "valid_to",
+          "revision"
+        ]
+      },
+      "Role": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Period"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "role": {
+                "enum": [
+                  "developer",
+                  "qa",
+                  "ba",
+                  "pm",
+                  "department_head",
+                  "reviewer"
+                ]
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        ]
+      },
+      "Source": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "enum": [
+              "gitlab",
+              "task_tracker",
+              "attendance",
+              "qa",
+              "manual"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "kind",
+          "label"
+        ]
+      },
+      "Identity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_instance_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "external_user_id": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "candidate_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200
+          },
+          "candidate_email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 254
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "source_instance_id",
+          "external_user_id",
+          "candidate_name",
+          "candidate_email"
+        ]
+      },
+      "Mapping": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "identity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employee_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "candidate",
+              "approved",
+              "rejected"
+            ]
+          },
+          "reviewer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "changed_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "reviewed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "UTC PostgreSQL timestamp text; may use a space separator rather than RFC3339."
+          },
+          "valid_from": {
+            "type": "string"
+          },
+          "valid_to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "UTC PostgreSQL timestamp text; may use a space separator rather than RFC3339."
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "identity_id",
+          "employee_id",
+          "status",
+          "reviewer_id",
+          "changed_by",
+          "reason",
+          "reviewed_at",
+          "valid_from",
+          "valid_to",
+          "revision"
+        ]
+      },
+      "MappingHistory": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Mapping"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "mapping_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "recorded_at": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "mapping_id",
+              "recorded_at"
+            ]
+          }
+        ]
+      },
+      "Attribution": {
+        "type": "object",
+        "properties": {
+          "mapping_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "identity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employee_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "valid_from": {
+            "type": "string"
+          },
+          "valid_to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "UTC PostgreSQL timestamp text; may use a space separator rather than RFC3339."
+          }
+        },
+        "required": [
+          "mapping_id",
+          "identity_id",
+          "employee_id",
+          "revision",
+          "valid_from",
+          "valid_to"
+        ]
+      },
+      "EmployeeCreate": {
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "reason_code": {
+            "enum": [
+              "local_setup",
+              "approved_change"
+            ]
+          }
+        },
+        "required": [
+          "display_name",
+          "reason_code"
+        ]
+      },
+      "EmployeeUpdate": {
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "reason_code": {
+            "enum": [
+              "local_setup",
+              "approved_change"
+            ]
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483646
+          }
+        },
+        "required": [
+          "display_name",
+          "reason_code",
+          "expected_revision"
+        ]
+      },
+      "DepartmentCreate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "reason_code": {
+            "enum": [
+              "local_setup",
+              "approved_change"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "reason_code"
+        ]
+      },
+      "DepartmentUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "reason_code": {
+            "enum": [
+              "local_setup",
+              "approved_change"
+            ]
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483646
+          }
+        },
+        "required": [
+          "name",
+          "reason_code",
+          "expected_revision"
+        ]
+      },
+      "ProjectCreate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ProjectUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483646
+          }
+        },
+        "required": [
+          "name",
+          "expected_revision"
+        ]
+      },
+      "PeriodCreate": {
+        "type": "object",
+        "properties": {
+          "employee_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "valid_from": {
+            "type": "string",
+            "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+          },
+          "valid_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "employee_id",
+          "valid_from"
+        ]
+      },
+      "RoleCreate": {
+        "type": "object",
+        "properties": {
+          "employee_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "valid_from": {
+            "type": "string",
+            "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+          },
+          "valid_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "role": {
+            "enum": [
+              "developer",
+              "qa",
+              "ba",
+              "pm",
+              "department_head",
+              "reviewer"
+            ]
+          }
+        },
+        "required": [
+          "employee_id",
+          "valid_from",
+          "role"
+        ]
+      },
+      "PeriodUpdate": {
+        "type": "object",
+        "properties": {
+          "valid_to": {
+            "type": "string",
+            "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483646
+          }
+        },
+        "required": [
+          "valid_to",
+          "expected_revision"
+        ]
+      },
+      "SourceCreate": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "gitlab",
+              "task_tracker",
+              "attendance",
+              "qa",
+              "manual"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "kind",
+          "label"
+        ]
+      },
+      "IdentityCreate": {
+        "type": "object",
+        "properties": {
+          "external_user_id": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "candidate_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200
+          },
+          "candidate_email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "email",
+            "maxLength": 254
+          }
+        },
+        "required": [
+          "external_user_id"
+        ]
+      },
+      "MappingCreate": {
+        "type": "object",
+        "properties": {
+          "employee_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "valid_from": {
+            "type": "string",
+            "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+          },
+          "valid_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "employee_id",
+          "valid_from",
+          "reason"
+        ]
+      },
+      "MappingReview": {
+        "type": "object",
+        "properties": {
+          "employee_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "valid_from": {
+            "type": "string",
+            "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+          },
+          "valid_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "Laravel-valid date/time; ISO-8601 with timezone recommended."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "status": {
+            "enum": [
+              "approved",
+              "rejected"
+            ]
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483646
+          }
+        },
+        "required": [
+          "employee_id",
+          "valid_from",
+          "reason",
+          "status",
+          "expected_revision"
+        ]
+      }
+    }
+  },
+  "x-internal-contracts": [
+    "../../contracts/analysis-context-v1.schema.json",
+    "../../contracts/analysis-output-v1.schema.json"
+  ]
+}

@@ -1,7 +1,7 @@
 # AI monitoring E01 poydevori dizayni
 
 Sana: 2026-10-03
-Holat: foydalanuvchi ko‘rib chiqishi uchun taklif; mahsulot kodi hali yozilmagan.
+Holat: lokal E01 dizayni va diagrammasi foydalanuvchining reja bo‘yicha ishlash ko‘rsatmasi bilan tasdiqlandi; implementatsiya boshlandi.
 Manba: docs/requirements/AI_monitoring_Texnik_spetsifikatsiya_v1_0.docx, 3, 21, 22, 23, 24, 25 va 30.2-bo‘limlar.
 Talab havolalari: FR-001, FR-020, FR-110, FR-160, FR-200; AC-09.
 

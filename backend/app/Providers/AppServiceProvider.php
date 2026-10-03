@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Domain\Access\AccessGateway;
-use App\Domain\Access\DenyAccessGateway;
+use App\Domain\Access\DatabaseAccessGateway;
+use App\Support\PrecisePostgresConnection;
+use Illuminate\Database\Connection;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +15,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(AccessGateway::class, DenyAccessGateway::class);
+        // Register a lazy resolver; no database connection is acquired during bootstrap.
+        Connection::resolverFor('pgsql', fn ($connection, $database, $prefix, $config) => new PrecisePostgresConnection($connection, $database, $prefix, $config));
+        $this->app->bind(AccessGateway::class, DatabaseAccessGateway::class);
     }
 
     /**

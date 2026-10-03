@@ -15,7 +15,7 @@ return new class extends Migration
                 $table->uuid('tenant_id');
                 $table->string($name === 'employees' ? 'display_name' : 'name', 200);
                 $table->unsignedInteger('revision')->default(1);
-                $table->timestampsTz();
+                $table->timestampsTz(6);
                 $table->unique(['tenant_id', 'id']);
                 $table->foreign('tenant_id')->references('id')->on('tenants');
             });
@@ -25,8 +25,8 @@ return new class extends Migration
             $table->uuid('tenant_id');
             $table->uuid('employee_id');
             $table->uuid('department_id');
-            $table->timestampTz('valid_from');
-            $table->timestampTz('valid_to')->nullable();
+            $table->timestampTz('valid_from', 6);
+            $table->timestampTz('valid_to', 6)->nullable();
             $table->unsignedInteger('revision')->default(1);
             $table->foreign(['tenant_id', 'employee_id'])->references(['tenant_id', 'id'])->on('employees');
             $table->foreign(['tenant_id', 'department_id'])->references(['tenant_id', 'id'])->on('departments');
@@ -36,8 +36,8 @@ return new class extends Migration
             $table->uuid('tenant_id');
             $table->uuid('employee_id');
             $table->uuid('manager_id');
-            $table->timestampTz('valid_from');
-            $table->timestampTz('valid_to')->nullable();
+            $table->timestampTz('valid_from', 6);
+            $table->timestampTz('valid_to', 6)->nullable();
             $table->unsignedInteger('revision')->default(1);
             foreach (['employee_id', 'manager_id'] as $column) {
                 $table->foreign(['tenant_id', $column])->references(['tenant_id', 'id'])->on('employees');
@@ -58,7 +58,7 @@ return new class extends Migration
             $table->unsignedInteger('revision');
             $table->string('reason_code', 80);
             $table->uuid('correlation_id');
-            $table->timestampTz('occurred_at');
+            $table->timestampTz('occurred_at', 6);
             $table->foreign('tenant_id')->references('id')->on('tenants');
         });
         foreach (['employees', 'departments', 'department_memberships', 'reporting_relationships', 'audit_events'] as $table) {
