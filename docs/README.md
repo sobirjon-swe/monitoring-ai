@@ -1,10 +1,16 @@
 # AI monitoring hujjatlari
 
-- requirements/AI_monitoring_Texnik_spetsifikatsiya_v1_0.docx — boshlang‘ich texnik spetsifikatsiya.
-- superpowers/specs/2026-10-03-e01-foundation-design.md — ko‘rib chiqish uchun E01 dizayni.
-- design-mockups/e01-foundation-architecture.png — dizaynning tizim diagrammasi.
-- superpowers/plans/2026-10-03-e01-local-foundation-plan.md — T01–T08 kichik vazifalar va qabul tekshiruvlari.
+2026-10-03: tasdiqlangan diagramma/reja asosidagi T02–T07 lokal backend qismlari implementatsiya va mustaqil reviewdan o‘tdi. Yakuniy fix testlari 97/97 o‘tdi; T08 yakuniy branch review va scoped tuzatish reviewi tasdiqlangan. Dashboard lokal demo va UI reviewi tayyor; haqiqiy API ulash, model/inference, live integratsiya va ishlab chiqarish SSO/OPS alohida ish.
 
-2026-10-03 qarori: mahsulot AI funksiyalari faqat lokal muhitda ishlaydi; tashqi tayyor AI APIlari va cloud fallback taqiqlanadi. Bu qaror spetsifikatsiyadagi tashqi model variantini almashtiradi. Hujjatning qolgan talablari saqlanadi. Dizayn tasdiqlanmaguncha mahsulot kodi yozilmaydi.
+- [Spetsifikatsiya nusxasi](requirements/AI_monitoring_Texnik_spetsifikatsiya_v1_0.docx) — v1.0, 2026-10-02; supplied source bilan SHA256 tekshirilgan.
+- [E01 tasdiqlangan dizayn](superpowers/specs/2026-10-03-e01-foundation-design.md) va [diagramma](design-mockups/e01-foundation-architecture.png).
+- [T01–T08 reja](superpowers/plans/2026-10-03-e01-local-foundation-plan.md).
+- [Qarorlar va ochiq cheklovlar](decisions.md).
+- [HTTP OpenAPI](api/openapi.yaml) — amaldagi yo‘llar, local bearer login, validatsiya va xatolar.
+- [Umumiy data dictionary](data/e01-dictionary.md) — modul lug‘atlariga havolalar, tenant/vaqt/audit invariantlari.
+- [Lokal development](operations/local-development.md), [PostgreSQL](operations/postgresql-local.md), [lokal autentifikatsiya](operations/local-authentication.md).
+- [E01 lokal qabul dalillari](acceptance/e01.md) — FR/AC doirasi, tekshiruvlar va qolgan ishlar.
 
-Joriy etish tartibi: avval ilova, PostgreSQL va AI shu kompyuterda ishga tushiriladi. Lokal natija foydalanuvchi tomonidan tasdiqlangach ichki serverga ko‘chiriladi. Serverga deploy alohida ish; muhit sozlamalari kodga qotirib yozilmaydi.
+Barcha mahsulot AI hisoblashlari faqat shu kompyuter yoki kompaniya boshqaradigan infratuzilmada bajariladi; tashqi AI API va cloud fallback taqiqlangan. Model keyingi bosqichda tanlanib ishlatiladi. Ruxsatli read-only source API integratsiyasi inference xizmatidan alohida.
+
+Avval ishlaydigan lokal natija foydalanuvchiga topshiriladi. Ichki serverga ko‘chirish faqat shu natija tasdig‘idan keyin alohida ruxsat bilan bajariladi; avtomatik deploy yoqilmagan. Sirlar `.env`, `.env.testing`, `.local/db-config.json`da ignored holatda qoladi va hujjatga ko‘chirilmaydi.
