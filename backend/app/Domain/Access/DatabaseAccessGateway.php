@@ -9,7 +9,9 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class DatabaseAccessGateway implements AccessGateway
 {
-    public const PURPOSES = ['organization.read', 'organization.manage', 'project.create', 'project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'identity.read', 'identity.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process'];
+    public const LIFECYCLE_PURPOSES = ['requirements.read', 'requirements.manage', 'requirements.approve', 'policy.approve', 'baseline.approve', 'evidence.review', 'acceptance.review', 'progress.read', 'lifecycle.process'];
+
+    public const PURPOSES = [...self::LIFECYCLE_PURPOSES, 'organization.read', 'organization.manage', 'project.create', 'project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'identity.read', 'identity.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process'];
 
     public function __construct(private readonly TenantContext $context) {}
 
@@ -36,7 +38,7 @@ class DatabaseAccessGateway implements AccessGateway
             }
             $project = $scope['project_id'] ?? null;
             $department = $scope['department_id'] ?? null;
-            if (in_array($purpose, ['project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process'], true) && $project === null) {
+            if (in_array($purpose, ['project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process', ...self::LIFECYCLE_PURPOSES], true) && $project === null) {
                 return false;
             }
             if ($project !== null && ($user->employee_id === null || ! DB::table('project_memberships')
@@ -55,7 +57,12 @@ class DatabaseAccessGateway implements AccessGateway
                 ->whereNull('g.revoked_at')->where('g.valid_from', '<=', $instant)
                 ->where(fn ($q) => $q->whereNull('g.valid_to')->orWhere('g.valid_to', '>', $instant));
             // An unscoped list requires an explicitly tenant-wide grant.
-            $grants->where(function ($q) use ($project, $department): void {
+            $grants->where(function ($q) use ($project, $department, $purpose): void {
+                if (in_array($purpose, self::LIFECYCLE_PURPOSES, true)) {
+                    $q->where('g.scope_type', 'project')->where('g.project_id', $project);
+
+                    return;
+                }
                 $q->where('g.scope_type', 'tenant');
                 if ($project !== null) {
                     $q->orWhere(fn ($q) => $q->where('g.scope_type', 'project')->where('g.project_id', $project));

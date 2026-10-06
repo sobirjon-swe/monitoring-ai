@@ -1,0 +1,7 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "oneOf": [
+    {"type":"object","additionalProperties":false,"required":["criterion_version_id","receipt_id","canonical_hash","locator"],"properties":{"criterion_version_id":{"type":"string","format":"uuid"},"receipt_id":{"type":"string","format":"uuid"},"canonical_hash":{"type":"string","pattern":"^[0-9a-f]{64}$"},"locator":{"enum":["payload.title","payload.status","payload.external_ticket_id"]}}},
+    {"type":"object","additionalProperties":false,"required":["criterion_version_id","link_id","test_key","result"],"properties":{"criterion_version_id":{"type":"string","format":"uuid"},"link_id":{"type":"string","format":"uuid"},"test_key":{"type":"string","minLength":1,"maxLength":100},"result":{"enum":["passed","failed","missing"]}}}
+  ]
+}

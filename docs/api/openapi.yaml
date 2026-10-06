@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Monitoring AI local E01 foundation and synthetic E02 ingestion",
-    "version": "1.1.0",
-    "description": "JSON syntax is valid YAML1.2. Local/testing loopback opaque bearer tokens only; production SSO and UI not implemented. Tenant/project scopes and current grants/membership are server-controlled. No T07 HTTP/model endpoint: analysis contracts are synthetic-only internal client. Responses may contain UTC PostgreSQL timestamp text, not uniformly RFC3339. HEAD uses the same read permissions and handler as GET and has an empty body; only POST/PATCH mutate. UTC timestamps preserve up to six fractional digits through validation, timestamptz(6) storage and event/access-time bindings. Periods remain [valid_from,valid_to) at microsecond precision. E02 I1/I2 provide synthetic-v1 manual-source connector bindings and bounded durable receipt/outbox acceptance. No real source API, webhook verification, raw receipt read, settings update, production worker identity or external AI inference. I3 local outbox processing and I4 projection/status are implemented and independently reviewed. Whole-unit code review found no Critical or Important blockers; dedicated dev incremental migrations000007/000008 and rollback-scoped synthetic acceptance/replay/CLI projection smoke were verified by the lead. Scoped metadata re-review approved. This synthetic foundation does not establish full E02 or production readiness. Source freshness remains unknown."
+    "title": "Monitoring AI local foundation, synthetic ingestion and lifecycle",
+    "version": "1.2.0",
+    "description": "JSON syntax is valid YAML1.2. Local/testing loopback opaque bearer tokens only; production SSO and UI not implemented. Tenant/project scopes and current grants/membership are server-controlled. No T07 HTTP/model endpoint: analysis contracts are synthetic-only internal client. Responses may contain UTC PostgreSQL timestamp text, not uniformly RFC3339. HEAD uses the same read permissions and handler as GET and has an empty body; only POST/PATCH mutate. UTC timestamps preserve up to six fractional digits through validation, timestamptz(6) storage and event/access-time bindings. Periods remain [valid_from,valid_to) at microsecond precision. E02 I1/I2 provide synthetic-v1 manual-source connector bindings and bounded durable receipt/outbox acceptance. No real source API, webhook verification, raw receipt read, settings update, production worker identity or external AI inference. I3 local outbox processing and I4 projection/status are implemented and independently reviewed. Whole-unit code review found no Critical or Important blockers; dedicated dev incremental migrations000007/000008 and rollback-scoped synthetic acceptance/replay/CLI projection smoke were verified by the lead. Scoped metadata re-review approved. This synthetic foundation does not establish full E02 or production readiness. Source freshness remains unknown. E03 deterministic synthetic lifecycle implements versioned requirements/tasks, reviewed receipt links, synthetic QA, immutable baselines/human decisions, exact progress and selective durable applicability invalidation. R6 final whole-unit/scoped review, ten dev incrementals000009–000014, rollback smoke and218-test verification passed; no full E03/AC06 or production readiness claim. Lifecycle transport rejects extra authority fields, duplicate keys, decoded NUL and object/array ambiguity; max65536 bytes/depth16. No inference or live CI."
   },
   "servers": [
     {
@@ -17,6 +17,2496 @@
     }
   ],
   "paths": {
+"/api/v1/projects/{project}/requirements": {
+        "get": {
+            "operationId": "lifecycleGetRequirements",
+            "summary": "Get requirements",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. GET/HEAD nonmutating; HEAD same authorization, empty body. data is an array; cursor is last returned id, no next_cursor wrapper.",
+            "x-purpose": "requirements.read",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                {
+                    "name": "limit",
+                    "in": "query",
+                    "schema": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    }
+                },
+                {
+                    "name": "cursor",
+                    "in": "query",
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "array",
+                                        "maxItems": 100,
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "id",
+                                                "requirement_id",
+                                                "version",
+                                                "draft_revision",
+                                                "content_hash",
+                                                "approved_at"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "requirement_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "version": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "draft_revision": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "content_hash": {
+                                                    "type": "string"
+                                                },
+                                                "approved_at": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            }
+        },
+        "head": {
+            "operationId": "lifecycleGetRequirementsHead",
+            "summary": "Get requirements",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. GET/HEAD nonmutating; HEAD same authorization, empty body.",
+            "x-purpose": "requirements.read",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                {
+                    "name": "limit",
+                    "in": "query",
+                    "schema": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    }
+                },
+                {
+                    "name": "cursor",
+                    "in": "query",
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Bounded lifecycle metadata wrapped in data"
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            }
+        },
+        "post": {
+            "operationId": "lifecyclePostRequirements",
+            "summary": "Post requirements",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409.",
+            "x-purpose": "requirements.manage",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "requirement_id",
+                                            "revision"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "requirement_id",
+                                            "revision"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "requirement_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "revision": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/LifecycleRequirement"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/requirement-drafts/{draft}": {
+        "patch": {
+            "operationId": "lifecyclePatchRequirementDraftsdraft",
+            "summary": "Patch requirement-drafts/{draft}",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409.",
+            "x-purpose": "requirements.manage",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                {
+                    "name": "draft",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "requirement_id",
+                                            "revision"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "requirement_id",
+                                            "revision"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "requirement_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "revision": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                                "title",
+                                "owner_id",
+                                "stakeholder",
+                                "business_outcome",
+                                "nfr_constraints",
+                                "dependencies",
+                                "criteria",
+                                "expected_revision"
+                            ],
+                            "properties": {
+                                "title": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 500
+                                },
+                                "owner_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "stakeholder": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 500
+                                },
+                                "business_outcome": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 4000
+                                },
+                                "nfr_constraints": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "maxItems": 100,
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 4000
+                                    }
+                                },
+                                "dependencies": {
+                                    "type": "array",
+                                    "maxItems": 100,
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 100
+                                    }
+                                },
+                                "criteria": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "maxItems": 100,
+                                    "items": {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "key",
+                                            "text",
+                                            "required_test_keys"
+                                        ],
+                                        "properties": {
+                                            "key": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "maxLength": 100
+                                            },
+                                            "text": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "maxLength": 4000
+                                            },
+                                            "required_test_keys": {
+                                                "type": "array",
+                                                "minItems": 1,
+                                                "maxItems": 20,
+                                                "uniqueItems": true,
+                                                "items": {
+                                                    "type": "string",
+                                                    "minLength": 1,
+                                                    "maxLength": 100
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "expected_revision": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/requirement-drafts/{draft}/approve": {
+        "post": {
+            "operationId": "lifecyclePostRequirementDraftsdraftApprove",
+            "summary": "Post requirement-drafts/{draft}/approve",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409.",
+            "x-purpose": "requirements.approve",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                {
+                    "name": "draft",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "requirement_id",
+                                            "version",
+                                            "hash",
+                                            "criteria",
+                                            "generation"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "requirement_id",
+                                            "version",
+                                            "hash",
+                                            "criteria",
+                                            "generation"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "requirement_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "version": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            },
+                                            "hash": {
+                                                "type": "string"
+                                            },
+                                            "criteria": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "id",
+                                                        "key",
+                                                        "version_id"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "uuid"
+                                                        },
+                                                        "key": {
+                                                            "type": "string"
+                                                        },
+                                                        "version_id": {
+                                                            "type": "string",
+                                                            "format": "uuid"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "generation": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "expected_revision": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "expected_generation": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "reason": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 500
+                                }
+                            },
+                            "required": [
+                                "expected_revision",
+                                "expected_generation",
+                                "reason"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/dod-policies": {
+        "post": {
+            "operationId": "lifecyclePostDodPolicies",
+            "summary": "Post dod-policies",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409.",
+            "x-purpose": "policy.approve",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "version",
+                                            "hash",
+                                            "generation"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "version",
+                                            "hash",
+                                            "generation"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "version": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            },
+                                            "hash": {
+                                                "type": "string"
+                                            },
+                                            "generation": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "mandatory_qa": {
+                                    "const": true
+                                },
+                                "human_acceptance": {
+                                    "const": true
+                                },
+                                "fictional": {
+                                    "const": true
+                                },
+                                "expected_generation": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                }
+                            },
+                            "required": [
+                                "mandatory_qa",
+                                "human_acceptance",
+                                "fictional",
+                                "expected_generation"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/lifecycle-tasks": {
+        "get": {
+            "operationId": "lifecycleGetLifecycleTasks",
+            "summary": "Get lifecycle-tasks",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. GET/HEAD nonmutating; HEAD same authorization, empty body. data is an array; cursor is last returned id, no next_cursor wrapper.",
+            "x-purpose": "requirements.read",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                {
+                    "name": "limit",
+                    "in": "query",
+                    "schema": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    }
+                },
+                {
+                    "name": "cursor",
+                    "in": "query",
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "array",
+                                        "maxItems": 100,
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "id",
+                                                "revision",
+                                                "version_id",
+                                                "title",
+                                                "assignee_id",
+                                                "estimate_basis",
+                                                "remaining_effort",
+                                                "expected_test_keys",
+                                                "status",
+                                                "content_hash",
+                                                "effective_at"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "revision": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "version_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "assignee_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "estimate_basis": {
+                                                    "type": "string"
+                                                },
+                                                "remaining_effort": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "expected_test_keys": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "content_hash": {
+                                                    "type": "string"
+                                                },
+                                                "effective_at": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            }
+        },
+        "head": {
+            "operationId": "lifecycleGetLifecycleTasksHead",
+            "summary": "Get lifecycle-tasks",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. GET/HEAD nonmutating; HEAD same authorization, empty body.",
+            "x-purpose": "requirements.read",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                {
+                    "name": "limit",
+                    "in": "query",
+                    "schema": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    }
+                },
+                {
+                    "name": "cursor",
+                    "in": "query",
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Bounded lifecycle metadata wrapped in data"
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            }
+        },
+        "post": {
+            "operationId": "lifecyclePostLifecycleTasks",
+            "summary": "Post lifecycle-tasks",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409.",
+            "x-purpose": "requirements.manage",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "version_id",
+                                            "revision",
+                                            "hash",
+                                            "generation"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "version_id",
+                                            "revision",
+                                            "hash",
+                                            "generation"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "version_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "revision": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            },
+                                            "hash": {
+                                                "type": "string"
+                                            },
+                                            "generation": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$id": "urn:monitoring-ai:lifecycle-task:v1",
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                                "title",
+                                "assignee_id",
+                                "estimate_basis",
+                                "remaining_effort",
+                                "expected_test_keys",
+                                "status",
+                                "criterion_links",
+                                "expected_generation"
+                            ],
+                            "properties": {
+                                "title": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 500
+                                },
+                                "assignee_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "estimate_basis": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 4000
+                                },
+                                "remaining_effort": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ],
+                                    "minimum": 0,
+                                    "maximum": 9007199254740991
+                                },
+                                "expected_test_keys": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "maxItems": 20,
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 100
+                                    }
+                                },
+                                "status": {
+                                    "enum": [
+                                        "unstarted",
+                                        "in_progress",
+                                        "blocked",
+                                        "implemented_awaiting_verification",
+                                        "done"
+                                    ]
+                                },
+                                "criterion_links": {
+                                    "type": "array",
+                                    "maxItems": 100,
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "criterion_id",
+                                            "criterion_version_id"
+                                        ],
+                                        "properties": {
+                                            "criterion_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "criterion_version_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            }
+                                        }
+                                    }
+                                },
+                                "source_receipt": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "connector_id",
+                                        "source_instance_id",
+                                        "source_object_type",
+                                        "source_object_id",
+                                        "receipt_id"
+                                    ],
+                                    "properties": {
+                                        "connector_id": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "source_instance_id": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "source_object_type": {
+                                            "const": "ticket"
+                                        },
+                                        "source_object_id": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 100
+                                        },
+                                        "receipt_id": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "expected_generation": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/lifecycle-tasks/{task}": {
+        "patch": {
+            "operationId": "lifecyclePatchLifecycleTaskstask",
+            "summary": "Patch lifecycle-tasks/{task}",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409.",
+            "x-purpose": "requirements.manage",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                {
+                    "name": "task",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "version_id",
+                                            "revision",
+                                            "hash",
+                                            "generation"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "version_id",
+                                            "revision",
+                                            "hash",
+                                            "generation"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "version_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "revision": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            },
+                                            "hash": {
+                                                "type": "string"
+                                            },
+                                            "generation": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$id": "urn:monitoring-ai:lifecycle-task:v1",
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                                "title",
+                                "assignee_id",
+                                "estimate_basis",
+                                "remaining_effort",
+                                "expected_test_keys",
+                                "status",
+                                "criterion_links",
+                                "expected_generation",
+                                "expected_revision"
+                            ],
+                            "properties": {
+                                "title": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 500
+                                },
+                                "assignee_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "estimate_basis": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 4000
+                                },
+                                "remaining_effort": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ],
+                                    "minimum": 0,
+                                    "maximum": 9007199254740991
+                                },
+                                "expected_test_keys": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "maxItems": 20,
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 100
+                                    }
+                                },
+                                "status": {
+                                    "enum": [
+                                        "unstarted",
+                                        "in_progress",
+                                        "blocked",
+                                        "implemented_awaiting_verification",
+                                        "done"
+                                    ]
+                                },
+                                "criterion_links": {
+                                    "type": "array",
+                                    "maxItems": 100,
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "criterion_id",
+                                            "criterion_version_id"
+                                        ],
+                                        "properties": {
+                                            "criterion_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "criterion_version_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            }
+                                        }
+                                    }
+                                },
+                                "source_receipt": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "connector_id",
+                                        "source_instance_id",
+                                        "source_object_type",
+                                        "source_object_id",
+                                        "receipt_id"
+                                    ],
+                                    "properties": {
+                                        "connector_id": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "source_instance_id": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "source_object_type": {
+                                            "const": "ticket"
+                                        },
+                                        "source_object_id": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 100
+                                        },
+                                        "receipt_id": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "expected_generation": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "expected_revision": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/lifecycle-tasks/{task}/dependencies": {
+        "post": {
+            "operationId": "lifecyclePostLifecycleTaskstaskDependencies",
+            "summary": "Post lifecycle-tasks/{task}/dependencies",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409.",
+            "x-purpose": "requirements.manage",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                {
+                    "name": "task",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "task_id",
+                                            "prerequisite_id",
+                                            "generation"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "task_id",
+                                            "prerequisite_id",
+                                            "generation"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "task_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "prerequisite_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "generation": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "prerequisite_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "expected_generation": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                }
+                            },
+                            "required": [
+                                "prerequisite_id",
+                                "expected_generation"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/evidence-links": {
+        "post": {
+            "operationId": "lifecyclePostEvidenceLinks",
+            "summary": "Post evidence-links",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. ingestion.read is independently required for authorized source eligibility/favorable delivery.",
+            "x-purpose": "evidence.review",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "revision",
+                                            "canonical_hash",
+                                            "state",
+                                            "generation"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "revision",
+                                            "canonical_hash",
+                                            "state",
+                                            "generation"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "revision": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            },
+                                            "canonical_hash": {
+                                                "type": "string"
+                                            },
+                                            "state": {
+                                                "type": "string"
+                                            },
+                                            "generation": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                                "criterion_version_id",
+                                "receipt_id",
+                                "canonical_hash",
+                                "locator",
+                                "expected_generation"
+                            ],
+                            "properties": {
+                                "criterion_version_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "receipt_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "canonical_hash": {
+                                    "type": "string",
+                                    "pattern": "^[0-9a-f]{64}$"
+                                },
+                                "locator": {
+                                    "enum": [
+                                        "payload.title",
+                                        "payload.status",
+                                        "payload.external_ticket_id"
+                                    ]
+                                },
+                                "expected_generation": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/evidence-links/{link}/reviews": {
+        "post": {
+            "operationId": "lifecyclePostEvidenceLinkslinkReviews",
+            "summary": "Post evidence-links/{link}/reviews",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. ingestion.read is independently required for authorized source eligibility/favorable delivery.",
+            "x-purpose": "evidence.review",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                {
+                    "name": "link",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "link_id",
+                                            "revision",
+                                            "state",
+                                            "generation"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "link_id",
+                                            "revision",
+                                            "state",
+                                            "generation"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "link_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "revision": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            },
+                                            "state": {
+                                                "type": "string"
+                                            },
+                                            "generation": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "decision": {
+                                    "enum": [
+                                        "reviewed",
+                                        "rejected",
+                                        "revoked"
+                                    ]
+                                },
+                                "reason": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 500
+                                },
+                                "expected_revision": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "expected_generation": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                }
+                            },
+                            "required": [
+                                "decision",
+                                "reason",
+                                "expected_revision",
+                                "expected_generation"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/qa-observations": {
+        "post": {
+            "operationId": "lifecyclePostQaObservations",
+            "summary": "Post qa-observations",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. ingestion.read is independently required for authorized source eligibility/favorable delivery.",
+            "x-purpose": "evidence.review",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "test_identity_id",
+                                            "revision",
+                                            "state",
+                                            "synthetic",
+                                            "generation"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "test_identity_id",
+                                            "revision",
+                                            "state",
+                                            "synthetic",
+                                            "generation"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "test_identity_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "revision": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            },
+                                            "state": {
+                                                "type": "string"
+                                            },
+                                            "synthetic": {
+                                                "const": true
+                                            },
+                                            "generation": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                                "criterion_version_id",
+                                "link_id",
+                                "test_key",
+                                "result",
+                                "expected_revision",
+                                "expected_generation"
+                            ],
+                            "properties": {
+                                "criterion_version_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "link_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "test_key": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 100
+                                },
+                                "result": {
+                                    "enum": [
+                                        "passed",
+                                        "failed",
+                                        "missing"
+                                    ]
+                                },
+                                "expected_revision": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "expected_generation": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/baselines": {
+        "post": {
+            "operationId": "lifecyclePostBaselines",
+            "summary": "Post baselines",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. Creating a new frozen historical snapshot requires independent ingestion.read; missing source access denies the entire operation atomically. Initial baseline creation and already-frozen history do not create a historical snapshot. baseline.approve does not grant source access. New action timestamps use the database server clock after coordination; retained history is unchanged.",
+            "x-purpose": "baseline.approve",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "policy_id",
+                                            "hash",
+                                            "previous_baseline_id",
+                                            "status",
+                                            "generation"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "policy_id",
+                                            "hash",
+                                            "previous_baseline_id",
+                                            "status",
+                                            "generation"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "policy_id": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "format": "uuid"
+                                            },
+                                            "hash": {
+                                                "type": "string"
+                                            },
+                                            "previous_baseline_id": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "format": "uuid"
+                                            },
+                                            "status": {
+                                                "type": "string"
+                                            },
+                                            "generation": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/LifecycleBaseline"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/baseline-close": {
+        "post": {
+            "operationId": "lifecyclePostBaselineClose",
+            "summary": "Post baseline-close",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. Creating a new frozen historical snapshot requires independent ingestion.read; missing source access denies the entire operation atomically. Initial baseline creation and already-frozen history do not create a historical snapshot. baseline.approve does not grant source access. New action timestamps use the database server clock after coordination; retained history is unchanged.",
+            "x-purpose": "baseline.approve",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "status",
+                                            "generation"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "status",
+                                            "generation"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "status": {
+                                                "type": "string"
+                                            },
+                                            "generation": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "expected_generation": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "reason": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 500
+                                }
+                            },
+                            "required": [
+                                "expected_generation",
+                                "reason"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/acceptance-decisions": {
+        "post": {
+            "operationId": "lifecyclePostAcceptanceDecisions",
+            "summary": "Post acceptance-decisions",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. ingestion.read is independently required for authorized source eligibility/favorable delivery.",
+            "x-purpose": "acceptance.review",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "id",
+                                            "baseline_id",
+                                            "criterion_version_id",
+                                            "pins_hash",
+                                            "status",
+                                            "generation"
+                                        ],
+                                        "x-exact-fields": [
+                                            "id",
+                                            "baseline_id",
+                                            "criterion_version_id",
+                                            "pins_hash",
+                                            "status",
+                                            "generation"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "baseline_id": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "format": "uuid"
+                                            },
+                                            "criterion_version_id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "pins_hash": {
+                                                "type": "string"
+                                            },
+                                            "status": {
+                                                "type": "string"
+                                            },
+                                            "generation": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            },
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "baseline_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "criterion_version_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "reviewed_link_ids": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "maxItems": 100,
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "expected_generation": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "reason": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 500
+                                }
+                            },
+                            "required": [
+                                "baseline_id",
+                                "criterion_version_id",
+                                "reviewed_link_ids",
+                                "expected_generation",
+                                "reason"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/v1/projects/{project}/progress": {
+        "get": {
+            "operationId": "lifecycleGetProgress",
+            "summary": "Get progress",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. GET/HEAD nonmutating; HEAD same authorization, empty body. Only optional baseline_id query is allowed. Source access checked independently. Exact integer numerator/denominator; basis points=floor(accepted*10000/total), null when unavailable. Frozen snapshots additionally have as_of. ingestion.read is independently required for authorized source eligibility/favorable delivery.",
+            "x-purpose": "progress.read",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                {
+                    "name": "baseline_id",
+                    "in": "query",
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Bounded lifecycle metadata wrapped in data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "required": [
+                                            "status",
+                                            "accepted_weight",
+                                            "total_weight",
+                                            "percentage_basis_points",
+                                            "baseline_id",
+                                            "policy_id",
+                                            "coverage_reason_codes",
+                                            "previous_snapshot",
+                                            "schedule_coverage"
+                                        ],
+                                        "x-exact-fields": [
+                                            "status",
+                                            "accepted_weight",
+                                            "total_weight",
+                                            "percentage_basis_points",
+                                            "baseline_id",
+                                            "policy_id",
+                                            "coverage_reason_codes",
+                                            "previous_snapshot",
+                                            "schedule_coverage"
+                                        ],
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "status": {
+                                                "enum": [
+                                                    "available",
+                                                    "partial",
+                                                    "unavailable"
+                                                ]
+                                            },
+                                            "accepted_weight": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            },
+                                            "total_weight": {
+                                                "type": "integer",
+                                                "minimum": 0
+                                            },
+                                            "percentage_basis_points": {
+                                                "type": [
+                                                    "integer",
+                                                    "null"
+                                                ],
+                                                "minimum": 0,
+                                                "maximum": 10000
+                                            },
+                                            "baseline_id": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "format": "uuid"
+                                            },
+                                            "policy_id": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "format": "uuid"
+                                            },
+                                            "coverage_reason_codes": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "previous_snapshot": {
+                                                "type": [
+                                                    "object",
+                                                    "null"
+                                                ]
+                                            },
+                                            "schedule_coverage": {
+                                                "type": "object",
+                                                "required": [
+                                                    "status",
+                                                    "reason_codes",
+                                                    "cycle_task_ids",
+                                                    "missing_estimate_task_ids"
+                                                ]
+                                            },
+                                            "as_of": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            }
+        },
+        "head": {
+            "operationId": "lifecycleGetProgressHead",
+            "summary": "Get progress",
+            "description": "Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. GET/HEAD nonmutating; HEAD same authorization, empty body. Only optional baseline_id query is allowed. Source access checked independently. Exact integer numerator/denominator; basis points=floor(accepted*10000/total), null when unavailable. Frozen snapshots additionally have as_of. ingestion.read is independently required for authorized source eligibility/favorable delivery.",
+            "x-purpose": "progress.read",
+            "parameters": [
+                {
+                    "name": "project",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                {
+                    "name": "baseline_id",
+                    "in": "query",
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Bounded lifecycle metadata wrapped in data"
+                },
+                "401": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "403": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "404": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "409": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "413": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                },
+                "422": {
+                    "description": "Sanitized error with request_id; no source payload or authority proof"
+                }
+            }
+        }
+    },
     "/api/v1/employees": {
       "get": {
         "operationId": "operation1",
@@ -5411,6 +7901,338 @@
       }
     },
     "schemas": {
+"LifecycleRequirement": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "title",
+            "owner_id",
+            "stakeholder",
+            "business_outcome",
+            "nfr_constraints",
+            "dependencies",
+            "criteria"
+        ],
+        "properties": {
+            "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+            },
+            "owner_id": {
+                "type": "string",
+                "format": "uuid"
+            },
+            "stakeholder": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+            },
+            "business_outcome": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+            },
+            "nfr_constraints": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 100,
+                "uniqueItems": true,
+                "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                }
+            },
+            "dependencies": {
+                "type": "array",
+                "maxItems": 100,
+                "uniqueItems": true,
+                "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                }
+            },
+            "criteria": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 100,
+                "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "key",
+                        "text",
+                        "required_test_keys"
+                    ],
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                        },
+                        "text": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 4000
+                        },
+                        "required_test_keys": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 20,
+                            "uniqueItems": true,
+                            "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 100
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "LifecycleTask": {
+        "$id": "urn:monitoring-ai:lifecycle-task:v1",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "title",
+            "assignee_id",
+            "estimate_basis",
+            "remaining_effort",
+            "expected_test_keys",
+            "status",
+            "criterion_links"
+        ],
+        "properties": {
+            "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+            },
+            "assignee_id": {
+                "type": "string",
+                "format": "uuid"
+            },
+            "estimate_basis": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+            },
+            "remaining_effort": {
+                "type": [
+                    "integer",
+                    "null"
+                ],
+                "minimum": 0,
+                "maximum": 9007199254740991
+            },
+            "expected_test_keys": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 20,
+                "uniqueItems": true,
+                "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                }
+            },
+            "status": {
+                "enum": [
+                    "unstarted",
+                    "in_progress",
+                    "blocked",
+                    "implemented_awaiting_verification",
+                    "done"
+                ]
+            },
+            "criterion_links": {
+                "type": "array",
+                "maxItems": 100,
+                "uniqueItems": true,
+                "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "criterion_id",
+                        "criterion_version_id"
+                    ],
+                    "properties": {
+                        "criterion_id": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "criterion_version_id": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                }
+            },
+            "source_receipt": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "connector_id",
+                    "source_instance_id",
+                    "source_object_type",
+                    "source_object_id",
+                    "receipt_id"
+                ],
+                "properties": {
+                    "connector_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "source_instance_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "source_object_type": {
+                        "const": "ticket"
+                    },
+                    "source_object_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                    },
+                    "receipt_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            }
+        }
+    },
+    "LifecycleBaseline": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "items",
+            "policy_id",
+            "expected_current_baseline_id",
+            "expected_generation",
+            "reason"
+        ],
+        "properties": {
+            "items": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "criterion_version_id",
+                        "weight"
+                    ],
+                    "properties": {
+                        "criterion_version_id": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "weight": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 1000000
+                        },
+                        "carry_decision_id": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                }
+            },
+            "policy_id": {
+                "type": "string",
+                "format": "uuid"
+            },
+            "expected_current_baseline_id": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "format": "uuid"
+            },
+            "expected_generation": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+            },
+            "reopen": {
+                "type": "boolean"
+            }
+        }
+    },
+    "EvidenceProposal": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "criterion_version_id",
+            "receipt_id",
+            "canonical_hash",
+            "locator"
+        ],
+        "properties": {
+            "criterion_version_id": {
+                "type": "string",
+                "format": "uuid"
+            },
+            "receipt_id": {
+                "type": "string",
+                "format": "uuid"
+            },
+            "canonical_hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+            },
+            "locator": {
+                "enum": [
+                    "payload.title",
+                    "payload.status",
+                    "payload.external_ticket_id"
+                ]
+            }
+        }
+    },
+    "QaObservation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "criterion_version_id",
+            "link_id",
+            "test_key",
+            "result"
+        ],
+        "properties": {
+            "criterion_version_id": {
+                "type": "string",
+                "format": "uuid"
+            },
+            "link_id": {
+                "type": "string",
+                "format": "uuid"
+            },
+            "test_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+            },
+            "result": {
+                "enum": [
+                    "passed",
+                    "failed",
+                    "missing"
+                ]
+            }
+        }
+    },
       "UUID": {
         "type": "string",
         "format": "uuid"
@@ -6504,6 +9326,10 @@
   "x-internal-contracts": [
     "../../contracts/analysis-context-v1.schema.json",
     "../../contracts/analysis-output-v1.schema.json",
-    "../../contracts/ingestion-envelope-v1.schema.json"
+    "../../contracts/ingestion-envelope-v1.schema.json",
+    "../../contracts/lifecycle-requirement-v1.schema.json",
+    "../../contracts/lifecycle-task-v1.schema.json",
+    "../../contracts/lifecycle-evidence-v1.schema.json",
+    "../../contracts/lifecycle-baseline-v1.schema.json"
   ]
 }

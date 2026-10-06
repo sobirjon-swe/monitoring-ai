@@ -1,0 +1,13 @@
+{
+  "$schema":"http://json-schema.org/draft-07/schema#",
+  "type":"object","additionalProperties":false,
+  "required":["items","policy_id","expected_current_baseline_id","expected_generation","reason"],
+  "properties":{
+    "items":{"type":"array","maxItems":100,"items":{"type":"object","additionalProperties":false,"required":["criterion_version_id","weight"],"properties":{"criterion_version_id":{"type":"string","format":"uuid"},"weight":{"type":"integer","minimum":1,"maximum":1000000},"carry_decision_id":{"type":"string","format":"uuid"}}}},
+    "policy_id":{"type":"string","format":"uuid"},
+    "expected_current_baseline_id":{"type":["string","null"],"format":"uuid"},
+    "expected_generation":{"type":"integer","minimum":0},
+    "reason":{"type":"string","minLength":1,"maxLength":500},
+    "reopen":{"type":"boolean"}
+  }
+}

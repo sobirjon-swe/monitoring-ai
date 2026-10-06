@@ -48,7 +48,7 @@ Hozir ignored .env/.env.testing/.local/db-config.json tayyor. Boshqa nusxada [Po
 
 Ignored local config runtime_username/password → DB_USERNAME/PASSWORD; migration_username/password → DB_MIGRATION_USERNAME/PASSWORD. .env.testing ham alohida tayyorlanadi. Endpoint/path/credential muhit konfiguratsiyasi; serverga avtomatik ko‘chirilmaydi.
 
-## Real buyruqlar
+## 2026-10-03 tarixiy buyruqlar (joriy runtime yuqorida)
 
 Repository ildizidan Set-Location backend qilib:
 
@@ -61,7 +61,7 @@ php artisan serve --host=127.0.0.1 --port=8000
 
 000001–000006 migrationlar dedicated dev/testga inkremental qo‘llangan; reset/fresh/seed ishlatilmagan. Guard actual local database/login/marker va shu migration connectionda owner SET ROLEni tekshiradi; keyin owner connection purged. Install/dev DB/admin/npm/model downloadni avtomatik bajarmaydi. Session/cache faylda, queue sync — qimmat analysis durability mexanizmi emas.
 
-Joriy root-owned server 127.0.0.1:8000da ishlaydi. Port band bo‘lsa loyiha serverini qayta ishlating; duplicate server yoki server deploy avtomatik boshlanmaydi. [Explicit lokal login](local-authentication.md) faqat tanlangan user/subject/grantlarni yaratadi.
+2026-10-03 tarixiy server 127.0.0.1:8000da ishlagan; joriy endpoint18080. Port band bo‘lsa loyiha serverini qayta ishlating; duplicate server yoki server deploy avtomatik boshlanmaydi. [Explicit lokal login](local-authentication.md) faqat tanlangan user/subject/grantlarni yaratadi.
 
 ```powershell
 composer validate --strict
@@ -78,8 +78,10 @@ IdentityMappingTest va AuthorizedContextTest filterlari bilan tegishli behavior 
 
 /up faqat liveness, DB/model/queue/connector readiness emas. / 404 JSON. [Product endpoints](../api/openapi.yaml) local bearer va current grant/membership talab qiladi. Errorlar debug bo‘lsa ham safe JSON/request_id; validation generic field xabar; Retry-After/Allow saqlanadi; log faqat correlation/type, raw SQL/DSN/prompt emas.
 
-## Ochiq scope
+## Joriy ochiq scope
 
-Production SSO/MFA, token rotation, FastAPI/model/worker, connectors/outbox, RAG/exports/notifications, backup/restore/rollback, retention/deletion, latency/load va real AI secret scanning/offline inference sinovlari bu poydevorda bajarilmagan. PostgreSQL trust va boshqa DB PUBLIC CONNECT cheklovlari [alohida qayd etilgan](postgresql-local.md), o‘zgartirilmagan. NFR-005 yoki production isolation da’vosi yo‘q.
+Production SSO/MFA, token rotation, FastAPI/model/production worker, real source adapters, RAG/exports/notifications, backup/restore/rollback, retention/deletion, latency/load va real AI secret scanning/offline inference sinovlari bu poydevorda bajarilmagan. PostgreSQL trust va boshqa DB PUBLIC CONNECT cheklovlari [alohida qayd etilgan](postgresql-local.md), o‘zgartirilmagan. NFR-005 yoki production isolation da’vosi yo‘q.
 
-Barcha product AI lokal/company-controlled; external inference/telemetry/fallback yo‘q. T07 faqat synthetic JSON kontrakt, haqiqiy model yoki sifat o‘lchovi emas. UI tasdiqlanmagan/frontend tanlanmagan. Serverga ko‘chirish faqat lokal natija tasdig‘idan keyin alohida ruxsat bilan, automatic deploy yo‘q.
+Barcha product AI lokal/company-controlled; external inference/telemetry/fallback yo‘q. T07 faqat synthetic JSON kontrakt, haqiqiy model yoki sifat o‘lchovi emas. Dashboard v1 image/demo approved; production frontend/API integration va yangi lifecycle UI tasdigi ochiq. Serverga ko‘chirish faqat lokal natija tasdig‘idan keyin alohida ruxsat bilan, automatic deploy yo‘q.
+
+2026-10-06 E03 API/outbox implemented, R1–R5 reviewed; final full suite218/4690/50.13s, full Pint, strict Composer/platform pass. Whole-unit/scoped review and safe dev ten incrementals000009–000014/rollback smoke passed. Commit pending. [Handoff](local-lifecycle.md).

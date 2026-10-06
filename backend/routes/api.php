@@ -2,12 +2,18 @@
 
 // All routes in this file inherit authentication. Domain permissions are added in T03–T05.
 
+use App\Http\Controllers\AcceptanceController;
+use App\Http\Controllers\BaselineController;
 use App\Http\Controllers\ConnectorController;
 use App\Http\Controllers\IdentityController;
 use App\Http\Controllers\IdentityMappingController;
 use App\Http\Controllers\IngestionController;
+use App\Http\Controllers\LifecycleEvidenceController;
+use App\Http\Controllers\LifecycleTaskController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\RequirementController;
 use Illuminate\Support\Facades\Route;
 
 foreach (['employees', 'departments'] as $resource) {
@@ -32,3 +38,19 @@ foreach (['roles', 'memberships'] as $resource) {
 Route::match(['GET', 'POST'], '/v1/projects/{project}/connectors', [ConnectorController::class, 'handle'])->whereUuid('project');
 Route::get('/v1/connectors/{connector}', [ConnectorController::class, 'handle'])->whereUuid('connector');
 Route::post('/v1/connectors/{connector}/receipts', [IngestionController::class, 'accept'])->whereUuid('connector');
+
+Route::match(['GET', 'POST'], '/v1/projects/{project}/requirements', [RequirementController::class, 'handle'])->whereUuid('project');
+Route::patch('/v1/projects/{project}/requirement-drafts/{draft}', [RequirementController::class, 'handle'])->whereUuid('project')->whereUuid('draft')->defaults('lifecycle_operation', 'update');
+Route::post('/v1/projects/{project}/requirement-drafts/{draft}/approve', [RequirementController::class, 'handle'])->whereUuid('project')->whereUuid('draft')->defaults('lifecycle_operation', 'approve');
+Route::post('/v1/projects/{project}/dod-policies', [RequirementController::class, 'handle'])->whereUuid('project')->defaults('lifecycle_operation', 'policy');
+
+Route::match(['GET', 'POST'], '/v1/projects/{project}/lifecycle-tasks', [LifecycleTaskController::class, 'handle'])->whereUuid('project');
+Route::patch('/v1/projects/{project}/lifecycle-tasks/{task}', [LifecycleTaskController::class, 'handle'])->whereUuid('project')->whereUuid('task')->defaults('task_operation', 'revise');
+Route::post('/v1/projects/{project}/lifecycle-tasks/{task}/dependencies', [LifecycleTaskController::class, 'handle'])->whereUuid('project')->whereUuid('task')->defaults('task_operation', 'dependency');
+Route::post('/v1/projects/{project}/evidence-links', [LifecycleEvidenceController::class, 'handle'])->whereUuid('project');
+Route::post('/v1/projects/{project}/evidence-links/{link}/reviews', [LifecycleEvidenceController::class, 'handle'])->whereUuid('project')->whereUuid('link')->defaults('evidence_operation', 'review');
+Route::post('/v1/projects/{project}/qa-observations', [LifecycleEvidenceController::class, 'handle'])->whereUuid('project')->defaults('evidence_operation', 'qa');
+Route::post('/v1/projects/{project}/baselines', [BaselineController::class, 'handle'])->whereUuid('project');
+Route::post('/v1/projects/{project}/baseline-close', [BaselineController::class, 'handle'])->whereUuid('project')->defaults('baseline_operation', 'close');
+Route::post('/v1/projects/{project}/acceptance-decisions', [AcceptanceController::class, 'handle'])->whereUuid('project');
+Route::get('/v1/projects/{project}/progress', [ProgressController::class, 'handle'])->whereUuid('project');

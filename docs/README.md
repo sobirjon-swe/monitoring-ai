@@ -16,3 +16,6 @@
 Barcha mahsulot AI hisoblashlari faqat shu kompyuter yoki kompaniya boshqaradigan infratuzilmada bajariladi; tashqi AI API va cloud fallback taqiqlangan. Model keyingi bosqichda tanlanib ishlatiladi. Ruxsatli read-only source API integratsiyasi inference xizmatidan alohida.
 
 Avval ishlaydigan lokal natija foydalanuvchiga topshiriladi. Ichki serverga ko‘chirish faqat shu natija tasdig‘idan keyin alohida ruxsat bilan bajariladi; avtomatik deploy yoqilmagan. Sirlar `.env`, `.env.testing`, `.local/db-config.json`da ignored holatda qoladi va hujjatga ko‘chirilmaydi.
+
+- [E03 synthetic lifecycle qabul chegarasi](acceptance/e03.md) — R1–R6 reviewed and locally verified;218 tests/4690 assertions, safe dev incrementals and rollback smoke passed. Commit authorized; full E03 AI/OPS remain open.
+- [E03 lifecycle dictionary](contracts/lifecycle-data-dictionary.md) va [local handoff](operations/local-lifecycle.md).

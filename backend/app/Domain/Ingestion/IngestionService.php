@@ -19,6 +19,10 @@ final class IngestionService
     public function accept(TrustedActor $actor, string $connectorId, array $envelope, ?string $rawPayload = null): array
     {
         return $this->context->run($actor->tenantId, function () use ($actor, $connectorId, $envelope, $rawPayload): array {
+            // Source corrections and lifecycle decisions share the project lock before connector/object locks.
+            $binding = DB::table('ingestion_connectors')->where('id', $connectorId)->first() ?? throw new NotFoundHttpException;
+            $this->access->authorize($actor, 'ingestion.accept', ['tenant_id' => $actor->tenantId, 'project_id' => $binding->project_id]);
+            DB::table('projects')->where('id', $binding->project_id)->lockForUpdate()->first() ?? throw new NotFoundHttpException;
             // Hold the connector binding/status stable until acceptance commits.
             $connector = DB::table('ingestion_connectors')->where('id', $connectorId)->sharedLock()->first() ?? throw new NotFoundHttpException;
             $this->access->authorize($actor, 'ingestion.accept', ['tenant_id' => $actor->tenantId, 'project_id' => $connector->project_id]);
