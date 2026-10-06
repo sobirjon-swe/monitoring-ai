@@ -19,3 +19,5 @@ Avval ishlaydigan lokal natija foydalanuvchiga topshiriladi. Ichki serverga ko�
 
 - [E03 synthetic lifecycle qabul chegarasi](acceptance/e03.md) — R1–R6 reviewed and locally verified;218 tests/4690 assertions, safe dev incrementals and rollback smoke passed. Commit authorized; full E03 AI/OPS remain open.
 - [E03 lifecycle dictionary](contracts/lifecycle-data-dictionary.md) va [local handoff](operations/local-lifecycle.md).
+- [E04 tasdiqlangan yozma dizayn](superpowers/specs/2026-10-06-e04-developer-evidence-design.md) va [tasdiqlangan implementation plan](superpowers/plans/2026-10-06-e04-developer-evidence-plan.md) — partial synthetic diff/parser/storage/review implemented; R1–R6 code reviews and final whole-unit scoped re-review approved, actual OS activation blocked/default disabled503.
+- [E04 data dictionary](contracts/developer-analysis-data-dictionary.md), [contracts/rules](contracts/developer-analysis-v1.md), [local runbook](operations/local-developer-analysis.md) va [qisman qabul dalillari](acceptance/e04.md). Model absent; synthetic behavioral tests full E04 yoki running vertical analysis isboti emas.

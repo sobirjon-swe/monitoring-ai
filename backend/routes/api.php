@@ -5,6 +5,7 @@
 use App\Http\Controllers\AcceptanceController;
 use App\Http\Controllers\BaselineController;
 use App\Http\Controllers\ConnectorController;
+use App\Http\Controllers\DeveloperAnalysisController;
 use App\Http\Controllers\IdentityController;
 use App\Http\Controllers\IdentityMappingController;
 use App\Http\Controllers\IngestionController;
@@ -54,3 +55,7 @@ Route::post('/v1/projects/{project}/baselines', [BaselineController::class, 'han
 Route::post('/v1/projects/{project}/baseline-close', [BaselineController::class, 'handle'])->whereUuid('project')->defaults('baseline_operation', 'close');
 Route::post('/v1/projects/{project}/acceptance-decisions', [AcceptanceController::class, 'handle'])->whereUuid('project');
 Route::get('/v1/projects/{project}/progress', [ProgressController::class, 'handle'])->whereUuid('project');
+Route::post('/v1/projects/{project}/analysis-runs', [DeveloperAnalysisController::class, 'requestRun'])->whereUuid('project');
+Route::get('/v1/analysis-runs/{run}', [DeveloperAnalysisController::class, 'run'])->whereUuid('run');
+Route::get('/v1/findings/{finding}', [DeveloperAnalysisController::class, 'finding'])->whereUuid('finding');
+Route::post('/v1/findings/{finding}/reviews', [DeveloperAnalysisController::class, 'review'])->whereUuid('finding');

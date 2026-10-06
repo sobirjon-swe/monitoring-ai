@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Monitoring AI local foundation, synthetic ingestion and lifecycle",
-    "version": "1.2.0",
+    "title": "Monitoring AI local foundation, synthetic ingestion, lifecycle and developer evidence",
+    "version": "1.3.0",
     "description": "JSON syntax is valid YAML1.2. Local/testing loopback opaque bearer tokens only; production SSO and UI not implemented. Tenant/project scopes and current grants/membership are server-controlled. No T07 HTTP/model endpoint: analysis contracts are synthetic-only internal client. Responses may contain UTC PostgreSQL timestamp text, not uniformly RFC3339. HEAD uses the same read permissions and handler as GET and has an empty body; only POST/PATCH mutate. UTC timestamps preserve up to six fractional digits through validation, timestamptz(6) storage and event/access-time bindings. Periods remain [valid_from,valid_to) at microsecond precision. E02 I1/I2 provide synthetic-v1 manual-source connector bindings and bounded durable receipt/outbox acceptance. No real source API, webhook verification, raw receipt read, settings update, production worker identity or external AI inference. I3 local outbox processing and I4 projection/status are implemented and independently reviewed. Whole-unit code review found no Critical or Important blockers; dedicated dev incremental migrations000007/000008 and rollback-scoped synthetic acceptance/replay/CLI projection smoke were verified by the lead. Scoped metadata re-review approved. This synthetic foundation does not establish full E02 or production readiness. Source freshness remains unknown. E03 deterministic synthetic lifecycle implements versioned requirements/tasks, reviewed receipt links, synthetic QA, immutable baselines/human decisions, exact progress and selective durable applicability invalidation. R6 final whole-unit/scoped review, ten dev incrementals000009–000014, rollback smoke and218-test verification passed; no full E03/AC06 or production readiness claim. Lifecycle transport rejects extra authority fields, duplicate keys, decoded NUL and object/array ambiguity; max65536 bytes/depth16. No inference or live CI."
   },
   "servers": [
@@ -17,6 +17,111 @@
     }
   ],
   "paths": {
+    "/api/v1/projects/{project}/analysis-runs": {
+      "post": {
+        "operationId": "requestDeveloperAnalysis",
+        "summary": "Request deterministic synthetic developer analysis",
+        "description": "Partial E04 admission and durable processor implemented. Runner remains disabled until actual R3 OS activation probes pass; default503 creates no run/outbox. Current activation is blocked by native startup and missing controlled independent network endpoint. Behavioral test parser injection is not runtime acceptance. No live source, LLM, AST, effort, worked hours, criterion acceptance or financial inference. Server actor/tenant/project and exact original requester proof; current project request+source permissions before scoped idempotency lookup. Existing-run retry additionally requires read permission and exact original proof, precedes runner availability and returns the same run. Scoped tenant/requester/operation/key is serialized before project coordination; project/payload mismatch409. Pins deduplicate/lowercase/sort, must be exact current approved E03 versions. Snapshot must be current, including rejected newer source receipts. Project-locked admission caps queued/running runs at100. Run/input/proof and execution outbox commit atomically. Paths follow the existing /api/v1 convention; no unversioned alias.",
+        "x-purposes": ["analysis.request", "analysis.source.read"],
+        "parameters": [
+          {"name": "project", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
+          {"name": "Idempotency-Key", "in": "header", "required": true, "schema": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[!-~]+$"}}
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "At most65536 UTF-8 bytes/depth16; duplicate keys, decoded NUL, unknown fields and object-shaped pin arrays rejected.",
+          "content": {"application/json": {"schema": {
+            "type": "object", "additionalProperties": false,
+            "required": ["snapshot_id", "mode", "criterion_version_ids", "task_version_ids"],
+            "properties": {
+              "snapshot_id": {"type": "string", "format": "uuid"},
+              "mode": {"const": "deterministic"},
+              "criterion_version_ids": {"type": "array", "maxItems": 100, "items": {"type": "string", "format": "uuid"}},
+              "task_version_ids": {"type": "array", "maxItems": 100, "items": {"type": "string", "format": "uuid"}}
+            }
+          }}}
+        },
+        "responses": {
+          "202": {"description": "Durable new run or authorized identical retry, wrapped in data", "content": {"application/json": {"schema": {
+            "type": "object", "required": ["data"], "properties": {"data": {
+              "type": "object", "required": ["id", "status", "applicability"], "properties": {
+                "id": {"type": "string", "format": "uuid"},
+                "status": {"enum": ["queued", "running", "succeeded", "partial", "error", "cancelled"]},
+                "applicability": {"enum": ["current", "stale", "unknown"]}
+              }
+            }}
+          }}}},
+          "401": {"description": "No valid existing local bearer subject"},
+          "403": {"description": "Current permission/membership or exact original authority denied; no retained ID leaked"},
+          "404": {"description": "Scoped snapshot or pin absent/inaccessible"},
+          "409": {"description": "Project/key/payload conflict, closed project, noncurrent source or version pins"},
+          "413": {"description": "Body exceeds65536 bytes"},
+          "422": {"description": "Malformed bounded payload or key"},
+          "429": {"description": "Project queue admission cap reached", "headers": {"Retry-After": {"schema": {"const": "5"}}}},
+          "503": {"description": "Local parser OS availability gate not ready; no new durable execution"}
+        }
+      }
+    },
+    "/api/v1/analysis-runs/{run}": {
+      "get": {
+        "operationId": "getDeveloperAnalysisRun",
+        "summary": "Read an authorized developer run",
+        "description": "GET/HEAD deliver coherent metadata; HEAD uses the same permissions with empty body. Reads may durably observe terminal invalidation, never rewrite immutable facts/history. Viewer read+source and pinned exact original requester proof are captured before source/run acquisition. Exact proof failure403. Closed projects permit historical metadata. Current source, blocked-receipt watermark, current E03 pins and stored sticky applicability govern delivery; stale/unknown hides output. Metadata includes id, project_id, snapshot_id, status, applicability, pins, reason_code, created_at/completed_at, output, ai_interpretation=unavailable and verified_findings. verified_findings contains at most3 current verified human-reviewed analysis fact summaries (id/kind/summary/review_revision); pending/rejected/stale excluded. It is not E03 criterion acceptance, accepted-release or contribution projection. First observed invalidation returns updated status/reason. No raw diff/input/requester proof/credentials. Pending run output is null. Runner remains disabled; implemented processing is not actual activated vertical acceptance. Query parameters rejected.",
+        "x-purposes": ["analysis.read", "analysis.source.read"],
+        "parameters": [{"name": "run", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}],
+        "responses": {
+          "200": {"description": "Authorized coherent run metadata wrapped in data"},
+          "401": {"description": "Unauthenticated"}, "403": {"description": "Current viewer/source or exact original proof denied"},
+          "404": {"description": "Run absent/inaccessible under tenant RLS"}, "422": {"description": "Unexpected query parameters"}
+        }
+      }
+    },
+    "/api/v1/findings/{finding}": {
+      "get": {
+        "operationId": "getDeveloperAnalysisFinding",
+        "summary": "Read authorized immutable finding facts",
+        "description": "GET/HEAD follow current-viewer read+source, pinned exact original requester, source-watermark, pin and sticky applicability checks on every page. Response data includes id, run_id, kind, review_revision, disposition, applicability, ai_interpretation=unavailable, facts, summary and review_history={items,next_cursor}. Stale/unknown facts and summary are null; authorized immutable historical review metadata remains visible, including on closed projects. Items contain id, revision, decision, disposition, actor_id, safe reason and PostgreSQL UTC effective_at. limit defaults50, max100. Ascending keyset on revision; next_cursor is bounded canonical base64url encoding finding UUID and last revision, with finding/existing-revision validation. It grants no authority. Concurrent append appears on later pages without rewriting earlier rows; pagination is not a fixed full-history snapshot. Unknown/foreign/malformed cursor422 without content, revoked viewer403. Extra parameters rejected; no unversioned alias.",
+        "x-purposes": ["analysis.read", "analysis.source.read"],
+        "parameters": [
+          {"name": "finding", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 50}},
+          {"name": "cursor", "in": "query", "schema": {"type": "string", "maxLength": 128, "pattern": "^[A-Za-z0-9_-]+$"}}
+        ],
+        "responses": {
+          "200": {"description": "Authorized finding metadata/facts wrapped in data"},
+          "401": {"description": "Unauthenticated"}, "403": {"description": "Current viewer/source or exact original proof denied"},
+          "404": {"description": "Finding/run absent or inaccessible"}, "422": {"description": "Malformed, unknown or foreign history cursor, invalid limit or unexpected query parameters"}
+        }
+      }
+    },
+    "/api/v1/findings/{finding}/reviews": {
+      "post": {
+        "operationId": "reviewDeveloperAnalysisFinding",
+        "summary": "Append authorized human review with revision CAS",
+        "description": "Current read+source+review and exact original requester proof captured as one pre-callback authority batch. Project/state, authority, source then finding locks; final actual-clock authority check before commit. Closed project409. expected_revision must match current finding; only one concurrent same-revision review commits. context-added increments revision and retains pending/verified/rejected. verified/rejected only change review disposition, never facts, rule classification, run applicability, E03 acceptance/progress or release/contribution aggregates. Stale runs stay stale even after verified. Reason nonblank and at most2000 UTF-8 bytes before secret scanner/audit; secrets reject422 without persistence. History append and current pointer/CAS plus safe code-only audit atomic. No actor/tenant/authority fields accepted.",
+        "x-purposes": ["analysis.read", "analysis.source.read", "analysis.review"],
+        "parameters": [{"name": "finding", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}],
+        "requestBody": {"required": true, "description": "Strict JSON object, max65536 bytes/depth16; duplicate keys/NUL/extra fields rejected. Reason limit is UTF-8 bytes, not characters.", "content": {"application/json": {"schema": {
+          "type": "object", "additionalProperties": false, "required": ["expected_revision", "decision", "reason"], "properties": {
+            "expected_revision": {"type": "integer", "minimum": 0, "maximum": 2147483646},
+            "decision": {"enum": ["verified", "rejected", "context-added"]},
+            "reason": {"type": "string", "minLength": 1, "maxLength": 2000, "x-max-utf8-bytes": 2000}
+          }
+        }}}},
+        "responses": {
+          "200": {"description": "Updated review metadata wrapped in data", "content": {"application/json": {"schema": {
+            "type": "object", "required": ["data"], "properties": {"data": {"type": "object", "required": ["id", "run_id", "review_id", "review_revision", "disposition", "applicability", "effective_at"], "properties": {
+              "id": {"type": "string", "format": "uuid"}, "run_id": {"type": "string", "format": "uuid"}, "review_id": {"type": "string", "format": "uuid"},
+              "review_revision": {"type": "integer", "minimum": 1}, "disposition": {"enum": ["pending", "verified", "rejected"]},
+              "applicability": {"enum": ["current", "stale", "unknown"]}, "effective_at": {"type": "string", "description": "Actual PostgreSQL UTC timestamptz(6) text"}
+            }}}
+          }}}},
+          "401": {"description": "Unauthenticated"}, "403": {"description": "Current viewer/review/source or exact original requester proof denied; no history written"},
+          "404": {"description": "Finding/run absent or inaccessible"}, "409": {"description": "Stale expected revision or closed project"},
+          "413": {"description": "Body exceeds65536 bytes"}, "422": {"description": "Invalid shape, revision, decision, blank/unsafe/over-byte-limit reason or query"}
+        }
+      }
+    },
 "/api/v1/projects/{project}/requirements": {
         "get": {
             "operationId": "lifecycleGetRequirements",

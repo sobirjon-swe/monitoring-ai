@@ -1,0 +1,11 @@
+{
+  "value": {
+    "z": [
+      2,
+      1
+    ],
+    "a": "Ω/  "
+  },
+  "expected_utf8_hex": "7b2261223a22cea92fe280a8e280a9222c227a223a5b322c315d7d",
+  "expected_sha256": "506027e77d2b1dbeb044ab944757ee9a44fb4561ed99385e1d59c12b6257d220"
+}

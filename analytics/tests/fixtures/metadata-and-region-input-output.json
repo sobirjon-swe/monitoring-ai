@@ -1,0 +1,1246 @@
+[
+  {
+    "name": "mode",
+    "input": {
+      "version": "developer-analysis-input-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "597f978bb3f0f89021f63d840b7c1c79ad0b06a7623cf53f20f96b8958744a7c",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "source_instance_id": "synthetic",
+        "repository_id": "repo",
+        "mr_id": "42",
+        "revision_ordinal": 1,
+        "paths": [
+          {
+            "old_path": "app/a.py",
+            "new_path": "app/a.py"
+          }
+        ],
+        "redacted_diff": "diff --git a/app/a.py b/app/a.py\nold mode 100644\nnew mode 100755\n",
+        "redaction": {
+          "version": "secret-gate-v1",
+          "policy": "block-v1",
+          "hash": "597f978bb3f0f89021f63d840b7c1c79ad0b06a7623cf53f20f96b8958744a7c",
+          "mapping": []
+        }
+      },
+      "input_hash": "e07ee415e5ca64abd6416a5a2bad9275728ddc8d8644239ecaa1ee956e4c59bd"
+    },
+    "output": {
+      "counts": {
+        "added": 0,
+        "deleted": 0
+      },
+      "buckets": {
+        "generated": {
+          "added": 0,
+          "deleted": 0
+        },
+        "vendor": {
+          "added": 0,
+          "deleted": 0
+        },
+        "tests": {
+          "added": 0,
+          "deleted": 0
+        },
+        "config": {
+          "added": 0,
+          "deleted": 0
+        },
+        "docs": {
+          "added": 0,
+          "deleted": 0
+        },
+        "application": {
+          "added": 0,
+          "deleted": 0
+        },
+        "unknown": {
+          "added": 0,
+          "deleted": 0
+        }
+      },
+      "files": [
+        {
+          "old_path": "app/a.py",
+          "new_path": "app/a.py",
+          "bucket": "application",
+          "counts": {
+            "added": 0,
+            "deleted": 0
+          },
+          "coverage": {
+            "status": "complete",
+            "notices": []
+          },
+          "flags": []
+        }
+      ],
+      "locators": [],
+      "omitted_locator_count": 0,
+      "coverage": {
+        "status": "complete",
+        "notices": []
+      },
+      "patch": {
+        "status": "exact",
+        "hash": "597f978bb3f0f89021f63d840b7c1c79ad0b06a7623cf53f20f96b8958744a7c"
+      },
+      "version": "developer-analysis-output-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "input_hash": "e07ee415e5ca64abd6416a5a2bad9275728ddc8d8644239ecaa1ee956e4c59bd",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "597f978bb3f0f89021f63d840b7c1c79ad0b06a7623cf53f20f96b8958744a7c",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "redaction_version": "secret-gate-v1",
+      "redaction_hash": "597f978bb3f0f89021f63d840b7c1c79ad0b06a7623cf53f20f96b8958744a7c"
+    }
+  },
+  {
+    "name": "rename_exact",
+    "input": {
+      "version": "developer-analysis-input-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "8272e0fdfabbc810d7f0024923ae8f872edab01e10dbf3ac3dcac8c6e42e84b6",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "source_instance_id": "synthetic",
+        "repository_id": "repo",
+        "mr_id": "42",
+        "revision_ordinal": 1,
+        "paths": [
+          {
+            "old_path": "app/a.py",
+            "new_path": "app/b.py"
+          }
+        ],
+        "redacted_diff": "diff --git a/app/a.py b/app/b.py\nsimilarity index 100%\nrename from app/a.py\nrename to app/b.py\n",
+        "redaction": {
+          "version": "secret-gate-v1",
+          "policy": "block-v1",
+          "hash": "8272e0fdfabbc810d7f0024923ae8f872edab01e10dbf3ac3dcac8c6e42e84b6",
+          "mapping": []
+        }
+      },
+      "input_hash": "25084245108dd2c9d36b0bdc6d6ad11b7c82617fe64bbaf8ebe380763b2184ea"
+    },
+    "output": {
+      "counts": {
+        "added": 0,
+        "deleted": 0
+      },
+      "buckets": {
+        "generated": {
+          "added": 0,
+          "deleted": 0
+        },
+        "vendor": {
+          "added": 0,
+          "deleted": 0
+        },
+        "tests": {
+          "added": 0,
+          "deleted": 0
+        },
+        "config": {
+          "added": 0,
+          "deleted": 0
+        },
+        "docs": {
+          "added": 0,
+          "deleted": 0
+        },
+        "application": {
+          "added": 0,
+          "deleted": 0
+        },
+        "unknown": {
+          "added": 0,
+          "deleted": 0
+        }
+      },
+      "files": [
+        {
+          "old_path": "app/a.py",
+          "new_path": "app/b.py",
+          "bucket": "application",
+          "counts": {
+            "added": 0,
+            "deleted": 0
+          },
+          "coverage": {
+            "status": "complete",
+            "notices": []
+          },
+          "flags": [
+            "rename"
+          ]
+        }
+      ],
+      "locators": [],
+      "omitted_locator_count": 0,
+      "coverage": {
+        "status": "complete",
+        "notices": []
+      },
+      "patch": {
+        "status": "exact",
+        "hash": "8272e0fdfabbc810d7f0024923ae8f872edab01e10dbf3ac3dcac8c6e42e84b6"
+      },
+      "version": "developer-analysis-output-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "input_hash": "25084245108dd2c9d36b0bdc6d6ad11b7c82617fe64bbaf8ebe380763b2184ea",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "8272e0fdfabbc810d7f0024923ae8f872edab01e10dbf3ac3dcac8c6e42e84b6",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "redaction_version": "secret-gate-v1",
+      "redaction_hash": "8272e0fdfabbc810d7f0024923ae8f872edab01e10dbf3ac3dcac8c6e42e84b6"
+    }
+  },
+  {
+    "name": "rename_partial",
+    "input": {
+      "version": "developer-analysis-input-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "9d483ec769485c941030c80bbf3ea9e27f5edebabdcb7cdc0f38fa674a1068b9",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "source_instance_id": "synthetic",
+        "repository_id": "repo",
+        "mr_id": "42",
+        "revision_ordinal": 1,
+        "paths": [
+          {
+            "old_path": "app/a.py",
+            "new_path": "app/b.py"
+          }
+        ],
+        "redacted_diff": "diff --git a/app/a.py b/app/b.py\nsimilarity index 60%\nrename from app/a.py\nrename to app/b.py\n",
+        "redaction": {
+          "version": "secret-gate-v1",
+          "policy": "block-v1",
+          "hash": "9d483ec769485c941030c80bbf3ea9e27f5edebabdcb7cdc0f38fa674a1068b9",
+          "mapping": []
+        }
+      },
+      "input_hash": "330e3c72f4d4ceac8c648d56eb5dc708e1bb3da97647d8ce83464912fb89f4ba"
+    },
+    "output": {
+      "counts": {
+        "added": 0,
+        "deleted": 0
+      },
+      "buckets": {
+        "generated": {
+          "added": 0,
+          "deleted": 0
+        },
+        "vendor": {
+          "added": 0,
+          "deleted": 0
+        },
+        "tests": {
+          "added": 0,
+          "deleted": 0
+        },
+        "config": {
+          "added": 0,
+          "deleted": 0
+        },
+        "docs": {
+          "added": 0,
+          "deleted": 0
+        },
+        "application": {
+          "added": 0,
+          "deleted": 0
+        },
+        "unknown": {
+          "added": 0,
+          "deleted": 0
+        }
+      },
+      "files": [
+        {
+          "old_path": "app/a.py",
+          "new_path": "app/b.py",
+          "bucket": "application",
+          "counts": {
+            "added": 0,
+            "deleted": 0
+          },
+          "coverage": {
+            "status": "partial",
+            "notices": [
+              "counts_unknown",
+              "unsupported"
+            ]
+          },
+          "flags": [
+            "rename",
+            "unsupported"
+          ]
+        }
+      ],
+      "locators": [],
+      "omitted_locator_count": 0,
+      "coverage": {
+        "status": "partial",
+        "notices": [
+          "counts_unknown",
+          "unsupported"
+        ]
+      },
+      "patch": {
+        "status": "unresolved",
+        "hash": null
+      },
+      "version": "developer-analysis-output-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "input_hash": "330e3c72f4d4ceac8c648d56eb5dc708e1bb3da97647d8ce83464912fb89f4ba",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "9d483ec769485c941030c80bbf3ea9e27f5edebabdcb7cdc0f38fa674a1068b9",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "redaction_version": "secret-gate-v1",
+      "redaction_hash": "9d483ec769485c941030c80bbf3ea9e27f5edebabdcb7cdc0f38fa674a1068b9"
+    }
+  },
+  {
+    "name": "type_mode_partial",
+    "input": {
+      "version": "developer-analysis-input-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "1d3d4ea96446d2de8b5576265350c464569510bd8490a04dc4ea48e01c9e9728",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "source_instance_id": "synthetic",
+        "repository_id": "repo",
+        "mr_id": "42",
+        "revision_ordinal": 1,
+        "paths": [
+          {
+            "old_path": "app/a.py",
+            "new_path": "app/a.py"
+          }
+        ],
+        "redacted_diff": "diff --git a/app/a.py b/app/a.py\nold mode 100644\nnew mode 120000\n",
+        "redaction": {
+          "version": "secret-gate-v1",
+          "policy": "block-v1",
+          "hash": "1d3d4ea96446d2de8b5576265350c464569510bd8490a04dc4ea48e01c9e9728",
+          "mapping": []
+        }
+      },
+      "input_hash": "c8b272ea6e54d17ebc2a35ecca7bcac54048d85f7e2f2ddac19fe2e3c2c4d807"
+    },
+    "output": {
+      "counts": {
+        "added": 0,
+        "deleted": 0
+      },
+      "buckets": {
+        "generated": {
+          "added": 0,
+          "deleted": 0
+        },
+        "vendor": {
+          "added": 0,
+          "deleted": 0
+        },
+        "tests": {
+          "added": 0,
+          "deleted": 0
+        },
+        "config": {
+          "added": 0,
+          "deleted": 0
+        },
+        "docs": {
+          "added": 0,
+          "deleted": 0
+        },
+        "application": {
+          "added": 0,
+          "deleted": 0
+        },
+        "unknown": {
+          "added": 0,
+          "deleted": 0
+        }
+      },
+      "files": [
+        {
+          "old_path": "app/a.py",
+          "new_path": "app/a.py",
+          "bucket": "application",
+          "counts": {
+            "added": 0,
+            "deleted": 0
+          },
+          "coverage": {
+            "status": "partial",
+            "notices": [
+              "counts_unknown",
+              "unsupported"
+            ]
+          },
+          "flags": [
+            "unsupported"
+          ]
+        }
+      ],
+      "locators": [],
+      "omitted_locator_count": 0,
+      "coverage": {
+        "status": "partial",
+        "notices": [
+          "counts_unknown",
+          "unsupported"
+        ]
+      },
+      "patch": {
+        "status": "unresolved",
+        "hash": null
+      },
+      "version": "developer-analysis-output-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "input_hash": "c8b272ea6e54d17ebc2a35ecca7bcac54048d85f7e2f2ddac19fe2e3c2c4d807",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "1d3d4ea96446d2de8b5576265350c464569510bd8490a04dc4ea48e01c9e9728",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "redaction_version": "secret-gate-v1",
+      "redaction_hash": "1d3d4ea96446d2de8b5576265350c464569510bd8490a04dc4ea48e01c9e9728"
+    }
+  },
+  {
+    "name": "region_gap",
+    "input": {
+      "version": "developer-analysis-input-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "9c86bbdbfb1adcbc74579d328c4cf90dbc60985bd80be81680754eeccee2e78f",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "source_instance_id": "synthetic",
+        "repository_id": "repo",
+        "mr_id": "42",
+        "revision_ordinal": 1,
+        "paths": [
+          {
+            "old_path": "app/a.py",
+            "new_path": "app/a.py"
+          }
+        ],
+        "redacted_diff": "diff --git a/app/a.py b/app/a.py\n--- a/app/a.py\n+++ b/app/a.py\n@@ -1 +1 @@\n-// BEGIN GENERATED\n+// BEGIN GENERATED\n@@ -99,2 +99,2 @@\n-manual_old\n-// END GENERATED\n+manual_new\n+// END GENERATED\n",
+        "redaction": {
+          "version": "secret-gate-v1",
+          "policy": "block-v1",
+          "hash": "9c86bbdbfb1adcbc74579d328c4cf90dbc60985bd80be81680754eeccee2e78f",
+          "mapping": []
+        }
+      },
+      "input_hash": "48a21099799063a44ee4bff18748a8fb197e4319e62494fb89c408cd00db12b9"
+    },
+    "output": {
+      "counts": {
+        "added": 3,
+        "deleted": 3
+      },
+      "buckets": {
+        "generated": {
+          "added": 1,
+          "deleted": 1
+        },
+        "vendor": {
+          "added": 0,
+          "deleted": 0
+        },
+        "tests": {
+          "added": 0,
+          "deleted": 0
+        },
+        "config": {
+          "added": 0,
+          "deleted": 0
+        },
+        "docs": {
+          "added": 0,
+          "deleted": 0
+        },
+        "application": {
+          "added": 0,
+          "deleted": 0
+        },
+        "unknown": {
+          "added": 2,
+          "deleted": 2
+        }
+      },
+      "files": [
+        {
+          "old_path": "app/a.py",
+          "new_path": "app/a.py",
+          "bucket": "application",
+          "counts": {
+            "added": 3,
+            "deleted": 3
+          },
+          "coverage": {
+            "status": "partial",
+            "notices": [
+              "unknown_path",
+              "unsupported"
+            ]
+          },
+          "flags": [
+            "generated",
+            "mixed",
+            "unsupported"
+          ]
+        }
+      ],
+      "locators": [
+        {
+          "path": "app/a.py",
+          "side": "old",
+          "line": 1,
+          "hunk_index": 0,
+          "kind": "deleted",
+          "snapshot_id": "33333333-3333-3333-3333-333333333333",
+          "snapshot_hash": "9c86bbdbfb1adcbc74579d328c4cf90dbc60985bd80be81680754eeccee2e78f",
+          "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "path": "app/a.py",
+          "side": "new",
+          "line": 1,
+          "hunk_index": 0,
+          "kind": "added",
+          "snapshot_id": "33333333-3333-3333-3333-333333333333",
+          "snapshot_hash": "9c86bbdbfb1adcbc74579d328c4cf90dbc60985bd80be81680754eeccee2e78f",
+          "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "path": "app/a.py",
+          "side": "old",
+          "line": 99,
+          "hunk_index": 1,
+          "kind": "deleted",
+          "snapshot_id": "33333333-3333-3333-3333-333333333333",
+          "snapshot_hash": "9c86bbdbfb1adcbc74579d328c4cf90dbc60985bd80be81680754eeccee2e78f",
+          "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "path": "app/a.py",
+          "side": "old",
+          "line": 100,
+          "hunk_index": 1,
+          "kind": "deleted",
+          "snapshot_id": "33333333-3333-3333-3333-333333333333",
+          "snapshot_hash": "9c86bbdbfb1adcbc74579d328c4cf90dbc60985bd80be81680754eeccee2e78f",
+          "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "path": "app/a.py",
+          "side": "new",
+          "line": 99,
+          "hunk_index": 1,
+          "kind": "added",
+          "snapshot_id": "33333333-3333-3333-3333-333333333333",
+          "snapshot_hash": "9c86bbdbfb1adcbc74579d328c4cf90dbc60985bd80be81680754eeccee2e78f",
+          "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "path": "app/a.py",
+          "side": "new",
+          "line": 100,
+          "hunk_index": 1,
+          "kind": "added",
+          "snapshot_id": "33333333-3333-3333-3333-333333333333",
+          "snapshot_hash": "9c86bbdbfb1adcbc74579d328c4cf90dbc60985bd80be81680754eeccee2e78f",
+          "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      ],
+      "omitted_locator_count": 0,
+      "coverage": {
+        "status": "partial",
+        "notices": [
+          "unknown_path",
+          "unsupported"
+        ]
+      },
+      "patch": {
+        "status": "unresolved",
+        "hash": null
+      },
+      "version": "developer-analysis-output-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "input_hash": "48a21099799063a44ee4bff18748a8fb197e4319e62494fb89c408cd00db12b9",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "9c86bbdbfb1adcbc74579d328c4cf90dbc60985bd80be81680754eeccee2e78f",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "redaction_version": "secret-gate-v1",
+      "redaction_hash": "9c86bbdbfb1adcbc74579d328c4cf90dbc60985bd80be81680754eeccee2e78f"
+    }
+  },
+  {
+    "name": "region_contiguous",
+    "input": {
+      "version": "developer-analysis-input-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "ebc90ce9c8dd0e6541965b782a023f3b598ac64d66c916432ff7ca94ef1cb5f7",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "source_instance_id": "synthetic",
+        "repository_id": "repo",
+        "mr_id": "42",
+        "revision_ordinal": 1,
+        "paths": [
+          {
+            "old_path": "app/a.py",
+            "new_path": "app/a.py"
+          }
+        ],
+        "redacted_diff": "diff --git a/app/a.py b/app/a.py\n--- a/app/a.py\n+++ b/app/a.py\n@@ -1 +1 @@\n-// BEGIN GENERATED\n+// BEGIN GENERATED\n@@ -2,2 +2,2 @@\n-manual_old\n-// END GENERATED\n+manual_new\n+// END GENERATED\n",
+        "redaction": {
+          "version": "secret-gate-v1",
+          "policy": "block-v1",
+          "hash": "ebc90ce9c8dd0e6541965b782a023f3b598ac64d66c916432ff7ca94ef1cb5f7",
+          "mapping": []
+        }
+      },
+      "input_hash": "870224d3bc5cdbae2345ae0f28be48ad868520064ecd52c26f2296f6da854e9b"
+    },
+    "output": {
+      "counts": {
+        "added": 3,
+        "deleted": 3
+      },
+      "buckets": {
+        "generated": {
+          "added": 3,
+          "deleted": 3
+        },
+        "vendor": {
+          "added": 0,
+          "deleted": 0
+        },
+        "tests": {
+          "added": 0,
+          "deleted": 0
+        },
+        "config": {
+          "added": 0,
+          "deleted": 0
+        },
+        "docs": {
+          "added": 0,
+          "deleted": 0
+        },
+        "application": {
+          "added": 0,
+          "deleted": 0
+        },
+        "unknown": {
+          "added": 0,
+          "deleted": 0
+        }
+      },
+      "files": [
+        {
+          "old_path": "app/a.py",
+          "new_path": "app/a.py",
+          "bucket": "application",
+          "counts": {
+            "added": 3,
+            "deleted": 3
+          },
+          "coverage": {
+            "status": "complete",
+            "notices": []
+          },
+          "flags": [
+            "generated"
+          ]
+        }
+      ],
+      "locators": [
+        {
+          "path": "app/a.py",
+          "side": "old",
+          "line": 1,
+          "hunk_index": 0,
+          "kind": "deleted",
+          "snapshot_id": "33333333-3333-3333-3333-333333333333",
+          "snapshot_hash": "ebc90ce9c8dd0e6541965b782a023f3b598ac64d66c916432ff7ca94ef1cb5f7",
+          "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "path": "app/a.py",
+          "side": "new",
+          "line": 1,
+          "hunk_index": 0,
+          "kind": "added",
+          "snapshot_id": "33333333-3333-3333-3333-333333333333",
+          "snapshot_hash": "ebc90ce9c8dd0e6541965b782a023f3b598ac64d66c916432ff7ca94ef1cb5f7",
+          "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "path": "app/a.py",
+          "side": "old",
+          "line": 2,
+          "hunk_index": 1,
+          "kind": "deleted",
+          "snapshot_id": "33333333-3333-3333-3333-333333333333",
+          "snapshot_hash": "ebc90ce9c8dd0e6541965b782a023f3b598ac64d66c916432ff7ca94ef1cb5f7",
+          "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "path": "app/a.py",
+          "side": "old",
+          "line": 3,
+          "hunk_index": 1,
+          "kind": "deleted",
+          "snapshot_id": "33333333-3333-3333-3333-333333333333",
+          "snapshot_hash": "ebc90ce9c8dd0e6541965b782a023f3b598ac64d66c916432ff7ca94ef1cb5f7",
+          "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "path": "app/a.py",
+          "side": "new",
+          "line": 2,
+          "hunk_index": 1,
+          "kind": "added",
+          "snapshot_id": "33333333-3333-3333-3333-333333333333",
+          "snapshot_hash": "ebc90ce9c8dd0e6541965b782a023f3b598ac64d66c916432ff7ca94ef1cb5f7",
+          "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "path": "app/a.py",
+          "side": "new",
+          "line": 3,
+          "hunk_index": 1,
+          "kind": "added",
+          "snapshot_id": "33333333-3333-3333-3333-333333333333",
+          "snapshot_hash": "ebc90ce9c8dd0e6541965b782a023f3b598ac64d66c916432ff7ca94ef1cb5f7",
+          "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      ],
+      "omitted_locator_count": 0,
+      "coverage": {
+        "status": "complete",
+        "notices": []
+      },
+      "patch": {
+        "status": "exact",
+        "hash": "ebc90ce9c8dd0e6541965b782a023f3b598ac64d66c916432ff7ca94ef1cb5f7"
+      },
+      "version": "developer-analysis-output-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "input_hash": "870224d3bc5cdbae2345ae0f28be48ad868520064ecd52c26f2296f6da854e9b",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "ebc90ce9c8dd0e6541965b782a023f3b598ac64d66c916432ff7ca94ef1cb5f7",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "redaction_version": "secret-gate-v1",
+      "redaction_hash": "ebc90ce9c8dd0e6541965b782a023f3b598ac64d66c916432ff7ca94ef1cb5f7"
+    }
+  },
+  {
+    "name": "mode_same_index",
+    "input": {
+      "version": "developer-analysis-input-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "1b20c313f418858eccebe4df4eec8552c1f05a783e8eb3ea3d18c1e855de6af1",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "source_instance_id": "synthetic",
+        "repository_id": "repo",
+        "mr_id": "42",
+        "revision_ordinal": 1,
+        "paths": [
+          {
+            "old_path": "app/a.py",
+            "new_path": "app/a.py"
+          }
+        ],
+        "redacted_diff": "diff --git a/app/a.py b/app/a.py\nold mode 100644\nnew mode 100755\nindex 1111111..1111111\n",
+        "redaction": {
+          "version": "secret-gate-v1",
+          "policy": "block-v1",
+          "hash": "1b20c313f418858eccebe4df4eec8552c1f05a783e8eb3ea3d18c1e855de6af1",
+          "mapping": []
+        }
+      },
+      "input_hash": "a39b33e50cd2e0451183cd63e3b9d03b710ea7622c980d4743f623c9970a7c2c"
+    },
+    "output": {
+      "counts": {
+        "added": 0,
+        "deleted": 0
+      },
+      "buckets": {
+        "generated": {
+          "added": 0,
+          "deleted": 0
+        },
+        "vendor": {
+          "added": 0,
+          "deleted": 0
+        },
+        "tests": {
+          "added": 0,
+          "deleted": 0
+        },
+        "config": {
+          "added": 0,
+          "deleted": 0
+        },
+        "docs": {
+          "added": 0,
+          "deleted": 0
+        },
+        "application": {
+          "added": 0,
+          "deleted": 0
+        },
+        "unknown": {
+          "added": 0,
+          "deleted": 0
+        }
+      },
+      "files": [
+        {
+          "old_path": "app/a.py",
+          "new_path": "app/a.py",
+          "bucket": "application",
+          "counts": {
+            "added": 0,
+            "deleted": 0
+          },
+          "coverage": {
+            "status": "complete",
+            "notices": []
+          },
+          "flags": []
+        }
+      ],
+      "locators": [],
+      "omitted_locator_count": 0,
+      "coverage": {
+        "status": "complete",
+        "notices": []
+      },
+      "patch": {
+        "status": "exact",
+        "hash": "1b20c313f418858eccebe4df4eec8552c1f05a783e8eb3ea3d18c1e855de6af1"
+      },
+      "version": "developer-analysis-output-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "input_hash": "a39b33e50cd2e0451183cd63e3b9d03b710ea7622c980d4743f623c9970a7c2c",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "1b20c313f418858eccebe4df4eec8552c1f05a783e8eb3ea3d18c1e855de6af1",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "redaction_version": "secret-gate-v1",
+      "redaction_hash": "1b20c313f418858eccebe4df4eec8552c1f05a783e8eb3ea3d18c1e855de6af1"
+    }
+  },
+  {
+    "name": "mode_different_index",
+    "input": {
+      "version": "developer-analysis-input-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "953e84eaaf770c15116160292125ae0191fa365e0d92d8d4380a74125ffbcf12",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "source_instance_id": "synthetic",
+        "repository_id": "repo",
+        "mr_id": "42",
+        "revision_ordinal": 1,
+        "paths": [
+          {
+            "old_path": "app/a.py",
+            "new_path": "app/a.py"
+          }
+        ],
+        "redacted_diff": "diff --git a/app/a.py b/app/a.py\nold mode 100644\nnew mode 100755\nindex 1111111..2222222\n",
+        "redaction": {
+          "version": "secret-gate-v1",
+          "policy": "block-v1",
+          "hash": "953e84eaaf770c15116160292125ae0191fa365e0d92d8d4380a74125ffbcf12",
+          "mapping": []
+        }
+      },
+      "input_hash": "30f6f29e0f9af7b70c03c9b5ac075d67ba19228be9e17abf119a9807695f545c"
+    },
+    "output": {
+      "counts": {
+        "added": 0,
+        "deleted": 0
+      },
+      "buckets": {
+        "generated": {
+          "added": 0,
+          "deleted": 0
+        },
+        "vendor": {
+          "added": 0,
+          "deleted": 0
+        },
+        "tests": {
+          "added": 0,
+          "deleted": 0
+        },
+        "config": {
+          "added": 0,
+          "deleted": 0
+        },
+        "docs": {
+          "added": 0,
+          "deleted": 0
+        },
+        "application": {
+          "added": 0,
+          "deleted": 0
+        },
+        "unknown": {
+          "added": 0,
+          "deleted": 0
+        }
+      },
+      "files": [
+        {
+          "old_path": "app/a.py",
+          "new_path": "app/a.py",
+          "bucket": "application",
+          "counts": {
+            "added": 0,
+            "deleted": 0
+          },
+          "coverage": {
+            "status": "partial",
+            "notices": [
+              "counts_unknown",
+              "unsupported"
+            ]
+          },
+          "flags": [
+            "unsupported"
+          ]
+        }
+      ],
+      "locators": [],
+      "omitted_locator_count": 0,
+      "coverage": {
+        "status": "partial",
+        "notices": [
+          "counts_unknown",
+          "unsupported"
+        ]
+      },
+      "patch": {
+        "status": "unresolved",
+        "hash": null
+      },
+      "version": "developer-analysis-output-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "input_hash": "30f6f29e0f9af7b70c03c9b5ac075d67ba19228be9e17abf119a9807695f545c",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "953e84eaaf770c15116160292125ae0191fa365e0d92d8d4380a74125ffbcf12",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "redaction_version": "secret-gate-v1",
+      "redaction_hash": "953e84eaaf770c15116160292125ae0191fa365e0d92d8d4380a74125ffbcf12"
+    }
+  },
+  {
+    "name": "rename_different_index",
+    "input": {
+      "version": "developer-analysis-input-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "c6ce640bca74fa5dfdcf0bb089d8f998f85c616bebcb26ad4033ee113735f0b7",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "source_instance_id": "synthetic",
+        "repository_id": "repo",
+        "mr_id": "42",
+        "revision_ordinal": 1,
+        "paths": [
+          {
+            "old_path": "app/a.py",
+            "new_path": "app/b.py"
+          }
+        ],
+        "redacted_diff": "diff --git a/app/a.py b/app/b.py\nsimilarity index 100%\nrename from app/a.py\nrename to app/b.py\nindex 1111111..2222222\n",
+        "redaction": {
+          "version": "secret-gate-v1",
+          "policy": "block-v1",
+          "hash": "c6ce640bca74fa5dfdcf0bb089d8f998f85c616bebcb26ad4033ee113735f0b7",
+          "mapping": []
+        }
+      },
+      "input_hash": "25e842f635f1b6606f9e4f4cda54d96306e512b2ad9b36e260a0398c3fa6a53d"
+    },
+    "output": {
+      "counts": {
+        "added": 0,
+        "deleted": 0
+      },
+      "buckets": {
+        "generated": {
+          "added": 0,
+          "deleted": 0
+        },
+        "vendor": {
+          "added": 0,
+          "deleted": 0
+        },
+        "tests": {
+          "added": 0,
+          "deleted": 0
+        },
+        "config": {
+          "added": 0,
+          "deleted": 0
+        },
+        "docs": {
+          "added": 0,
+          "deleted": 0
+        },
+        "application": {
+          "added": 0,
+          "deleted": 0
+        },
+        "unknown": {
+          "added": 0,
+          "deleted": 0
+        }
+      },
+      "files": [
+        {
+          "old_path": "app/a.py",
+          "new_path": "app/b.py",
+          "bucket": "application",
+          "counts": {
+            "added": 0,
+            "deleted": 0
+          },
+          "coverage": {
+            "status": "partial",
+            "notices": [
+              "counts_unknown",
+              "unsupported"
+            ]
+          },
+          "flags": [
+            "rename",
+            "unsupported"
+          ]
+        }
+      ],
+      "locators": [],
+      "omitted_locator_count": 0,
+      "coverage": {
+        "status": "partial",
+        "notices": [
+          "counts_unknown",
+          "unsupported"
+        ]
+      },
+      "patch": {
+        "status": "unresolved",
+        "hash": null
+      },
+      "version": "developer-analysis-output-v1",
+      "run_id": "11111111-1111-1111-1111-111111111111",
+      "request_id": "22222222-2222-2222-2222-222222222222",
+      "input_hash": "25e842f635f1b6606f9e4f4cda54d96306e512b2ad9b36e260a0398c3fa6a53d",
+      "pins": {
+        "criterion_version_ids": [],
+        "task_version_ids": []
+      },
+      "analyzer_version": "unified-diff-v1",
+      "rule_version": "developer-taxonomy-v1",
+      "snapshot": {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "hash": "c6ce640bca74fa5dfdcf0bb089d8f998f85c616bebcb26ad4033ee113735f0b7",
+        "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "redaction_version": "secret-gate-v1",
+      "redaction_hash": "c6ce640bca74fa5dfdcf0bb089d8f998f85c616bebcb26ad4033ee113735f0b7"
+    }
+  }
+]

@@ -1,0 +1,83 @@
+# E04 — synthetic developer evidence: yozma dizayn v1
+
+2026-10-06. **Yozma dizayn va implementation plan tasdiqlangan; partial R1–R6 implemented, R1/R2/R4/R5 hamda R3 safe-disabled reviewlari o‘tgan. R1–R6 code reviews and final whole-unit scoped re-review approved. Actual OS activation blocked/default disabled503.**
+Asos: E03 `32c4e24`, branch `developer-evidence-analysis`. Foydalanuvchining “Ishni boshla” javobi [diagramma v1 va brief](../../design-mockups/e04-developer-evidence-flow-v1.md) doirasini tasdiqladi. Quyidagi yangi texnik tanlovlar shu yozma dizayn bilan ko‘rib chiqiladi.
+
+## Maqsad va chegaralar
+
+Lokal synthetic MR revisionining diff tarkibini hisoblash, natijani aniq SHA/path/line daliliga bog‘lash va inson reviewini saqlash. Laravel durable so‘rov, scope, tarix va natija validatsiyasini boshqaradi; Python faqat chegaralangan matnni deterministik tasniflaydi. Ishga tushadigan parser haqiqiy diffni hisoblaydi; fixture natijasi parser o‘rniga qo‘yilmaydi.
+
+Repository DOCX v1.0: FR-060/061, FR-120 deterministik qismi, §25 API/CAS, E04-BE/DATA/OPS/QA, AC-03/11 foundation holatlari. Bu **qisman E04**: lokal LLM, syntax/AST/static analyzer, semantic criterion satisfaction, effort/AC-04, real GitLab/Kanban, UI va production release gate kirmaydi. Task yoki criterion bilan bog‘lanish bajarilganlik isboti emas. Review E03 acceptance/progressini o‘zgartirmaydi. LOCdan xodim reytingi, ishlangan soat yoki pul hisoblanmaydi.
+
+Tavsiya etilgan synthetic facts + lokal parser yo‘li tanlangan. Backend-only muqobili haqiqiy analysis bermaydi; to‘liq model yo‘li esa hali tanlanmagan weights/runtime/hardware/quality qarorlarini talab qiladi. `grill-me` mavjud emas; supplied specification, ikki specialist tahlili va yozma qarorlar ishlatilmoqda. UI yo‘q.
+
+## 1. Manba va o‘zgarmas pinlar
+
+- Guarded local CLI faqat synthetic fixture ro‘yxatdan o‘tkazadi. Productionda yopiq; authenticated tenant/project subject va `analysis.fixture.manage` talab etiladi. API arbitrary URL, checkout yoki raw diff olmaydi. Hech qanday source tizimiga ulanish/yozish yo‘q.
+- Fixture: source instance/repository/MR immutable IDlari, revision ordinal, distinct lowercase 40-hex synthetic base/head SHA, `open|merged|released` source holati, occurred/received/source-updated UTC vaqtlar, diff va content SHA256. Synthetic SHA Git commit mavjudligini isbotlamaydi; locator synthetic deb belgilanadi.
+- Approved snapshot immutable; yangi revision current pointerga expected revision CAS bilan o‘tadi. Kech kelgan ordinal currentni almashtirmaydi. Raw payload secret gate o‘tmasdan saqlanmaydi; blocked receipt faqat safe reason, correlation ID va restricted hash metadata saqlaydi.
+- Requirement/criterion/task pinlari mavjud E03 versiyalaridan, shu tenant/projectdan olinadi. Pinlarning current holati publicationda tekshiriladi. Eski snapshot/result saqlanadi; current applicability alohida `current|stale|unknown`, historical natija current deb qayta chiqarilmaydi.
+- Force push, source correction, pin o‘zgarishi yoki kuzatilgan authority revocation selective invalidation event/outbox yaratadi. Observed stale holat eski run uchun terminal; yangi ruxsat/restore yangi so‘rov talab qiladi. Bir mutable grant qatorining kuzatishlar orasidagi revoke/restore tarixi mavjud tizimda tiklanmaydi; bu cheklov yashirilmaydi.
+
+## 2. Secret, format va limit gate
+
+Versionlangan scanner/policy raw diff va barcha free-text input/review maydonlarini tekshiradi. Default secret match **block**. Redaction faqat fixture uchun explicit versionlangan policyda: diff prefix/newline/path/hunk koordinatalari saqlanib, line content almashtiriladi. Header/pathdagi secret, noaniq multiline yoki line mapping buzilishi block qilinadi. Parser faqat qayta tekshirilgan redacted text va redaction version/hash oladi; credentials/environment/raw secret logs yoki workerga kirmaydi. Synthetic scanner corporate DLP kafolati emas.
+
+Dev limitlar: UTF-8 unified non-combined diff ≤512 KiB, JSON input ≤1 MiB, ≤100 files, ≤2000 hunks, ≤50000 changed lines. Archive, binary content, executable input va filesystem checkout ochilmaydi. Path logical case-sensitive POSIX relative identifier: NUL, absolute/drive/URI va `..` segment rad etiladi; parser pathni host fayli sifatida ochmaydi. Unsupported/binary/truncated file metadata bounded holda coverage noticega aylanadi; observed count bilan source-declared count aralashtirilmaydi. Parser malformed hunk/count yoki ambiguous pathga soxta locator yaratmaydi.
+
+## 3. Kontraktlar va API
+
+Yangi `developer-analysis-input-v1` va `developer-analysis-output-v1` strict JSON Schema, canonical hash va unknown-field rejection bilan. Mavjud E01 analysis-v1 va E02 ticket ingestion-v1 kengaytirilmaydi. Laravel serialized job Python tomonidan o‘qilmaydi; Laravel broker versionlangan JSONni stdin orqali beradi, bounded stdoutni qabul qiladi. FastAPI yoki LLM gateway bu slice uchun ochilmaydi.
+
+| Amal | Kirish/natija va qoida |
+|---|---|
+| `POST /api/projects/{project}/analysis-runs` | Approved snapshot ID, criterion/task version IDlari, `mode=deterministic`, `Idempotency-Key`; durable transactiondan keyin202/run ID. Server tenant/actorni beradi. |
+| `GET /api/analysis-runs/{run}` | Status, applicability, coverage, pinned versions, `ai_interpretation=unavailable`; current source/viewer access talab qilinadi. |
+| `GET /api/findings/{finding}` | Immutable facts, validated locators, review revision/history va confidence reasons; current scope/source access. |
+| `POST /api/findings/{finding}/reviews` | `expected_revision`, `verified|rejected|context-added`, sabab; append-only CAS, conflict409. |
+
+Purposes: project-scoped `analysis.request`, `analysis.read`, `analysis.source.read`, `analysis.review`, `analysis.process`, CLI uchun `analysis.fixture.manage`. Connector admin yoki ingestion permission bularni avtomatik bermaydi. Request uchun request+source.read; delivery uchun read+source.read; review uchun read+source.read+review; processor uchun process+source.read. Original requesterning exact membership/grant references va effective periods captured; current requester/operator authority publicationda qayta tekshiriladi. Viewer huquqi history snapshotini mutatsiya qilmaydi.
+
+Idempotency tenant/caller/operation/key bilan unique; canonical project/payload hash mismatch409, bir xil retry ayni runni qaytaradi. Key printable ASCII1–128; pins deduplicated/sorted canonical ID arrays. Unauthorized scoped ID404; unauthenticated401; known forbidden action403; malformed422; concurrency409; saturation429; unavailable runner503. Existing run javobi/collision current request+read+source access tekshirilgach, availabilitydan oldin beriladi; availability authorization o‘rnini bosmaydi. Yangi request runner disabled bo‘lsa503, durable queued run yaratilmaydi.
+
+## 4. PostgreSQL va durable execution
+
+Analysis snapshot/current pointer, request, finding/result, append-only review, invalidation va alohida outbox Laravelga tegishli. Tenant composite uniqueness/FK va project FK cross-scope write/upsertni rad etadi; FORCE RLS/nonowner runtime, transaction-local tenant context har kirishda/resetda. Python DB credential yoki DB write olmaydi. Raw rejected output logga tushmaydi.
+
+Snapshot registration va source event/outbox, request va execution outbox tegishli transactionlarda atomic. Request input pins/hashes, analyzer/rule/redaction/contract versions, original authority proof va actual coherent capture time bilan immutable. E03 queue/lifecycle countersga analysis job qo‘shilmaydi. Parent project/current-source/pin/grant lock tartibi bitta coordination boundaryda belgilangan; authorization/source change publication bilan serialize qilinadi. Closed projectda yangi registration/request/review rad etiladi; ruxsatli historical read saqlanadi. E03 close/reopen semantics o‘zgarmaydi.
+
+Run: `queued→running→succeeded|partial|error|cancelled`; applicability mustaqil. Lease60s, fencing token, max5 attempts, retry5/30/120/600s, batch≤20, backlog admission≤100 project pending runs. Claim commit compute oldidan; publication lease/token/authority/current pinsni qayta tekshiradi. Crash retry duplicate result/review/invalidation yaratmaydi. Expired lease natijasi rad etiladi. Permanent format/output violation error; infrastructure timeout bounded retry. Invalid parser output faqat bir marta ayni trusted parser bilan budget doirasida qayta olinadi; model repair yo‘q. Partial coverage hech qachon full success sifatida yashirilmaydi.
+
+## 5. Lokal parser va OS activation gate
+
+Taklif: mavjud Python3.12.14 dev runtime, stdlib-only pure parser. Production DEC-04/runtime qarori alohida. Runtime uchun project-owned `.local/e04-runtime` nusxasi va trusted parser manifest/checksum; remote package/model download yo‘q. Shared cache/runtime ACLlari o‘zgartirilmaydi.
+
+Windows runner AppContainer network capabilities bermasdan va Job Object cheklovlari bilan ishga tushadi. AppContainer file/network isolation mexanizmi; Job Object process lifetime/resource limits beradi ([Microsoft AppContainer](https://learn.microsoft.com/en-us/windows/win32/secauthz/appcontainer-isolation), [Job Objects](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects)). Bu hujjatlar ushbu kompyuterda gate o‘tganini anglatmaydi.
+
+Trusted broker fixed executable/args (`-I -B`, trusted parser), sanitized allowlist environment va stdin/stdout ishlatadi; input shell/argv bo‘lmaydi. Child suspended yaratiladi, resume oldidan AppContainer/Job Object binding tekshiriladi. Job kill-on-close, no breakaway, active process limit1, committed memory128 MiB, CPU3s, wall10s, output256 KiB, stderr8 KiB. Read-only ACL faqat owned runtime/parserga; job scratch alohida bounded, host checkout/credentialsga kirish yo‘q. Per-user profile `monitoring-ai-e04-parser-v1`; machine-wide firewall, existing-cache ACL yoki loopback exemption qo‘shilmaydi.
+
+Runner default disabled. Activation actual child token/AppContainer SID, empty network-capability list, no loopback exemption, job-before-resume va minimal inherited pipe handlesni tekshiradi. Broker uchun reachable positive control bilan controlled non-loopback listenerga child ulanishi rad etilishi talab qilinadi; loopback denial alohida probe, outbound denialning o‘rnini bosmaydi. Public internet yoki source-systemga test so‘rovi yuborilmaydi. Positive-control canary tests host checkout/config/credentials read denial, runtime/parser write denial va bounded scratchni tekshiradi. Child spawn denial, memory/CPU/wall/output limits va broker crash cleanup actual dalil talab qiladi. OSning umumiy ruxsatli system resourceslari absolute no-host-read kafolati deb aytilmaydi. Runtime checksum/profile/capability/ACL drift gate bekor qiladi. Profile/owned-runtime provisioning va ACL yozuvlari keyingi implementation plan doirasida aniq ko‘rsatiladi; sandbox escalation rad bo‘lsa activation disabled qoladi. Unsafe/remote fallback yo‘q. Pure parser tests OS isolation isboti emas. OS gate bajarilmasa bu slice running vertical analysis sifatida complete deb topshirilmaydi.
+
+## 6. Facts, provenance va locator validation
+
+Har observed added/deleted line bitta primary bucket: `generated|vendor|application|tests|config|docs|unknown`. Server-approved versionlangan ordered rules overlapni deterministik hal qiladi; unrecognized path unknown. File/hunkda mixed, rename, binary, unsupported, truncated va generator/template/migration relation mustaqil flags. Path/marker heuristic ekanligi ko‘rinadi; refactor, bug, N+1 yoki semantic quality inference yo‘q. Review correction yangi approved rule/snapshot version va rerun bilan; eski count/result o‘zgarmaydi.
+
+AC-03 fixture parser orqali `+5172=3800 generated+900 application+300 tests+100 config+72 docs`; `-378` alohida bucket conservation bilan. Unknown totaldan chiqarilmaydi. Unsupported/truncated full source count unknown; observed subtotal va coverage alohida, nol qolgan ish deb talqin qilinmaydi.
+
+Exact patch group tenant/project/repository va requirement-context versiyasiga scoped SHA256 normalized UTF-8/LF diffga asoslanadi. Faqat CRLF→LF normalization; headers/index metadata, hunk offsets, file ordering, path va added/deleted/context content saqlanadi. Whitespace strip, reorder yoki semantic equivalence yo‘q; metadata/offsetdagi farq ham boshqa group, konservativ false-negative explicit. Source event/base/head SHA envelope alohida pinlar bo‘lib patch bytesga sun’iy qo‘shilmaydi. Redacted/binary/truncated/unsupported patch dedupe unresolved; redaction turli secretlarni bitta change deb birlashtirmaydi. Har source revision/event saqlanadi. Squash/cherry-pick ownership taxmin qilinmaydi; event counts va proven unique patch groups alohida. Accepted-release/contribution aggregate va authorship/review/test-improvement/research attribution bu slicega kirmaydi; full FR-061 complete deb aytilmaydi.
+
+Finding faqat `composition_fact|coverage_notice|provenance_notice`, server-template summary, run/hash/analyzer/rule/contract/pin refs, coverage, assumptions, suggested validation, counterevidence, source/link/claim confidence labels+reasons, informational severity va review holatini oladi. Labels calibrated probability emas; arbitrary quality claims rad etiladi. Locator snapshot ID/hash, exact base/head SHA, logical path, old/new side va hunk-derived line boundsga tekshiriladi. Deleted line old/base, added new/head; binary/unsupported locator yo‘q. Noexistent/wrongSHA/path/line/hash/schema result accepted findingsga kirmaydi.
+
+Human review faqat shu fakt tasnifi/coverage/provenance uchun. Verified review source haqiqat yoki criterion acceptance bo‘lib ketmaydi; stale input review orqali tiklanmaydi. Review actor, expected revision, safe reason va actual action time append-only; concurrency409. `context-added` review revisionini oshiradi va annotation qo‘shadi, oxirgi verified/rejected dispositionni almashtirmaydi; dastlab disposition pending. Employee context mavjud ruxsatli review orqali qo‘shiladi, source record ustiga yozilmaydi. Outputda aggregate counts conserved, per-file coverage va ≤200 representative locators; omitted locator count explicit, output limitga sig‘magan result truncate qilinib valid deb qabul qilinmaydi.
+
+## 7. Qabul va topshirish mezonlari
+
+Mustaqil Laravel/database/security va Python review; fresh isolated PostgreSQL behavioral/RLS/composite-FK tests. Schema/hash/locator, idempotency collision/retry, exact count conservation, unknown/mixed/generator/rename/binary/truncation, injection-as-data, secret block/redaction, malformed hunk, stale source/pins/authority, late/fenced result, crash recovery, concurrent review va unchanged E03 progress tekshiriladi. OS activation probes effective capabilities va controlled non-loopback/loopback denial, aniq host-data boundariesni actual dalil bilan tasdiqlaydi; public-internet test o‘tkazildi deb aytilmaydi. Corporate/model/NFR sifat natijasi da’vo qilinmaydi.
+
+Deliverables: versionlangan OpenAPI/JSON contracts, analysis data dictionary, taxonomy/rule registry, capability matrixdagi synthetic-only belgi, disabled/activated runner evidence, retry/recovery runbook va acceptance report. Real AI unavailable aniq ko‘rsatiladi. No push/merge/server deployment. E04 commit alohida completed-unit ruxsati talab qiladi.
+
+## Joriy implementatsiya va qabul chegarasi
+
+Tasdiqlangan plan subagent-driven bajarildi; PostgreSQL storage/authority/admission, pure parser, safe-disabled broker, durable processor/gate/invalidation va human review/history implemented. R6 focused11/306, combined API/invalidation37/980; final parent PHP324/7032, Python51, full Pint/strict locked Composer checks passed. Dev migrations15–18 guarded incremental applied; immutable history saqlangan. R1–R6 code reviews and final whole-unit scoped re-review approved. OpenAPI1.3.0; original v1 input/output schemas o‘zgarmadi. Logical `/api/...` mavjud `/api/v1/...` transportiga normalizatsiya qilindi; history default50/max100 scoped revision keyset, review reason≤2000 UTF-8 bytes. Verified analysis summaries E03 acceptance emas.
+
+PNG v1 o‘zgartirilmagan; ayni tasdiqlangan doira qayta ishlatilmoqda. Actual AppContainer Python KERNELBASE startup0xc0000142 va controlled independent non-loopback endpoint yo‘qligi sabab activated vertical analysis blocked; runner default-disabled/503, model absent, unsafe/remote fallback yo‘q. Test-only worker injection actual activation deb hisoblanmaydi. [Acceptance](../../acceptance/e04.md), [dictionary](../../contracts/developer-analysis-data-dictionary.md), [runbook](../../operations/local-developer-analysis.md) aniq dalil va qolgan FR/AC/NFR chegaralarini qayd etadi. E04 commit/push/merge/deploy bajarilmagan.

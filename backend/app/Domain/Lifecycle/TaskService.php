@@ -5,6 +5,7 @@ namespace App\Domain\Lifecycle;
 use App\Domain\Access\AccessGateway;
 use App\Domain\Access\TrustedActor;
 use App\Domain\Audit\AuditWriter;
+use App\Domain\DeveloperAnalysis\AnalysisInvalidation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -44,6 +45,7 @@ class TaskService
             $version = (string) Str::uuid();
             $result = $this->snapshot($actor, $project, $task, $version, $data, $expectedRevision + 1);
             DB::table('lifecycle_tasks')->where('id', $task)->update(['revision' => $expectedRevision + 1, 'current_version_id' => $version]);
+            app(AnalysisInvalidation::class)->observeProject($actor, $project, 'task:'.$version, ['task_version_ids' => [$old->current_version_id]]);
 
             return $result;
         });

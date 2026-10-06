@@ -1,0 +1,24 @@
+diff --git a/app/template.py b/app/template.py
+--- a/app/template.py
++++ b/app/template.py
+@@ -0,0 +1,5 @@
++normal
++// BEGIN GENERATED
++machine_a
++machine_b
++// END GENERATED
+diff --git a/vendor/tests/tool.py b/vendor/tests/tool.py
+--- a/vendor/tests/tool.py
++++ b/vendor/tests/tool.py
+@@ -0,0 +1,1 @@
++tool
+diff --git a/misc/opaque.xyz b/misc/opaque.xyz
+--- a/misc/opaque.xyz
++++ b/misc/opaque.xyz
+@@ -0,0 +1,1 @@
++opaque
+diff --git a/database/migrations/add.sql b/database/migrations/add.sql
+--- a/database/migrations/add.sql
++++ b/database/migrations/add.sql
+@@ -0,0 +1,1 @@
++ALTER TABLE synthetic ADD x integer;

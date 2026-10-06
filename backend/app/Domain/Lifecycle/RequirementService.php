@@ -4,6 +4,7 @@ namespace App\Domain\Lifecycle;
 
 use App\Domain\Access\TrustedActor;
 use App\Domain\Audit\AuditWriter;
+use App\Domain\DeveloperAnalysis\AnalysisInvalidation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -105,6 +106,7 @@ class RequirementService
                 }
             }
             $this->audit->record($actor->id, $scope, 'requirement.approved', ['type' => 'requirement_versions', 'id' => $id], $version, 'approved_change');
+            app(AnalysisInvalidation::class)->observeProject($actor, $projectId, 'requirement:'.$id, ['criterion_version_ids' => $oldLinks->pluck('criterion_version_id')->all()]);
 
             return ['id' => $id, 'requirement_id' => $d->requirement_id, 'version' => $version, 'hash' => $hash, 'criteria' => $criteria];
         });

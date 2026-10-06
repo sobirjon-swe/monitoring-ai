@@ -50,3 +50,9 @@ Mavjud `source_instances`dagi `task_tracker` turi kelajakdagi ushbu manbani ifod
 Keyingi adapter tenant/project bindingini ishonchli konfiguratsiyadan olishi, approved identity mappingdan foydalanishi, source instance/object/versionni saqlashi, UTC vaqtlarni ajratishi va noto‘liq qamrovni ochiq ko‘rsatishi kerak. Ism yoki email asosida shaxslar avtomatik birlashtirilmaydi. Ruxsatli source o‘qish mahsulot AI inference xizmatidan alohida; barcha mahsulot AI faqat lokal yoki kompaniya boshqaradigan infratuzilmada bajariladi.
 
 Bu matritsa E02 implementatsiyasi, test natijasi yoki to‘liq AC-02/09/10 qabul dalili emas. Real source pagination, backfill/reconciliation, credential/webhook tekshiruvi va real importlar ochiq qoladi.
+
+## 2026-10-06: E04 synthetic developer evidence
+
+Matrix supplement v0.2: approved partial E04 uses guarded local `app:developer-fixture`, source-instance/repository/MR logical IDs, immutable revision/base/head SHA and safe diff snapshot. No GitLab/Kanban network call, checkout, webhook/source credential or real SHA resolution is implemented. open/merged/released are fixture metadata, never release acceptance. Existing Kanban read-only authorization is unchanged; no further source request was made for E04.
+
+Durable request/process/read/review and exact scoped patch-group metadata are implemented; real parser activation stays disabled503 because native Python startup fails0xc0000142 and independent controlled non-loopback probe endpoint is absent. Behavioral fake test workers and standalone trusted parser fixtures are not production/live source or activation evidence. AI interpretation unavailable; model absent. [Data dictionary](developer-analysis-data-dictionary.md), [runbook](../operations/local-developer-analysis.md), [partial acceptance](../acceptance/e04.md).

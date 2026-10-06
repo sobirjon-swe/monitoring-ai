@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:monitoring-ai:developer-analysis-input-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "run_id",
+    "request_id",
+    "input_hash",
+    "pins",
+    "analyzer_version",
+    "rule_version",
+    "snapshot"
+  ],
+  "properties": {
+    "version": {
+      "const": "developer-analysis-input-v1"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "request_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "input_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "pins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criterion_version_ids",
+        "task_version_ids"
+      ],
+      "properties": {
+        "criterion_version_ids": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          }
+        },
+        "task_version_ids": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          }
+        }
+      }
+    },
+    "analyzer_version": {
+      "const": "unified-diff-v1"
+    },
+    "rule_version": {
+      "const": "developer-taxonomy-v1"
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "hash",
+        "base_sha",
+        "head_sha",
+        "source_instance_id",
+        "repository_id",
+        "mr_id",
+        "revision_ordinal",
+        "paths",
+        "redacted_diff",
+        "redaction"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "head_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "source_instance_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "repository_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "mr_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "revision_ordinal": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "paths": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "old_path",
+              "new_path"
+            ],
+            "properties": {
+              "old_path": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 500
+              },
+              "new_path": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 500
+              }
+            }
+          }
+        },
+        "redacted_diff": {
+          "type": "string",
+          "maxLength": 524288
+        },
+        "redaction": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "policy",
+            "hash",
+            "mapping"
+          ],
+          "properties": {
+            "version": {
+              "const": "secret-gate-v1"
+            },
+            "policy": {
+              "enum": [
+                "block-v1",
+                "redact-lines-v1"
+              ]
+            },
+            "hash": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "mapping": {
+              "type": "array",
+              "maxItems": 50000,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "diff_line",
+                  "prefix"
+                ],
+                "properties": {
+                  "diff_line": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 600000
+                  },
+                  "prefix": {
+                    "enum": [
+                      "+",
+                      "-",
+                      " "
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

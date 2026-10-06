@@ -1,0 +1,521 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:monitoring-ai:developer-analysis-output-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "run_id",
+    "request_id",
+    "input_hash",
+    "pins",
+    "analyzer_version",
+    "rule_version",
+    "snapshot",
+    "redaction_version",
+    "redaction_hash",
+    "counts",
+    "buckets",
+    "coverage",
+    "files",
+    "locators",
+    "omitted_locator_count",
+    "patch"
+  ],
+  "properties": {
+    "version": {
+      "const": "developer-analysis-output-v1"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "request_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "input_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "pins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criterion_version_ids",
+        "task_version_ids"
+      ],
+      "properties": {
+        "criterion_version_ids": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          }
+        },
+        "task_version_ids": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          }
+        }
+      }
+    },
+    "analyzer_version": {
+      "const": "unified-diff-v1"
+    },
+    "rule_version": {
+      "const": "developer-taxonomy-v1"
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "hash",
+        "base_sha",
+        "head_sha"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "head_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "redaction_version": {
+      "const": "secret-gate-v1"
+    },
+    "redaction_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "added",
+        "deleted"
+      ],
+      "properties": {
+        "added": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50000
+        },
+        "deleted": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50000
+        }
+      }
+    },
+    "buckets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generated",
+        "vendor",
+        "application",
+        "tests",
+        "config",
+        "docs",
+        "unknown"
+      ],
+      "properties": {
+        "generated": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "added",
+            "deleted"
+          ],
+          "properties": {
+            "added": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            },
+            "deleted": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            }
+          }
+        },
+        "vendor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "added",
+            "deleted"
+          ],
+          "properties": {
+            "added": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            },
+            "deleted": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            }
+          }
+        },
+        "application": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "added",
+            "deleted"
+          ],
+          "properties": {
+            "added": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            },
+            "deleted": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            }
+          }
+        },
+        "tests": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "added",
+            "deleted"
+          ],
+          "properties": {
+            "added": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            },
+            "deleted": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            }
+          }
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "added",
+            "deleted"
+          ],
+          "properties": {
+            "added": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            },
+            "deleted": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            }
+          }
+        },
+        "docs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "added",
+            "deleted"
+          ],
+          "properties": {
+            "added": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            },
+            "deleted": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            }
+          }
+        },
+        "unknown": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "added",
+            "deleted"
+          ],
+          "properties": {
+            "added": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            },
+            "deleted": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50000
+            }
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "notices"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "partial"
+          ]
+        },
+        "notices": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "binary",
+              "unsupported",
+              "truncated",
+              "redacted",
+              "unknown_path",
+              "counts_unknown"
+            ]
+          }
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "old_path",
+          "new_path",
+          "bucket",
+          "counts",
+          "coverage",
+          "flags"
+        ],
+        "properties": {
+          "old_path": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500
+          },
+          "new_path": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500
+          },
+          "bucket": {
+            "enum": [
+              "generated",
+              "vendor",
+              "application",
+              "tests",
+              "config",
+              "docs",
+              "unknown"
+            ]
+          },
+          "counts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "added",
+              "deleted"
+            ],
+            "properties": {
+              "added": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 50000
+              },
+              "deleted": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 50000
+              }
+            }
+          },
+          "coverage": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "notices"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "complete",
+                  "partial"
+                ]
+              },
+              "notices": {
+                "type": "array",
+                "maxItems": 20,
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "binary",
+                    "unsupported",
+                    "truncated",
+                    "redacted",
+                    "unknown_path",
+                    "counts_unknown"
+                  ]
+                }
+              }
+            }
+          },
+          "flags": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 12,
+            "items": {
+              "enum": [
+                "mixed",
+                "rename",
+                "binary",
+                "unsupported",
+                "truncated",
+                "generated",
+                "template",
+                "migration",
+                "redacted"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "locators": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "snapshot_id",
+          "snapshot_hash",
+          "base_sha",
+          "head_sha",
+          "path",
+          "side",
+          "line",
+          "hunk_index",
+          "kind"
+        ],
+        "properties": {
+          "snapshot_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "snapshot_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "base_sha": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "head_sha": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "side": {
+            "enum": [
+              "old",
+              "new"
+            ]
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "hunk_index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1999
+          },
+          "kind": {
+            "enum": [
+              "added",
+              "deleted"
+            ]
+          }
+        }
+      }
+    },
+    "omitted_locator_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 50000
+    },
+    "patch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "hash"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "exact",
+            "unresolved"
+          ]
+        },
+        "hash": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}

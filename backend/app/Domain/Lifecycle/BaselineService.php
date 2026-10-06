@@ -4,6 +4,7 @@ namespace App\Domain\Lifecycle;
 
 use App\Domain\Access\TrustedActor;
 use App\Domain\Audit\AuditWriter;
+use App\Domain\DeveloperAnalysis\AnalysisInvalidation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -103,6 +104,7 @@ class BaselineService
             $event = $this->changes->record($actor, $project, 'baseline.approve', 'project_closed', $state->current_baseline_id, $state->current_baseline_id, $reason);
             $this->freeze($actor, $project, $p, $event);
             DB::table('lifecycle_project_state')->where('project_id', $project)->update(['is_closed' => true]);
+            app(AnalysisInvalidation::class)->observeProject($actor, $project, 'closure:'.$event);
             $this->audit->record($actor->id, ['tenant_id' => $actor->tenantId, 'project_id' => $project], 'baseline.closed', ['type' => 'baselines', 'id' => $state->current_baseline_id], 1, 'approved_change');
 
             return ['id' => $state->current_baseline_id, 'status' => 'closed'];
