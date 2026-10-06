@@ -10,6 +10,8 @@
 - [Umumiy data dictionary](data/e01-dictionary.md) — modul lug‘atlariga havolalar, tenant/vaqt/audit invariantlari.
 - [Lokal development](operations/local-development.md), [PostgreSQL](operations/postgresql-local.md), [lokal autentifikatsiya](operations/local-authentication.md).
 - [E01 lokal qabul dalillari](acceptance/e01.md) — FR/AC doirasi, tekshiruvlar va qolgan ishlar.
+- [E02 lokal qabul dalillari va qilinmagan ishlar](acceptance/e02.md) — reviewed synthetic slice yakunlandi; 150 test/3154 assertion va lokal dev smoke o‘tdi.
+- [E02 ingestion lug‘ati](contracts/ingestion-data-dictionary.md), [lokal operatsiyalar](operations/local-ingestion.md) va [manba imkoniyatlari](contracts/source-capability-matrix.md).
 
 Barcha mahsulot AI hisoblashlari faqat shu kompyuter yoki kompaniya boshqaradigan infratuzilmada bajariladi; tashqi AI API va cloud fallback taqiqlangan. Model keyingi bosqichda tanlanib ishlatiladi. Ruxsatli read-only source API integratsiyasi inference xizmatidan alohida.
 

@@ -2,8 +2,10 @@
 
 // All routes in this file inherit authentication. Domain permissions are added in T03–T05.
 
+use App\Http\Controllers\ConnectorController;
 use App\Http\Controllers\IdentityController;
 use App\Http\Controllers\IdentityMappingController;
+use App\Http\Controllers\IngestionController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
@@ -26,3 +28,7 @@ foreach (['roles', 'memberships'] as $resource) {
     Route::match($resource === 'roles' ? ['GET', 'POST'] : ['POST'], '/v1/projects/{project}/'.$resource, [ProjectController::class, 'handle'])->whereUuid('project')->defaults('project_resource', $resource);
     Route::patch('/v1/projects/{project}/'.$resource.'/{id}', [ProjectController::class, 'handle'])->whereUuid('project')->whereUuid('id')->defaults('project_resource', $resource);
 }
+
+Route::match(['GET', 'POST'], '/v1/projects/{project}/connectors', [ConnectorController::class, 'handle'])->whereUuid('project');
+Route::get('/v1/connectors/{connector}', [ConnectorController::class, 'handle'])->whereUuid('connector');
+Route::post('/v1/connectors/{connector}/receipts', [IngestionController::class, 'accept'])->whereUuid('connector');

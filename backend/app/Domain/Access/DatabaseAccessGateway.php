@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class DatabaseAccessGateway implements AccessGateway
 {
-    public const PURPOSES = ['organization.read', 'organization.manage', 'project.create', 'project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'identity.read', 'identity.manage', 'analysis.context'];
+    public const PURPOSES = ['organization.read', 'organization.manage', 'project.create', 'project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'identity.read', 'identity.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process'];
 
     public function __construct(private readonly TenantContext $context) {}
 
@@ -36,7 +36,7 @@ class DatabaseAccessGateway implements AccessGateway
             }
             $project = $scope['project_id'] ?? null;
             $department = $scope['department_id'] ?? null;
-            if (in_array($purpose, ['project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'analysis.context'], true) && $project === null) {
+            if (in_array($purpose, ['project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process'], true) && $project === null) {
                 return false;
             }
             if ($project !== null && ($user->employee_id === null || ! DB::table('project_memberships')

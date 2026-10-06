@@ -1,5 +1,7 @@
 # Lokal PostgreSQL tayyorlash
 
+2026-10-05 joriy checkout alohida PostgreSQL 17.10 SCRAM klasteridan `127.0.0.1:55432`da foydalanadi; `.local/postgres-data`, dev/test va runtime/migrator rollari [joriy lokal development](local-development.md)da qayd etilgan. Quyidagi 2026-10-03 port5432/trust kuzatuvlari tarixiy, joriy klasterning holati emas. Eski service yoki boshqa bazalar o‘zgartirilmagan.
+
 Bu yo‘riqnoma E01 rejasining T02 lokal DB tayyorlash qismini qamraydi. Spetsifikatsiya 21.2, 22, 23 va 30.2-bo‘limlari hamda FR-200 uchun migration/runtime rollari ajratiladi. Provisioner faqat baza/rol tayyorlaydi; tenant RLS va audit/identity tarix cheklovlari hozir T03–T06 inkremental migratsiyalarida joriy qilingan. Ularning behavior dalillari ilova testlarida, provisioning bilan aralashtirilmaydi.
 
 ## Provisioning

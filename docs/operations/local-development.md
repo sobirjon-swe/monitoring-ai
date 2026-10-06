@@ -1,5 +1,40 @@
 # Lokal development
 
+## 2026-10-05: ushbu checkoutdagi tekshirilgan muhit
+
+Oldingi D:/Tools runtime va ignored konfiguratsiya bu kompyuterda mavjud emas edi. Mos runtime loyiha ichida tiklandi: `.local/tools/php85/php.exe` — PHP 8.5.11 NTS x64; rasmiy [PHP Windows yuklash sahifasi](https://www.php.net/downloads.php?os=windows&version=8.5) SHA256 `0ea96e0d2b9b737a6036f05cf4e95c49313faa6d0f27bd97edb2742503f0c043` bilan tekshirildi. Global PATHdagi PHP 8.4 loyihaning ^8.5 talabiga mos emas; quyidagi aniq executable ishlatiladi. Composer 2.10.2, locked Laravel 13.34.0 va PHPUnit 12.5.37 tiklandi; composer.lock yangilanmadi. Dependency yuklash AI inference emas; mahsulot ma’lumotlari yuborilmadi.
+
+Mavjud PostgreSQL17 xizmatiga tegmasdan `.local/postgres-data`da alohida 17.10 klaster yaratildi. U **127.0.0.1:55432**, SCRAM autentifikatsiyasi bilan ishlaydi; dev/test bazalari va nonowner runtime/migrator rollari mavjud provisioning skripti bilan yaratildi. Bu klaster Windows service sifatida o‘rnatilmagan. Private credential/config va `.env`/`.env.testing` ignored va ACL bilan cheklangan. `.local` backup/Gitga kiritilmaydi; parollar chat/command linega yozilmaydi.
+
+Repository ildizidan, klaster avval ishga tushganini `pg_isready -h 127.0.0.1 -p 55432` bilan tekshiring. PostgreSQL binari `C:/Program Files/PostgreSQL/17/bin/`da. To‘xtatilgan klasterni lokal terminaldan `pg_ctl -D <repo>/.local/postgres-data -l <repo>/.local/postgres-start.log -o "-h 127.0.0.1 -p 55432" start` bilan ishga tushirish mumkin. Agent fon jarayonini `Start-Process -WindowStyle Hidden` bilan ochadi; mavjud boshqa xizmatlarni to‘xtatmaydi. Klaster faqat shu loyiha uchun to‘xtatilishi kerak.
+
+Backend katalogidan:
+
+```powershell
+& ../.local/tools/php85/php.exe artisan app:migrate-local --env=testing
+& ../.local/tools/php85/php.exe artisan app:migrate-local
+& ../.local/tools/php85/php.exe artisan test --colors=never
+& ../.local/tools/php85/php.exe vendor/bin/pint --test
+& ../.local/tools/php85/php.exe C:/php/php84/composer.phar validate --strict
+& ../.local/tools/php85/php.exe C:/php/php84/composer.phar check-platform-reqs
+```
+
+Mavjud E01 baseline yangi muhitda 2026-10-05 tekshirildi: **97 passed / 1934 assertions / exit0 / 11.25s**; E02 yangi testlari baselinega kiritilmagan. Bu E02 yakuniy natijasi emas. Unit suite katalogi Gitga saqlanadi, shunda fresh checkoutda PHPUnit mavjud bo‘lmagan katalog sabab ishga tushmay qolmaydi.
+
+E02 integratsiya tekshiruvi: **150 passed / 3154 assertions / 17.61s / exit0**; full Pint, strict Composer/platform va API route/contract parity o‘tdi. Reviewed 000007/000008 dev migrationlari inkremental qo‘llandi. Dev synthetic acceptance/replay/guarded CLI/projection smoke outer transaction bilan bajarildi va rollbackdan keyin synthetic tenant qolmagani tekshirildi. Durable lease/concurrency dalili alohida test bazada, bu rollback smoke bilan almashtirilmaydi.
+
+Joriy API **http://127.0.0.1:18080**da ishlaydi. Windows port8000da mavjud boshqa listener aniqlandi; boshqa ilova saqlandi, faqat shu taskning kolliziya bergan serveri yopildi. `Get-NetTCPConnection`ning muvaffaqiyatsiz/no-output holati port bo‘shligi isboti emas; `netstat -ano -p tcp` ham tekshirilsin. Yangi serverni ishga tushirishda mavjud jarayonlarni yopmang:
+
+```powershell
+& ../.local/tools/php85/php.exe artisan serve --host=127.0.0.1 --port=18080 --tries=1
+```
+
+Fon ishga tushirish `Start-Process -WindowStyle Hidden` orqali bajarildi. HTTP `/up` 200 va server request ID, ruxsatsiz connector GET 401 tekshirildi; `/up` faqat liveness. [E02 qabul dalillari](../acceptance/e02.md) scope va cheklovlarni saqlaydi.
+
+Quyidagi 2026-10-03 yozuvlar tarixiy muhit va dalillarni tavsiflaydi; ulardagi path, live server va tayyor local config holati bugungi checkout uchun avtomatik kafolat emas. Joriy E02 natijalari alohida qabul hujjatida qayd etiladi.
+
+## 2026-10-03: tarixiy muhit
+
 2026-10-03: PHP 8.5.5 NTS (D:/Tools/php/php.exe), Composer 2.9.5, Laravel 13.34.0, PHPUnit 12.5.37, PostgreSQL 17.10. composer.lock aniq dependencylarni, jumladan lokal Opis/json-schema 2.6.0ni belgilaydi. Frontend/npm va model runtime tanlanmagan.
 
 ## Konfiguratsiya

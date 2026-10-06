@@ -10,6 +10,8 @@
 | Tashqi identity | source_instances, identities, identity_mappings, identity_mapping_histories. | [Identity](../contracts/identity-data-dictionary.md) |
 | Sun’iy tahlil chegarasi | TrustedAnalysisScope, AuthorizedSnapshot, ichki empty-default SyntheticArtifactRegistry va analysis-context/output.v1 sxemalari; DB artifact yoki analysis jadvallari yo‘q. | [Analysis](../contracts/analysis-data-dictionary.md) |
 
+E02 davom etayotgan alohida modul: [lokal ingestion ma’lumotlar lug‘ati](../contracts/ingestion-data-dictionary.md); implementatsiya va tekshiruv chegaralari o‘sha hujjatda ko‘rsatilgan.
+
 Ichki kalitlar UUID; tenant scoped parent-child aloqalar composite FKlarga ega. Project scoped yozuvlar project_idni ham saqlaydi. Project/department membership, reporting relationship, business role va explicit access grant mustaqil; birini boshqasidan taxmin qilmaymiz. Tarixiy davrlar [valid_from,valid_to), PostgreSQL sessiyalari UTC, loyiha displey default Asia/Tashkent.
 
 Runtime monitoring_ai_app himoyalangan jadvallarning egasi, SUPERUSER yoki BYPASSRLS emas. Barcha scoped jadvallarda ENABLE/FORCE RLS; app.tenant_id faqat transaction-local, TenantContext savepoint/commit/rollbackdan keyin scope qiymatini tiklaydi. Kontekst yo‘q bo‘lsa scoped read bo‘sh, write rad etiladi. migrator→owner ulanishi runtime ulanishidan alohida; migrations ledger runtime uchun yopiq.

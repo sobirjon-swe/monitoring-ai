@@ -1,14 +1,14 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Monitoring AI local E01 foundation",
-    "version": "1.0.0",
-    "description": "JSON syntax is valid YAML1.2. Local/testing loopback opaque bearer tokens only; production SSO and UI not implemented. Tenant/project scopes and current grants/membership are server-controlled. No T07 HTTP/model endpoint: analysis contracts are synthetic-only internal client. Responses may contain UTC PostgreSQL timestamp text, not uniformly RFC3339. HEAD uses the same read permissions and handler as GET and has an empty body; only POST/PATCH mutate. UTC timestamps preserve up to six fractional digits through validation, timestamptz(6) storage and event/access-time bindings. Periods remain [valid_from,valid_to) at microsecond precision."
+    "title": "Monitoring AI local E01 foundation and synthetic E02 ingestion",
+    "version": "1.1.0",
+    "description": "JSON syntax is valid YAML1.2. Local/testing loopback opaque bearer tokens only; production SSO and UI not implemented. Tenant/project scopes and current grants/membership are server-controlled. No T07 HTTP/model endpoint: analysis contracts are synthetic-only internal client. Responses may contain UTC PostgreSQL timestamp text, not uniformly RFC3339. HEAD uses the same read permissions and handler as GET and has an empty body; only POST/PATCH mutate. UTC timestamps preserve up to six fractional digits through validation, timestamptz(6) storage and event/access-time bindings. Periods remain [valid_from,valid_to) at microsecond precision. E02 I1/I2 provide synthetic-v1 manual-source connector bindings and bounded durable receipt/outbox acceptance. No real source API, webhook verification, raw receipt read, settings update, production worker identity or external AI inference. I3 local outbox processing and I4 projection/status are implemented and independently reviewed. Whole-unit code review found no Critical or Important blockers; dedicated dev incremental migrations000007/000008 and rollback-scoped synthetic acceptance/replay/CLI projection smoke were verified by the lead. Scoped metadata re-review approved. This synthetic foundation does not establish full E02 or production readiness. Source freshness remains unknown."
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:8000",
-      "description": "Current configurable local development endpoint"
+      "url": "http://127.0.0.1:18080",
+      "description": "Current configurable local development endpoint; port8000 belongs to another application and is preserved."
     }
   ],
   "security": [
@@ -4477,6 +4477,928 @@
           }
         }
       }
+    },
+    "/api/v1/projects/{project}/connectors": {
+      "get": {
+        "operationId": "listSyntheticConnectors",
+        "summary": "List synthetic connectors",
+        "description": "Local/testing bearer only; trusted tenant and current project membership/grant are server-controlled.",
+        "x-purpose": "connector.manage",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "project",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "description": "ID-ordered list capped at100; no cursor or completeness guarantee.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/IngestionConnector"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createSyntheticConnector",
+        "summary": "Create synthetic connector binding",
+        "description": "Local/testing bearer only; trusted tenant and current project membership/grant are server-controlled.",
+        "x-purpose": "connector.manage",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "project",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "201": {
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "description": "Connector created; default status disabled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/IngestionConnector"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngestionConnectorCreate"
+              }
+            }
+          },
+          "required": true
+        }
+      },
+      "head": {
+        "operationId": "listSyntheticConnectorsHead",
+        "summary": "Automatic HEAD counterpart",
+        "description": "Local/testing bearer only; trusted tenant and current project membership/grant are server-controlled. Same GET read authorization/handler; response body empty, no mutation.",
+        "x-purpose": "connector.manage",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "project",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "200": {
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "description": "ID-ordered list capped at100; no cursor or completeness guarantee."
+          }
+        }
+      }
+    },
+    "/api/v1/connectors/{connector}": {
+      "get": {
+        "operationId": "readSyntheticConnectorStatus",
+        "summary": "Read synthetic connector operational counters",
+        "description": "Local/testing bearer only; trusted tenant and current project membership/grant are server-controlled.",
+        "x-purpose": "connector.manage",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "connector",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "description": "Connector, receipt/outbox counters, last received/completed times and fixed coverage codes; source freshness unknown.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/IngestionConnectorStatus"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "readSyntheticConnectorStatusHead",
+        "summary": "Automatic HEAD counterpart",
+        "description": "Local/testing bearer only; trusted tenant and current project membership/grant are server-controlled. Same GET read authorization/handler; response body empty, no mutation.",
+        "x-purpose": "connector.manage",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "connector",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, FK/unique/exclusion conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid fields/date period.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "200": {
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "description": "Connector and receipt/outbox counters."
+          }
+        }
+      }
+    },
+    "/api/v1/connectors/{connector}/receipts": {
+      "post": {
+        "operationId": "acceptSyntheticReceipt",
+        "summary": "Durably accept synthetic ticket snapshot",
+        "description": "Local/testing bearer only; trusted tenant and current project membership/grant are server-controlled. Active connector required. Source/object acceptance serialized across versions; changing historical project binding denied. Canonical hash ignores object key order. Malformed synthetic envelopes rejected before persistence, not durably quarantined. Receipt accepted_by is server-derived and immutable.",
+        "x-purpose": "ingestion.accept",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "connector",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked local token.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current scope/grant/membership denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing or tenant-hidden resource.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Disabled connector, changed canonical payload under same logical version key, or source/object project rebinding conflict.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid strict JSON/schema, timestamp, duplicate key or NUL string; no receipt persisted.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Safe unexpected failure.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "201": {
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "description": "New immutable receipt and outbox committed atomically, duplicate=false.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/IngestionAcceptance"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "description": "Semantic replay: same receipt, duplicate=true; first raw bytes retained.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/IngestionAcceptance"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Raw request exceeds65536bytes; no receipt persisted.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated correlation UUID.",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngestionEnvelopeV1"
+              }
+            }
+          },
+          "required": true
+        }
+      }
     }
   },
   "components": {
@@ -5300,11 +6222,288 @@
           "status",
           "expected_revision"
         ]
+      },
+      "IngestionConnector": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_instance_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "adapter": {
+            "type": "string",
+            "enum": [
+              "synthetic-v1"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "disabled"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at": {
+            "type": "string",
+            "description": "UTC PostgreSQL timestamp text with up to six fractional digits."
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "project_id",
+          "source_instance_id",
+          "adapter",
+          "status",
+          "revision",
+          "created_at"
+        ],
+        "type": "object"
+      },
+      "IngestionConnectorCreate": {
+        "properties": {
+          "source_instance_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "adapter": {
+            "type": "string",
+            "enum": [
+              "synthetic-v1"
+            ]
+          },
+          "status": {
+            "default": "disabled",
+            "enum": [
+              "active",
+              "disabled"
+            ],
+            "type": "string"
+          }
+        },
+        "description": "Extra fields are ignored by this connector controller and cannot establish authority. Source must be a tenant-local manual instance. No URL/token field is supported.",
+        "required": [
+          "source_instance_id",
+          "adapter"
+        ],
+        "type": "object"
+      },
+      "IngestionConnectorStatus": {
+        "properties": {
+          "connector": {
+            "$ref": "#/components/schemas/IngestionConnector"
+          },
+          "outbox_counts": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              {
+                "type": "array",
+                "maxItems": 0
+              }
+            ],
+            "description": "Observed status keys only: pending, processing, retry, completed, dead_letter, blocked. Empty PHP array serializes as [] when no rows exist."
+          },
+          "receipt_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "last_received_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Maximum receipts.received_at for this connector; nullable UTC PostgreSQL timestamp text, up to six fractional digits. Not source synchronization time."
+          },
+          "last_processed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Maximum outbox.completed_at among completed rows for this connector; nullable UTC PostgreSQL timestamp text, up to six fractional digits."
+          },
+          "pending_count": {
+            "minimum": 0,
+            "type": "integer",
+            "description": "Sum of pending, processing and retry rows."
+          },
+          "dead_letter_count": {
+            "minimum": 0,
+            "type": "integer",
+            "description": "Count of dead_letter rows only; blocked rows excluded."
+          },
+          "coverage_reason_codes": {
+            "minItems": 1,
+            "description": "Always includes source_freshness_unknown; projection coverage adds only the three fixed allowlisted codes. No state or arbitrary stored strings.",
+            "items": {
+              "type": "string",
+              "enum": [
+                "source_freshness_unknown",
+                "identity_unresolved",
+                "ordering_unknown",
+                "ordering_conflict"
+              ]
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "connector",
+          "receipt_count",
+          "outbox_counts",
+          "last_received_at",
+          "last_processed_at",
+          "pending_count",
+          "dead_letter_count",
+          "coverage_reason_codes"
+        ],
+        "description": "Operational counters and fixed coverage only. No raw payload, projection state, source watermark or source-sync health. I4 status extension and I3 local processing are implemented and independently reviewed. Whole-unit code review found no Critical or Important blockers; dedicated dev migrations000007/000008 and rollback-scoped synthetic smoke were verified by the lead. Scoped metadata re-review approved. No full E02 or production readiness claim.",
+        "type": "object"
+      },
+      "IngestionEnvelopeV1": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "version",
+          "source_object_id",
+          "source_version",
+          "event_kind",
+          "occurred_at",
+          "source_updated_at",
+          "payload"
+        ],
+        "properties": {
+          "version": {
+            "const": "ingestion-v1"
+          },
+          "source_object_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "source_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "event_kind": {
+            "const": "ticket.snapshot"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "T.*(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+          },
+          "source_updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "pattern": "T.*(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "external_project_id",
+              "external_ticket_id",
+              "title",
+              "status",
+              "external_actor_id",
+              "due_at"
+            ],
+            "properties": {
+              "external_project_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200,
+                "pattern": "\\S"
+              },
+              "external_ticket_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200,
+                "pattern": "\\S"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500,
+                "pattern": "\\S"
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100,
+                "pattern": "\\S"
+              },
+              "external_actor_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "minLength": 1,
+                "maxLength": 200,
+                "pattern": "\\S"
+              },
+              "due_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time",
+                "pattern": "T.*(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+              }
+            }
+          }
+        },
+        "description": "Strict synthetic allowlist; required nullable fields must be present. Raw UTF-8 request maximum 65536 bytes, JSON nesting maximum16; duplicate keys and NUL strings rejected. No tenant/project override or metadata/code/description. Server computes transport/canonical SHA256; original bytes are retained."
+      },
+      "IngestionAcceptance": {
+        "properties": {
+          "duplicate": {
+            "type": "boolean"
+          },
+          "receipt_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "receipt_id",
+          "duplicate"
+        ],
+        "type": "object"
       }
     }
   },
   "x-internal-contracts": [
     "../../contracts/analysis-context-v1.schema.json",
-    "../../contracts/analysis-output-v1.schema.json"
+    "../../contracts/analysis-output-v1.schema.json",
+    "../../contracts/ingestion-envelope-v1.schema.json"
   ]
 }

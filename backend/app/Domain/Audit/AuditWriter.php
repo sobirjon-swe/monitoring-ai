@@ -20,8 +20,8 @@ class AuditWriter
                 throw new InvalidArgumentException('Audit fields must be bounded codes.');
             }
         }
-        if (! in_array($action, ['organization.created', 'organization.updated', 'organization.membership_created', 'project.created', 'project.updated', 'project.assignment_created', 'project.assignment_updated', 'identity.setup', 'access.setup', 'identity.source_created', 'identity.created', 'identity.mapping_proposed', 'identity.mapping_reviewed'], true)
-            || ! in_array($resource['type'], ['employees', 'departments', 'department_memberships', 'reporting_relationships', 'projects', 'project_memberships', 'role_assignments', 'users', 'auth_subjects', 'auth_tokens', 'policy_versions', 'access_grants', 'source_instances', 'identities', 'identity_mappings'], true)) {
+        if (! in_array($action, ['organization.created', 'organization.updated', 'organization.membership_created', 'project.created', 'project.updated', 'project.assignment_created', 'project.assignment_updated', 'identity.setup', 'access.setup', 'identity.source_created', 'identity.created', 'identity.mapping_proposed', 'identity.mapping_reviewed', 'connector.created'], true)
+            || ! in_array($resource['type'], ['employees', 'departments', 'department_memberships', 'reporting_relationships', 'projects', 'project_memberships', 'role_assignments', 'users', 'auth_subjects', 'auth_tokens', 'policy_versions', 'access_grants', 'source_instances', 'identities', 'identity_mappings', 'ingestion_connectors'], true)) {
             throw new InvalidArgumentException('Unsupported audit action or resource.');
         }
         if (! in_array($reason, ['local_setup', 'approved_change', 'membership_change', 'identity_review', 'access_change'], true) || $revision < 1) {
