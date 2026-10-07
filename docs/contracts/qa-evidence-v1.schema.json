@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/envelope",
+  "$defs": {
+    "uuid": {"type":"string","pattern":"^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"},
+    "hash": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "key": {"type":"string","pattern":"^[A-Za-z0-9._:-]{1,100}$"},
+    "revision": {"type":"integer","minimum":0,"maximum":9007199254740991},
+    "reason": {"type":"string","minLength":1,"maxLength":2000},
+    "text": {"type":"string","minLength":1,"maxLength":4000},
+    "title": {"type":"string","minLength":1,"maxLength":500},
+    "instant": {"type":"string","pattern":"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{6}Z$"},
+    "envelope": {
+      "type":"object","additionalProperties":false,
+      "required":["schema_version","operation","source_instance_id","object_id","source_revision","occurred_at","source_updated_at","body"],
+      "properties": {
+        "schema_version":{"const":"qa-evidence-v1"},"operation":{"enum":["build","environment","definition","execution","defect","handoff"]},
+        "source_instance_id":{"$ref":"#/$defs/uuid"},"object_id":{"$ref":"#/$defs/key"},"source_revision":{"type":"integer","minimum":1,"maximum":9007199254740991},
+        "occurred_at":{"$ref":"#/$defs/instant"},"source_updated_at":{"$ref":"#/$defs/instant"},"body":{"type":"object"}
+      }
+    },
+    "build": {
+      "type":"object","additionalProperties":false,"required":["logical_key","revision","title","content_hash"],
+      "properties":{"logical_key":{"$ref":"#/$defs/key"},"revision":{"type":"integer","minimum":1},"title":{"$ref":"#/$defs/title"},"content_hash":{"$ref":"#/$defs/hash"},"mr_snapshot_id":{"$ref":"#/$defs/uuid"},"base_sha":{"type":"string","pattern":"^[0-9a-f]{40}$"},"head_sha":{"type":"string","pattern":"^[0-9a-f]{40}$"}}
+    },
+    "environment": {
+      "type":"object","additionalProperties":false,"required":["logical_key","revision","title","content_hash"],
+      "properties":{"logical_key":{"$ref":"#/$defs/key"},"revision":{"type":"integer","minimum":1},"title":{"$ref":"#/$defs/title"},"content_hash":{"$ref":"#/$defs/hash"}}
+    },
+    "definition": {
+      "type":"object","additionalProperties":false,"required":["logical_key","revision","criterion_version_id","title","steps","expected_result","test_type","release_critical"],
+      "properties":{"logical_key":{"$ref":"#/$defs/key"},"revision":{"type":"integer","minimum":1},"criterion_version_id":{"$ref":"#/$defs/uuid"},"title":{"$ref":"#/$defs/title"},"steps":{"$ref":"#/$defs/text"},"expected_result":{"$ref":"#/$defs/text"},"test_type":{"enum":["functional","regression","security","integration","unit"]},"release_critical":{"type":"boolean"}}
+    },
+    "execution": {
+      "type":"object","additionalProperties":false,"required":["definition_version_id","build_id","environment_version_id","attempt_ordinal","outcome","task_version_id","locator"],
+      "properties":{"definition_version_id":{"$ref":"#/$defs/uuid"},"build_id":{"$ref":"#/$defs/uuid"},"environment_version_id":{"$ref":"#/$defs/uuid"},"attempt_ordinal":{"type":"integer","minimum":1},"outcome":{"enum":["passed","failed","blocked"]},"predecessor_attempt_id":{"$ref":"#/$defs/uuid"},"retests_execution_id":{"$ref":"#/$defs/uuid"},"fix_request_event_id":{"$ref":"#/$defs/uuid"},"task_version_id":{"$ref":"#/$defs/uuid"},"actor_identity_id":{"$ref":"#/$defs/uuid"},"blocked_reason":{"$ref":"#/$defs/text"},"locator":{"$ref":"#/$defs/key"}}
+    },
+    "definition.review": {
+      "type":"object","additionalProperties":false,"required":["expected_revision","decision","reason"],
+      "properties":{"expected_revision":{"$ref":"#/$defs/revision"},"decision":{"enum":["reviewed","rejected","revoked"]},"reason":{"$ref":"#/$defs/reason"}}
+    },
+    "plan.entry": {
+      "type":"object","additionalProperties":false,"required":["baseline_id","baseline_item_id","criterion_version_id","disposition","reason","tests"],
+      "properties":{"baseline_id":{"$ref":"#/$defs/uuid"},"baseline_item_id":{"$ref":"#/$defs/uuid"},"criterion_version_id":{"$ref":"#/$defs/uuid"},"disposition":{"enum":["included","excluded"]},"reason":{"type":["string","null"],"maxLength":2000},"tests":{"type":"array","maxItems":20,"items":{"type":"object","additionalProperties":false,"required":["definition_version_id","source_instance_id","required"],"properties":{"definition_version_id":{"$ref":"#/$defs/uuid"},"source_instance_id":{"$ref":"#/$defs/uuid"},"required":{"type":"boolean"}}}}}
+    },
+    "plan.compose": {
+      "type":"object","additionalProperties":false,"required":["baseline_id","entry_snapshot_ids"],"properties":{"baseline_id":{"$ref":"#/$defs/uuid"},"entry_snapshot_ids":{"type":"array","maxItems":100,"uniqueItems":true,"items":{"$ref":"#/$defs/uuid"}}}
+    },
+    "plan.review": {
+      "type":"object","additionalProperties":false,"required":["expected_revision","decision","reason"],"properties":{"expected_revision":{"$ref":"#/$defs/revision"},"decision":{"enum":["approved","rejected","revoked"]},"reason":{"$ref":"#/$defs/reason"}}
+    },
+    "selection.select": {
+      "type":"object","additionalProperties":false,"required":["plan_version_id","build_id","environment_version_id","expected_revision","reason"],"properties":{"plan_version_id":{"$ref":"#/$defs/uuid"},"build_id":{"$ref":"#/$defs/uuid"},"environment_version_id":{"$ref":"#/$defs/uuid"},"expected_revision":{"$ref":"#/$defs/revision"},"reason":{"$ref":"#/$defs/reason"}}
+    },
+    "defect": {"$ref":"#/$defs/defect.report"},
+    "defect.report": {
+      "type":"object","additionalProperties":false,"required":["logical_key","criterion_version_id","definition_version_id","build_id","environment_version_id","task_version_id","severity","reproducibility","reproduction"],
+      "properties":{"logical_key":{"$ref":"#/$defs/key"},"criterion_version_id":{"$ref":"#/$defs/uuid"},"definition_version_id":{"$ref":"#/$defs/uuid"},"build_id":{"$ref":"#/$defs/uuid"},"environment_version_id":{"$ref":"#/$defs/uuid"},"task_version_id":{"$ref":"#/$defs/uuid"},"execution_id":{"$ref":"#/$defs/uuid"},"severity":{"enum":["critical","high","medium","low"]},"reproducibility":{"enum":["reproduced","not_reproduced","unknown"]},"reproduction":{"$ref":"#/$defs/text"}}
+    },
+    "defect.transition": {
+      "type":"object","additionalProperties":false,"required":["expected_revision","kind","reason","pins"],
+      "properties":{"expected_revision":{"$ref":"#/$defs/revision"},"kind":{"enum":["triaged","fix_requested","verified_closed","reopened","scope_revised","duplicate","context_added"]},"reason":{"$ref":"#/$defs/reason"},"pins":{"$ref":"#/$defs/defect.pins"}}
+    },
+    "defect.pins": {
+      "type":"object","additionalProperties":false,
+      "properties":{"criterion_version_id":{"$ref":"#/$defs/uuid"},"definition_version_id":{"$ref":"#/$defs/uuid"},"build_id":{"$ref":"#/$defs/uuid"},"environment_version_id":{"$ref":"#/$defs/uuid"},"task_version_id":{"$ref":"#/$defs/uuid"},"selection_id":{"$ref":"#/$defs/uuid"},"execution_id":{"$ref":"#/$defs/uuid"},"fix_snapshot_id":{"$ref":"#/$defs/uuid"},"fix_request_event_id":{"$ref":"#/$defs/uuid"},"canonical_defect_id":{"$ref":"#/$defs/uuid"},"cause":{"enum":["incomplete_fix","new_scope","environment","regression","insufficient_evidence"]}}
+    },
+    "handoff": {"$ref":"#/$defs/handoff.open"},
+    "handoff.open": {
+      "type":"object","additionalProperties":false,"required":["task_version_id","criterion_version_id","owner_id","handoff_type","reason","occurred_at"],
+      "properties":{"task_version_id":{"$ref":"#/$defs/uuid"},"criterion_version_id":{"$ref":"#/$defs/uuid"},"owner_id":{"$ref":"#/$defs/uuid"},"handoff_type":{"enum":["verification_blocked","fix_requested","retest_requested","support_requested"]},"reason":{"$ref":"#/$defs/reason"},"occurred_at":{"$ref":"#/$defs/instant"},"actor_identity_id":{"$ref":"#/$defs/uuid"},"execution_id":{"$ref":"#/$defs/uuid"},"defect_id":{"$ref":"#/$defs/uuid"},"linked_handoff_id":{"$ref":"#/$defs/uuid"}}
+    },
+    "handoff.transition": {
+      "type":"object","additionalProperties":false,"required":["expected_revision","kind","reason","pins"],
+      "properties":{"expected_revision":{"$ref":"#/$defs/revision"},"kind":{"enum":["acknowledged","resolved","context_added","owner_changed"]},"reason":{"$ref":"#/$defs/reason"},"pins":{"type":"object","additionalProperties":false,"properties":{"owner_id":{"$ref":"#/$defs/uuid"},"execution_id":{"$ref":"#/$defs/uuid"},"defect_event_id":{"$ref":"#/$defs/uuid"}}}}
+    }
+  }
+}

@@ -6,6 +6,7 @@ use App\Domain\Access\AccessGateway;
 use App\Domain\Access\DatabaseAccessGateway;
 use App\Domain\DeveloperAnalysis\LocalParserRunner;
 use App\Domain\DeveloperAnalysis\RunnerAvailability;
+use App\Domain\Qa\QaContract;
 use App\Support\PrecisePostgresConnection;
 use Illuminate\Database\Connection;
 use Illuminate\Support\ServiceProvider;
@@ -22,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AccessGateway::class, DatabaseAccessGateway::class);
         $this->app->singleton(RunnerAvailability::class);
         $this->app->singleton(LocalParserRunner::class);
+        $this->app->singleton(QaContract::class);
     }
 
     /**

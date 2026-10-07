@@ -5,6 +5,7 @@ namespace App\Domain\Lifecycle;
 use App\Domain\Access\TrustedActor;
 use App\Domain\Audit\AuditWriter;
 use App\Domain\DeveloperAnalysis\AnalysisInvalidation;
+use App\Domain\Qa\QaInvalidation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -78,6 +79,7 @@ class RequirementService
             $oldLinks = $old ? DB::table('requirement_version_criteria')->where('requirement_version_id', $old->id)->get()->keyBy('criterion_id') : collect();
             $kept = [];
             $criteria = [];
+            $qaHooks = [];
             foreach ($data['criteria'] as $item) {
                 $c = DB::table('criteria')->where('requirement_id', $d->requirement_id)->where('key', $item['key'])->first();
                 $cid = $c->id ?? (string) Str::uuid();
@@ -93,7 +95,7 @@ class RequirementService
                     $cv = (int) DB::table('criterion_versions')->where('criterion_id', $cid)->max('version') + 1;
                     DB::table('criterion_versions')->insert(['id' => $vid, 'criterion_id' => $cid, 'version' => $cv, 'text' => $item['text'], 'required_test_keys' => $this->json($item['required_test_keys']), 'context_hash' => $context, 'content_hash' => $fingerprint] + $scope);
                     if ($prev) {
-                        $this->changes->record($actor, $projectId, 'requirements.approve', 'criterion_replaced', $cid, $vid, $reason);
+                        $qaHooks[] = ['lifecycle_mutation_id' => $this->changes->record($actor, $projectId, 'requirements.approve', 'criterion_replaced', $cid, $vid, $reason), 'criterion_version_id' => $prev->id];
                     }
                 }
                 DB::table('requirement_version_criteria')->insert(['id' => (string) Str::uuid(), 'requirement_version_id' => $id, 'requirement_id' => $d->requirement_id, 'criterion_id' => $cid, 'criterion_version_id' => $vid] + $scope);
@@ -102,11 +104,14 @@ class RequirementService
             }
             foreach ($oldLinks as $cid => $link) {
                 if (! in_array($cid, $kept, true)) {
-                    $this->changes->record($actor, $projectId, 'requirements.approve', 'criterion_removed', $cid, $id, $reason);
+                    $qaHooks[] = ['lifecycle_mutation_id' => $this->changes->record($actor, $projectId, 'requirements.approve', 'criterion_removed', $cid, $id, $reason), 'criterion_version_id' => $link->criterion_version_id];
                 }
             }
             $this->audit->record($actor->id, $scope, 'requirement.approved', ['type' => 'requirement_versions', 'id' => $id], $version, 'approved_change');
             app(AnalysisInvalidation::class)->observeProject($actor, $projectId, 'requirement:'.$id, ['criterion_version_ids' => $oldLinks->pluck('criterion_version_id')->all()]);
+            foreach ($qaHooks as $hook) {
+                app(QaInvalidation::class)->observeLocked($actor, $projectId, 'requirement:'.$hook['lifecycle_mutation_id'], $hook);
+            }
 
             return ['id' => $id, 'requirement_id' => $d->requirement_id, 'version' => $version, 'hash' => $hash, 'criteria' => $criteria];
         });

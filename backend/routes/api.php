@@ -14,6 +14,7 @@ use App\Http\Controllers\LifecycleTaskController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\QaController;
 use App\Http\Controllers\RequirementController;
 use Illuminate\Support\Facades\Route;
 
@@ -59,3 +60,17 @@ Route::post('/v1/projects/{project}/analysis-runs', [DeveloperAnalysisController
 Route::get('/v1/analysis-runs/{run}', [DeveloperAnalysisController::class, 'run'])->whereUuid('run');
 Route::get('/v1/findings/{finding}', [DeveloperAnalysisController::class, 'finding'])->whereUuid('finding');
 Route::post('/v1/findings/{finding}/reviews', [DeveloperAnalysisController::class, 'review'])->whereUuid('finding');
+
+Route::prefix('/v1/projects/{project}/qa')->whereUuid('project')->group(function (): void {
+    foreach (['fixtures' => 'fixture', 'plan-entries' => 'entry', 'plans' => 'plan', 'executions' => 'execution', 'defects' => 'defect', 'handoffs' => 'handoff'] as $path => $operation) {
+        Route::post('/'.$path, [QaController::class, 'create'])->defaults('qa_operation', $operation);
+    }
+    foreach (['definitions/{definition}/reviews' => ['definition.review', 'definition'], 'plans/{plan}/reviews' => ['plan.review', 'plan'], 'defects/{defect}/events' => ['defect.transition', 'defect'], 'handoffs/{handoff}/events' => ['handoff.transition', 'handoff']] as $path => [$operation, $parameter]) {
+        Route::post('/'.$path, [QaController::class, 'decision'])->whereUuid($parameter)->defaults('qa_operation', $operation);
+    }
+    Route::post('/selections', [QaController::class, 'decision'])->defaults('qa_operation', 'selection.select');
+    foreach (['verification', 'queue'] as $operation) {
+        Route::get('/'.$operation, [QaController::class, 'read'])->defaults('qa_operation', $operation);
+    }
+    Route::get('/history/{kind}/{subject}', [QaController::class, 'read'])->whereUuid('subject')->defaults('qa_operation', 'history');
+});

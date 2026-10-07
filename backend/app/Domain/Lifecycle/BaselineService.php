@@ -5,6 +5,7 @@ namespace App\Domain\Lifecycle;
 use App\Domain\Access\TrustedActor;
 use App\Domain\Audit\AuditWriter;
 use App\Domain\DeveloperAnalysis\AnalysisInvalidation;
+use App\Domain\Qa\QaInvalidation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -82,6 +83,7 @@ class BaselineService
             }
             DB::table('lifecycle_project_state')->where('project_id', $project)->update(['current_baseline_id' => $id, 'current_dod_policy_id' => $policyId, 'is_closed' => false]);
             $this->audit->record($actor->id, $scope, 'baseline.approved', ['type' => 'baselines', 'id' => $id], 1, 'approved_change');
+            app(QaInvalidation::class)->observeLocked($actor, $project, 'baseline:'.$event, ['lifecycle_mutation_id' => $event, 'baseline_id' => $id]);
 
             return ['id' => $id, 'policy_id' => $policyId, 'hash' => $hash, 'previous_baseline_id' => $state->current_baseline_id, 'status' => $reopen ? 'reopened' : 'active'];
         };
@@ -106,6 +108,7 @@ class BaselineService
             DB::table('lifecycle_project_state')->where('project_id', $project)->update(['is_closed' => true]);
             app(AnalysisInvalidation::class)->observeProject($actor, $project, 'closure:'.$event);
             $this->audit->record($actor->id, ['tenant_id' => $actor->tenantId, 'project_id' => $project], 'baseline.closed', ['type' => 'baselines', 'id' => $state->current_baseline_id], 1, 'approved_change');
+            app(QaInvalidation::class)->observeLocked($actor, $project, 'closure:'.$event, ['lifecycle_mutation_id' => $event, 'baseline_id' => $state->current_baseline_id]);
 
             return ['id' => $state->current_baseline_id, 'status' => 'closed'];
         });
