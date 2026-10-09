@@ -9859,6 +9859,817 @@
           "qa.source.read"
         ]
       }
+    },
+    "/api/v1/projects/{project}/ba/clarifications": {
+      "post": {
+        "operationId": "openBaClarification",
+        "summary": "openBaClarification",
+        "x-purposes": [
+          "ba.request.manage",
+          "ba.source.read"
+        ],
+        "x-required-role": "ba",
+        "description": "Synthetic only. Current role AND scoped grants/membership/source authority; original proofs rechecked at final PostgreSQL clock. Every POST requires idempotency. Duplicate decoded/unknown keys, array-object/bool-integer substitutions, controls, secret text and query strings reject. Known inapplicable Idempotency/Expected-Source/Expected-Series/Expected-Project-Generation/Expected-Revision controls reject. Source routes require Expected-Source-Revision; human routes use body expected_revision. Answer/review/event clarification_id must exactly match route. New201/replay200. Confirmation requires a distinct employee from answer recorder; scope obligation cannot be cleared here.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,100}$",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "Expected-Source-Revision",
+            "in": "header",
+            "required": true,
+            "description": "ASCII canonical nonnegative integer, max9007199254740991. Source CAS stays outside immutable envelope hash.",
+            "schema": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,15})$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Strict UTF-8 JSON object, maximum65536 bytes/depth16. question/answer/context4000 bytes; reason2000; object/party references200. JSON Schema maxLength is characters; application additionally enforces byte bounds and secret/UTC validation.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaOpenEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Current scope/purpose/source/role denied"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped mutation subject/project"
+          },
+          "409": {
+            "description": "CAS/hash/state/cursor conflict"
+          },
+          "413": {
+            "description": "POST over65536 bytes"
+          },
+          "422": {
+            "description": "Strict JSON/query/control/schema/secret validation rejected"
+          },
+          "503": {
+            "description": "Local runtime or bounded mutation graph unavailable"
+          },
+          "200": {
+            "description": "Authorized exact replay",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BaMutation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New committed fact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BaMutation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/ba/clarifications/{clarification}/answers": {
+      "post": {
+        "operationId": "recordBaAnswer",
+        "summary": "recordBaAnswer",
+        "x-purposes": [
+          "ba.answer.record",
+          "ba.source.read"
+        ],
+        "x-required-role": "ba",
+        "description": "Synthetic only. Current role AND scoped grants/membership/source authority; original proofs rechecked at final PostgreSQL clock. Every POST requires idempotency. Duplicate decoded/unknown keys, array-object/bool-integer substitutions, controls, secret text and query strings reject. Known inapplicable Idempotency/Expected-Source/Expected-Series/Expected-Project-Generation/Expected-Revision controls reject. Source routes require Expected-Source-Revision; human routes use body expected_revision. Answer/review/event clarification_id must exactly match route. New201/replay200. Confirmation requires a distinct employee from answer recorder; scope obligation cannot be cleared here.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "clarification",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,100}$",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "Expected-Source-Revision",
+            "in": "header",
+            "required": true,
+            "description": "ASCII canonical nonnegative integer, max9007199254740991. Source CAS stays outside immutable envelope hash.",
+            "schema": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,15})$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Strict UTF-8 JSON object, maximum65536 bytes/depth16. question/answer/context4000 bytes; reason2000; object/party references200. JSON Schema maxLength is characters; application additionally enforces byte bounds and secret/UTC validation.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaAnswerEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Current scope/purpose/source/role denied"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped mutation subject/project"
+          },
+          "409": {
+            "description": "CAS/hash/state/cursor conflict"
+          },
+          "413": {
+            "description": "POST over65536 bytes"
+          },
+          "422": {
+            "description": "Strict JSON/query/control/schema/secret validation rejected"
+          },
+          "503": {
+            "description": "Local runtime or bounded mutation graph unavailable"
+          },
+          "200": {
+            "description": "Authorized exact replay",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BaMutation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New committed fact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BaMutation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/ba/clarifications/{clarification}/events": {
+      "post": {
+        "operationId": "recordBaEvent",
+        "summary": "recordBaEvent",
+        "x-purposes": [
+          "ba.request.manage",
+          "ba.source.read"
+        ],
+        "x-required-role": "ba",
+        "description": "Synthetic only. Current role AND scoped grants/membership/source authority; original proofs rechecked at final PostgreSQL clock. Every POST requires idempotency. Duplicate decoded/unknown keys, array-object/bool-integer substitutions, controls, secret text and query strings reject. Known inapplicable Idempotency/Expected-Source/Expected-Series/Expected-Project-Generation/Expected-Revision controls reject. Source routes require Expected-Source-Revision; human routes use body expected_revision. Answer/review/event clarification_id must exactly match route. New201/replay200. Confirmation requires a distinct employee from answer recorder; scope obligation cannot be cleared here.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "clarification",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,100}$",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Strict UTF-8 JSON object, maximum65536 bytes/depth16. question/answer/context4000 bytes; reason2000; object/party references200. JSON Schema maxLength is characters; application additionally enforces byte bounds and secret/UTC validation.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaDef_event"
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Current scope/purpose/source/role denied"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped mutation subject/project"
+          },
+          "409": {
+            "description": "CAS/hash/state/cursor conflict"
+          },
+          "413": {
+            "description": "POST over65536 bytes"
+          },
+          "422": {
+            "description": "Strict JSON/query/control/schema/secret validation rejected"
+          },
+          "503": {
+            "description": "Local runtime or bounded mutation graph unavailable"
+          },
+          "200": {
+            "description": "Authorized exact replay",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BaMutation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New committed fact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BaMutation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/ba/clarifications/{clarification}/reviews": {
+      "post": {
+        "operationId": "reviewBaAnswer",
+        "summary": "reviewBaAnswer",
+        "x-purposes": [
+          "ba.decision.confirm",
+          "ba.source.read"
+        ],
+        "x-required-role": "pm",
+        "description": "Synthetic only. Current role AND scoped grants/membership/source authority; original proofs rechecked at final PostgreSQL clock. Every POST requires idempotency. Duplicate decoded/unknown keys, array-object/bool-integer substitutions, controls, secret text and query strings reject. Known inapplicable Idempotency/Expected-Source/Expected-Series/Expected-Project-Generation/Expected-Revision controls reject. Source routes require Expected-Source-Revision; human routes use body expected_revision. Answer/review/event clarification_id must exactly match route. New201/replay200. Confirmation requires a distinct employee from answer recorder; scope obligation cannot be cleared here.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "clarification",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,100}$",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Strict UTF-8 JSON object, maximum65536 bytes/depth16. question/answer/context4000 bytes; reason2000; object/party references200. JSON Schema maxLength is characters; application additionally enforces byte bounds and secret/UTC validation.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaDef_review"
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Current scope/purpose/source/role denied"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped mutation subject/project"
+          },
+          "409": {
+            "description": "CAS/hash/state/cursor conflict"
+          },
+          "413": {
+            "description": "POST over65536 bytes"
+          },
+          "422": {
+            "description": "Strict JSON/query/control/schema/secret validation rejected"
+          },
+          "503": {
+            "description": "Local runtime or bounded mutation graph unavailable"
+          },
+          "200": {
+            "description": "Authorized exact replay",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BaMutation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New committed fact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BaMutation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/ba/queue": {
+      "get": {
+        "operationId": "readBaQueue",
+        "summary": "Read synthetic BA queue",
+        "x-purposes": [
+          "ba.read",
+          "ba.source.read"
+        ],
+        "description": "Bodyless GET/HEAD; unknown queries and all mutation control headers reject. Current whole-record privacy before LIMIT, exact original proofs and final clock. Counts cover only delivered authorized records. Missing/hidden history UUID returns authorized empty200 without existence disclosure. Unknown/withheld history has null count and no continuation. AI unavailable, synthetic parties not verified, elapsed UTC only; business age null/calendar_unavailable.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "description": "Opaque HMAC cursor scoped to tenant/actor/project/resource/department/limit and continuation generation/revision."
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Additional ba.department.read, department_head role and every named-person department membership; never replaces project/source authority."
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Current scope/purpose/source/role denied"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped mutation subject/project"
+          },
+          "409": {
+            "description": "CAS/hash/state/cursor conflict"
+          },
+          "413": {
+            "description": "POST over65536 bytes"
+          },
+          "422": {
+            "description": "Strict JSON/query/control/schema/secret validation rejected"
+          },
+          "503": {
+            "description": "Local runtime or bounded mutation graph unavailable"
+          },
+          "200": {
+            "description": "Authorized bounded page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BaQueuePage"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "headBaQueue",
+        "summary": "Read synthetic BA queue",
+        "x-purposes": [
+          "ba.read",
+          "ba.source.read"
+        ],
+        "description": "Bodyless GET/HEAD; unknown queries and all mutation control headers reject. Current whole-record privacy before LIMIT, exact original proofs and final clock. Counts cover only delivered authorized records. Missing/hidden history UUID returns authorized empty200 without existence disclosure. Unknown/withheld history has null count and no continuation. AI unavailable, synthetic parties not verified, elapsed UTC only; business age null/calendar_unavailable.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "description": "Opaque HMAC cursor scoped to tenant/actor/project/resource/department/limit and continuation generation/revision."
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Additional ba.department.read, department_head role and every named-person department membership; never replaces project/source authority."
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthenticated; empty HEAD body"
+          },
+          "403": {
+            "description": "Current scope/purpose/source/role denied; empty HEAD body"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped mutation subject/project; empty HEAD body"
+          },
+          "409": {
+            "description": "CAS/hash/state/cursor conflict; empty HEAD body"
+          },
+          "413": {
+            "description": "POST over65536 bytes; empty HEAD body"
+          },
+          "422": {
+            "description": "Strict JSON/query/control/schema/secret validation rejected; empty HEAD body"
+          },
+          "503": {
+            "description": "Local runtime or bounded mutation graph unavailable; empty HEAD body"
+          },
+          "200": {
+            "description": "Authorized bounded page; empty HEAD body"
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/ba/history/{clarification}": {
+      "get": {
+        "operationId": "readBaHistory",
+        "summary": "Read synthetic BA history",
+        "x-purposes": [
+          "ba.read",
+          "ba.source.read"
+        ],
+        "description": "Bodyless GET/HEAD; unknown queries and all mutation control headers reject. Current whole-record privacy before LIMIT, exact original proofs and final clock. Counts cover only delivered authorized records. Missing/hidden history UUID returns authorized empty200 without existence disclosure. Unknown/withheld history has null count and no continuation. AI unavailable, synthetic parties not verified, elapsed UTC only; business age null/calendar_unavailable.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "clarification",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "description": "Opaque HMAC cursor scoped to tenant/actor/project/resource/department/limit and continuation generation/revision."
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Additional ba.department.read, department_head role and every named-person department membership; never replaces project/source authority."
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Current scope/purpose/source/role denied"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped mutation subject/project"
+          },
+          "409": {
+            "description": "CAS/hash/state/cursor conflict"
+          },
+          "413": {
+            "description": "POST over65536 bytes"
+          },
+          "422": {
+            "description": "Strict JSON/query/control/schema/secret validation rejected"
+          },
+          "503": {
+            "description": "Local runtime or bounded mutation graph unavailable"
+          },
+          "200": {
+            "description": "Authorized bounded page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BaHistoryPage"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "headBaHistory",
+        "summary": "Read synthetic BA history",
+        "x-purposes": [
+          "ba.read",
+          "ba.source.read"
+        ],
+        "description": "Bodyless GET/HEAD; unknown queries and all mutation control headers reject. Current whole-record privacy before LIMIT, exact original proofs and final clock. Counts cover only delivered authorized records. Missing/hidden history UUID returns authorized empty200 without existence disclosure. Unknown/withheld history has null count and no continuation. AI unavailable, synthetic parties not verified, elapsed UTC only; business age null/calendar_unavailable.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "clarification",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "description": "Opaque HMAC cursor scoped to tenant/actor/project/resource/department/limit and continuation generation/revision."
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Additional ba.department.read, department_head role and every named-person department membership; never replaces project/source authority."
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthenticated; empty HEAD body"
+          },
+          "403": {
+            "description": "Current scope/purpose/source/role denied; empty HEAD body"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped mutation subject/project; empty HEAD body"
+          },
+          "409": {
+            "description": "CAS/hash/state/cursor conflict; empty HEAD body"
+          },
+          "413": {
+            "description": "POST over65536 bytes; empty HEAD body"
+          },
+          "422": {
+            "description": "Strict JSON/query/control/schema/secret validation rejected; empty HEAD body"
+          },
+          "503": {
+            "description": "Local runtime or bounded mutation graph unavailable; empty HEAD body"
+          },
+          "200": {
+            "description": "Authorized bounded page; empty HEAD body"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -12408,6 +13219,1037 @@
           "reason_codes",
           "synthetic",
           "ai_interpretation"
+        ]
+      },
+      "BaDef_party": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "party_reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "party_kind": {
+            "enum": [
+              "customer",
+              "internal",
+              "unknown"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "predecessor_party_version_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "party_reference",
+          "party_kind",
+          "label",
+          "predecessor_party_version_id"
+        ]
+      },
+      "BaDef_link": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "task_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "criterion_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "criterion_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "relation": {
+            "enum": [
+              "blocks",
+              "context"
+            ]
+          }
+        },
+        "required": [
+          "task_version_id",
+          "criterion_id",
+          "criterion_version_id",
+          "relation"
+        ]
+      },
+      "BaDef_request": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "requester_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "coordinator_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "decision_party": {
+            "enum": [
+              "customer",
+              "internal",
+              "unknown"
+            ]
+          },
+          "decision_owner_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decision_owner_party_version_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "requested_at": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$"
+          },
+          "links": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/BaDef_link"
+            }
+          }
+        },
+        "required": [
+          "question",
+          "requester_id",
+          "coordinator_id",
+          "decision_party",
+          "decision_owner_id",
+          "decision_owner_party_version_id",
+          "requested_at",
+          "links"
+        ]
+      },
+      "BaDef_answer": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clarification_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "request_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "request_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "links_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "author_party_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "response_at": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$"
+          },
+          "answer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "predecessor_answer_version_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "clarification_id",
+          "expected_revision",
+          "request_version_id",
+          "request_hash",
+          "links_hash",
+          "author_party_version_id",
+          "response_at",
+          "answer",
+          "predecessor_answer_version_id"
+        ]
+      },
+      "BaDef_answer.retract": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clarification_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "request_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "request_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "links_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "predecessor_answer_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "clarification_id",
+          "expected_revision",
+          "request_version_id",
+          "request_hash",
+          "links_hash",
+          "predecessor_answer_version_id",
+          "reason"
+        ]
+      },
+      "BaDef_review.confirm": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clarification_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "request_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "request_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "links_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "answer_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "answer_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "kind": {
+            "const": "review.confirm"
+          },
+          "disposition": {
+            "enum": [
+              "no_scope_change",
+              "scope_change_required"
+            ]
+          }
+        },
+        "required": [
+          "clarification_id",
+          "expected_revision",
+          "request_version_id",
+          "request_hash",
+          "links_hash",
+          "answer_version_id",
+          "answer_hash",
+          "reason",
+          "kind",
+          "disposition"
+        ]
+      },
+      "BaDef_review.reject": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clarification_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "request_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "request_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "links_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "answer_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "answer_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "kind": {
+            "const": "review.reject"
+          }
+        },
+        "required": [
+          "clarification_id",
+          "expected_revision",
+          "request_version_id",
+          "request_hash",
+          "links_hash",
+          "answer_version_id",
+          "answer_hash",
+          "reason",
+          "kind"
+        ]
+      },
+      "BaDef_review.revoke": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clarification_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "request_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "request_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "links_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "answer_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "answer_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "kind": {
+            "const": "review.revoke"
+          },
+          "predecessor_review_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "clarification_id",
+          "expected_revision",
+          "request_version_id",
+          "request_hash",
+          "links_hash",
+          "answer_version_id",
+          "answer_hash",
+          "reason",
+          "kind",
+          "predecessor_review_id"
+        ]
+      },
+      "BaDef_review": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/BaDef_review.confirm"
+          },
+          {
+            "$ref": "#/components/schemas/BaDef_review.reject"
+          },
+          {
+            "$ref": "#/components/schemas/BaDef_review.revoke"
+          }
+        ]
+      },
+      "BaDef_request.revise": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clarification_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "kind": {
+            "const": "request.revise"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "request": {
+            "$ref": "#/components/schemas/BaDef_request"
+          }
+        },
+        "required": [
+          "clarification_id",
+          "expected_revision",
+          "kind",
+          "reason",
+          "request"
+        ]
+      },
+      "BaDef_request.reopen": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clarification_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "kind": {
+            "const": "request.reopen"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "request": {
+            "$ref": "#/components/schemas/BaDef_request"
+          }
+        },
+        "required": [
+          "clarification_id",
+          "expected_revision",
+          "kind",
+          "reason",
+          "request"
+        ]
+      },
+      "BaDef_request.withdraw": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clarification_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "kind": {
+            "const": "request.withdraw"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "clarification_id",
+          "expected_revision",
+          "kind",
+          "reason"
+        ]
+      },
+      "BaDef_context.add": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clarification_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "kind": {
+            "const": "context.add"
+          },
+          "context": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "clarification_id",
+          "expected_revision",
+          "kind",
+          "context"
+        ]
+      },
+      "BaDef_event": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/BaDef_request.revise"
+          },
+          {
+            "$ref": "#/components/schemas/BaDef_request.reopen"
+          },
+          {
+            "$ref": "#/components/schemas/BaDef_request.withdraw"
+          },
+          {
+            "$ref": "#/components/schemas/BaDef_context.add"
+          }
+        ]
+      },
+      "BaDef_party.register": {
+        "$ref": "#/components/schemas/BaDef_party"
+      },
+      "BaDef_request.open": {
+        "$ref": "#/components/schemas/BaDef_request"
+      },
+      "BaDef_answer.record": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaDef_answer"
+          },
+          {
+            "properties": {
+              "predecessor_answer_version_id": {
+                "type": "null"
+              }
+            }
+          }
+        ]
+      },
+      "BaDef_answer.correct": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaDef_answer"
+          },
+          {
+            "properties": {
+              "predecessor_answer_version_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ]
+      },
+      "BaDef_envelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "ba-evidence-v1"
+          },
+          "operation": {
+            "enum": [
+              "party.register",
+              "request.open",
+              "answer.record",
+              "answer.correct",
+              "answer.retract"
+            ]
+          },
+          "source_instance_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "source_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "occurred_at": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$"
+          },
+          "source_updated_at": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$"
+          },
+          "body": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "schema_version",
+          "operation",
+          "source_instance_id",
+          "object_id",
+          "source_revision",
+          "occurred_at",
+          "source_updated_at",
+          "body"
+        ],
+        "oneOf": [
+          {
+            "properties": {
+              "operation": {
+                "const": "party.register"
+              },
+              "body": {
+                "$ref": "#/components/schemas/BaDef_party.register"
+              }
+            }
+          },
+          {
+            "properties": {
+              "operation": {
+                "const": "request.open"
+              },
+              "body": {
+                "$ref": "#/components/schemas/BaDef_request.open"
+              }
+            }
+          },
+          {
+            "properties": {
+              "operation": {
+                "const": "answer.record"
+              },
+              "body": {
+                "$ref": "#/components/schemas/BaDef_answer.record"
+              }
+            }
+          },
+          {
+            "properties": {
+              "operation": {
+                "const": "answer.correct"
+              },
+              "body": {
+                "$ref": "#/components/schemas/BaDef_answer.correct"
+              }
+            }
+          },
+          {
+            "properties": {
+              "operation": {
+                "const": "answer.retract"
+              },
+              "body": {
+                "$ref": "#/components/schemas/BaDef_answer.retract"
+              }
+            }
+          }
+        ]
+      },
+      "BaOpenEnvelope": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaDef_envelope"
+          },
+          {
+            "properties": {
+              "operation": {
+                "const": "request.open"
+              }
+            }
+          }
+        ]
+      },
+      "BaAnswerEnvelope": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaDef_envelope"
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "answer.record",
+                  "answer.correct",
+                  "answer.retract"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "BaMutation": {
+        "type": "object",
+        "properties": {
+          "synthetic": {
+            "const": true
+          },
+          "ai_interpretation": {
+            "const": "unavailable"
+          },
+          "customer_authenticity": {
+            "const": "not_verified"
+          },
+          "replayed": {
+            "type": "boolean"
+          },
+          "receipt_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clarification_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "request_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "answer_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "review_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "event_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "synthetic",
+          "ai_interpretation",
+          "customer_authenticity",
+          "replayed",
+          "receipt_id",
+          "clarification_id",
+          "event_id"
+        ]
+      },
+      "BaQueueItem": {
+        "type": "object",
+        "description": "Authorized whole-record projection. Clarification resolution never approves E03 scope, task acceptance or release. Recorded task responsibility stays at its exact version/time.",
+        "properties": {
+          "synthetic": {
+            "const": true
+          },
+          "ai_interpretation": {
+            "const": "unavailable"
+          },
+          "customer_authenticity": {
+            "const": "not_verified"
+          },
+          "clarification_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clarification_state": {
+            "enum": [
+              "open",
+              "answered",
+              "resolved",
+              "withdrawn"
+            ]
+          },
+          "applicability": {
+            "enum": [
+              "current",
+              "stale",
+              "unknown",
+              "revoked"
+            ]
+          },
+          "scope_status": {
+            "enum": [
+              "not_requested",
+              "scope_approval_pending",
+              "unknown"
+            ]
+          },
+          "dependency_status": {
+            "type": "string"
+          },
+          "answer_review_status": {
+            "type": "string"
+          },
+          "waiting_on": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "business_age": {
+            "type": "null"
+          },
+          "links": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "object"
+            }
+          },
+          "responsibilities": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "object"
+            }
+          },
+          "elapsed_age": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "business_age_reason": {
+            "const": "calendar_unavailable"
+          }
+        }
+      },
+      "BaHistoryItem": {
+        "type": "object",
+        "description": "Immutable event: subject_answer_version_id pins the separately authorized recorded late/correct/retract fact delivered in answer. answer_version_id is the event projection and may differ. Optional unsafe history is withheld. No raw authority proof.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "kind": {
+            "type": "string"
+          },
+          "subject_answer_version_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "answer_version_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "answer": {
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        }
+      },
+      "BaQueuePage": {
+        "type": "object",
+        "properties": {
+          "synthetic": {
+            "const": true
+          },
+          "ai_interpretation": {
+            "const": "unavailable"
+          },
+          "customer_authenticity": {
+            "const": "not_verified"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/BaQueueItem"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "visible_record_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 50
+          },
+          "coverage_status": {
+            "enum": [
+              "complete",
+              "unknown",
+              "unavailable"
+            ]
+          },
+          "reason_codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "synthetic",
+          "ai_interpretation",
+          "customer_authenticity",
+          "items",
+          "next_cursor",
+          "visible_record_count",
+          "coverage_status",
+          "reason_codes"
+        ]
+      },
+      "BaHistoryPage": {
+        "type": "object",
+        "properties": {
+          "synthetic": {
+            "const": true
+          },
+          "ai_interpretation": {
+            "const": "unavailable"
+          },
+          "customer_authenticity": {
+            "const": "not_verified"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/BaHistoryItem"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "visible_record_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 50
+          },
+          "coverage_status": {
+            "enum": [
+              "complete",
+              "unknown",
+              "unavailable"
+            ]
+          },
+          "reason_codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "synthetic",
+          "ai_interpretation",
+          "customer_authenticity",
+          "items",
+          "next_cursor",
+          "visible_record_count",
+          "coverage_status",
+          "reason_codes"
         ]
       }
     }

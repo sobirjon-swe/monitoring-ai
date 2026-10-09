@@ -3,6 +3,7 @@
 // All routes in this file inherit authentication. Domain permissions are added in T03–T05.
 
 use App\Http\Controllers\AcceptanceController;
+use App\Http\Controllers\BaController;
 use App\Http\Controllers\BaselineController;
 use App\Http\Controllers\ConnectorController;
 use App\Http\Controllers\DeveloperAnalysisController;
@@ -73,4 +74,13 @@ Route::prefix('/v1/projects/{project}/qa')->whereUuid('project')->group(function
         Route::get('/'.$operation, [QaController::class, 'read'])->defaults('qa_operation', $operation);
     }
     Route::get('/history/{kind}/{subject}', [QaController::class, 'read'])->whereUuid('subject')->defaults('qa_operation', 'history');
+});
+
+Route::prefix('/v1/projects/{project}/ba')->whereUuid('project')->group(function (): void {
+    Route::post('/clarifications', [BaController::class, 'write'])->defaults('ba_operation', 'open');
+    foreach (['answers' => 'answer', 'events' => 'event', 'reviews' => 'review'] as $path => $operation) {
+        Route::post('/clarifications/{clarification}/'.$path, [BaController::class, 'write'])->whereUuid('clarification')->defaults('ba_operation', $operation);
+    }
+    Route::get('/queue', [BaController::class, 'read'])->defaults('ba_operation', 'queue');
+    Route::get('/history/{clarification}', [BaController::class, 'read'])->whereUuid('clarification')->defaults('ba_operation', 'history');
 });

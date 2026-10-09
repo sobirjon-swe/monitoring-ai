@@ -1,0 +1,721 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:monitoring-ai:ba-evidence-v1",
+  "$defs": {
+    "party": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "party_reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "party_kind": {
+          "enum": [
+            "customer",
+            "internal",
+            "unknown"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "predecessor_party_version_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "party_reference",
+        "party_kind",
+        "label",
+        "predecessor_party_version_id"
+      ]
+    },
+    "link": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "task_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "criterion_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "criterion_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "relation": {
+          "enum": [
+            "blocks",
+            "context"
+          ]
+        }
+      },
+      "required": [
+        "task_version_id",
+        "criterion_id",
+        "criterion_version_id",
+        "relation"
+      ]
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "requester_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "coordinator_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "decision_party": {
+          "enum": [
+            "customer",
+            "internal",
+            "unknown"
+          ]
+        },
+        "decision_owner_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decision_owner_party_version_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "requested_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$"
+        },
+        "links": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/link"
+          }
+        }
+      },
+      "required": [
+        "question",
+        "requester_id",
+        "coordinator_id",
+        "decision_party",
+        "decision_owner_id",
+        "decision_owner_party_version_id",
+        "requested_at",
+        "links"
+      ]
+    },
+    "answer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clarification_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "request_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "request_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "links_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "author_party_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "response_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$"
+        },
+        "answer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "predecessor_answer_version_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "clarification_id",
+        "expected_revision",
+        "request_version_id",
+        "request_hash",
+        "links_hash",
+        "author_party_version_id",
+        "response_at",
+        "answer",
+        "predecessor_answer_version_id"
+      ]
+    },
+    "answer.retract": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clarification_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "request_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "request_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "links_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "predecessor_answer_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "clarification_id",
+        "expected_revision",
+        "request_version_id",
+        "request_hash",
+        "links_hash",
+        "predecessor_answer_version_id",
+        "reason"
+      ]
+    },
+    "review.confirm": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clarification_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "request_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "request_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "links_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "answer_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "answer_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "kind": {
+          "const": "review.confirm"
+        },
+        "disposition": {
+          "enum": [
+            "no_scope_change",
+            "scope_change_required"
+          ]
+        }
+      },
+      "required": [
+        "clarification_id",
+        "expected_revision",
+        "request_version_id",
+        "request_hash",
+        "links_hash",
+        "answer_version_id",
+        "answer_hash",
+        "reason",
+        "kind",
+        "disposition"
+      ]
+    },
+    "review.reject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clarification_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "request_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "request_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "links_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "answer_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "answer_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "kind": {
+          "const": "review.reject"
+        }
+      },
+      "required": [
+        "clarification_id",
+        "expected_revision",
+        "request_version_id",
+        "request_hash",
+        "links_hash",
+        "answer_version_id",
+        "answer_hash",
+        "reason",
+        "kind"
+      ]
+    },
+    "review.revoke": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clarification_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "request_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "request_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "links_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "answer_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "answer_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "kind": {
+          "const": "review.revoke"
+        },
+        "predecessor_review_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "clarification_id",
+        "expected_revision",
+        "request_version_id",
+        "request_hash",
+        "links_hash",
+        "answer_version_id",
+        "answer_hash",
+        "reason",
+        "kind",
+        "predecessor_review_id"
+      ]
+    },
+    "review": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/review.confirm"
+        },
+        {
+          "$ref": "#/$defs/review.reject"
+        },
+        {
+          "$ref": "#/$defs/review.revoke"
+        }
+      ]
+    },
+    "request.revise": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clarification_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "kind": {
+          "const": "request.revise"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "request": {
+          "$ref": "#/$defs/request"
+        }
+      },
+      "required": [
+        "clarification_id",
+        "expected_revision",
+        "kind",
+        "reason",
+        "request"
+      ]
+    },
+    "request.reopen": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clarification_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "kind": {
+          "const": "request.reopen"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "request": {
+          "$ref": "#/$defs/request"
+        }
+      },
+      "required": [
+        "clarification_id",
+        "expected_revision",
+        "kind",
+        "reason",
+        "request"
+      ]
+    },
+    "request.withdraw": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clarification_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "kind": {
+          "const": "request.withdraw"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "clarification_id",
+        "expected_revision",
+        "kind",
+        "reason"
+      ]
+    },
+    "context.add": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clarification_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "kind": {
+          "const": "context.add"
+        },
+        "context": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        }
+      },
+      "required": [
+        "clarification_id",
+        "expected_revision",
+        "kind",
+        "context"
+      ]
+    },
+    "event": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/request.revise"
+        },
+        {
+          "$ref": "#/$defs/request.reopen"
+        },
+        {
+          "$ref": "#/$defs/request.withdraw"
+        },
+        {
+          "$ref": "#/$defs/context.add"
+        }
+      ]
+    },
+    "party.register": {
+      "$ref": "#/$defs/party"
+    },
+    "request.open": {
+      "$ref": "#/$defs/request"
+    },
+    "answer.record": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/answer"
+        },
+        {
+          "properties": {
+            "predecessor_answer_version_id": {
+              "type": "null"
+            }
+          }
+        }
+      ]
+    },
+    "answer.correct": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/answer"
+        },
+        {
+          "properties": {
+            "predecessor_answer_version_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      ]
+    },
+    "envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "ba-evidence-v1"
+        },
+        "operation": {
+          "enum": [
+            "party.register",
+            "request.open",
+            "answer.record",
+            "answer.correct",
+            "answer.retract"
+          ]
+        },
+        "source_instance_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "object_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "source_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "occurred_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$"
+        },
+        "source_updated_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$"
+        },
+        "body": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "schema_version",
+        "operation",
+        "source_instance_id",
+        "object_id",
+        "source_revision",
+        "occurred_at",
+        "source_updated_at",
+        "body"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "operation": {
+              "const": "party.register"
+            },
+            "body": {
+              "$ref": "#/$defs/party.register"
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "request.open"
+            },
+            "body": {
+              "$ref": "#/$defs/request.open"
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "answer.record"
+            },
+            "body": {
+              "$ref": "#/$defs/answer.record"
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "answer.correct"
+            },
+            "body": {
+              "$ref": "#/$defs/answer.correct"
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "answer.retract"
+            },
+            "body": {
+              "$ref": "#/$defs/answer.retract"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$ref": "#/$defs/envelope"
+}

@@ -15,7 +15,9 @@ class DatabaseAccessGateway implements AccessGateway
 
     public const QA_PURPOSES = ['qa.fixture.manage', 'qa.plan.manage', 'qa.execution.record', 'qa.defect.review', 'qa.handoff.manage', 'qa.read', 'qa.source.read', 'qa.process'];
 
-    public const PURPOSES = [...self::QA_PURPOSES, 'qa.department.read', ...self::DEVELOPER_PURPOSES, ...self::LIFECYCLE_PURPOSES, 'organization.read', 'organization.manage', 'project.create', 'project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'identity.read', 'identity.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process'];
+    public const BA_PURPOSES = ['ba.fixture.manage', 'ba.request.manage', 'ba.answer.record', 'ba.decision.confirm', 'ba.read', 'ba.source.read'];
+
+    public const PURPOSES = [...self::BA_PURPOSES, 'ba.department.read', ...self::QA_PURPOSES, 'qa.department.read', ...self::DEVELOPER_PURPOSES, ...self::LIFECYCLE_PURPOSES, 'organization.read', 'organization.manage', 'project.create', 'project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'identity.read', 'identity.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process'];
 
     public function __construct(private readonly TenantContext $context) {}
 
@@ -34,7 +36,7 @@ class DatabaseAccessGateway implements AccessGateway
         if (isset($scope['project_id'], $scope['department_id'])) {
             throw new AccessDeniedHttpException;
         }
-        if ($purpose === 'qa.department.read' && (! isset($scope['department_id']) || isset($scope['project_id']))) {
+        if (in_array($purpose, ['qa.department.read', 'ba.department.read'], true) && (! isset($scope['department_id']) || isset($scope['project_id']))) {
             throw new AccessDeniedHttpException;
         }
         $allowed = $this->context->run($actor->tenantId, function () use ($actor, $purpose, $scope): bool {
@@ -45,7 +47,7 @@ class DatabaseAccessGateway implements AccessGateway
             }
             $project = $scope['project_id'] ?? null;
             $department = $scope['department_id'] ?? null;
-            if (in_array($purpose, ['project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process', ...self::LIFECYCLE_PURPOSES, ...self::DEVELOPER_PURPOSES, ...self::QA_PURPOSES], true) && $project === null) {
+            if (in_array($purpose, ['project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process', ...self::LIFECYCLE_PURPOSES, ...self::DEVELOPER_PURPOSES, ...self::QA_PURPOSES, ...self::BA_PURPOSES], true) && $project === null) {
                 return false;
             }
             if ($project !== null && ($user->employee_id === null || ! DB::table('project_memberships')
@@ -65,12 +67,12 @@ class DatabaseAccessGateway implements AccessGateway
                 ->where(fn ($q) => $q->whereNull('g.valid_to')->orWhere('g.valid_to', '>', $instant));
             // An unscoped list requires an explicitly tenant-wide grant.
             $grants->where(function ($q) use ($project, $department, $purpose): void {
-                if ($purpose === 'qa.department.read') {
+                if (in_array($purpose, ['qa.department.read', 'ba.department.read'], true)) {
                     $q->where('g.scope_type', 'department')->where('g.department_id', $department);
 
                     return;
                 }
-                if (in_array($purpose, [...self::LIFECYCLE_PURPOSES, ...self::DEVELOPER_PURPOSES, ...self::QA_PURPOSES], true)) {
+                if (in_array($purpose, [...self::LIFECYCLE_PURPOSES, ...self::DEVELOPER_PURPOSES, ...self::QA_PURPOSES, ...self::BA_PURPOSES], true)) {
                     $q->where('g.scope_type', 'project')->where('g.project_id', $project);
 
                     return;

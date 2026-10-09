@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Domain\Access\AccessGateway;
 use App\Domain\Access\DatabaseAccessGateway;
+use App\Domain\Ba\BaContract;
 use App\Domain\DeveloperAnalysis\LocalParserRunner;
 use App\Domain\DeveloperAnalysis\RunnerAvailability;
 use App\Domain\Qa\QaContract;
@@ -24,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(RunnerAvailability::class);
         $this->app->singleton(LocalParserRunner::class);
         $this->app->singleton(QaContract::class);
+        $this->app->singleton(BaContract::class);
     }
 
     /**
