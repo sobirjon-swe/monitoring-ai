@@ -8,6 +8,8 @@ Mavjud PostgreSQL17 xizmatiga tegmasdan `.local/postgres-data`da alohida 17.10 k
 
 Repository ildizidan, klaster avval ishga tushganini `pg_isready -h 127.0.0.1 -p 55432` bilan tekshiring. PostgreSQL binari `C:/Program Files/PostgreSQL/17/bin/`da. To‘xtatilgan klasterni lokal terminaldan `pg_ctl -D <repo>/.local/postgres-data -l <repo>/.local/postgres-start.log -o "-h 127.0.0.1 -p 55432" start` bilan ishga tushirish mumkin. Agent fon jarayonini `Start-Process -WindowStyle Hidden` bilan ochadi; mavjud boshqa xizmatlarni to‘xtatmaydi. Klaster faqat shu loyiha uchun to‘xtatilishi kerak.
 
+2026-10-24 tekshiruv: Codex tarmoq sandboxi ichida boshlangan server portni tinglashi va `ready` ko‘rsatishi mumkin, ammo sandbox tashqarisidagi klient ham unga ulana olmasligi kuzatildi. Agent mavjud klasterni **`sandbox_permissions=require_escalated` kontekstida** ishga tushirishi, `pg_isready`, runtime guard va DB testlarini ham shu kontekstda bajarishi kerak. Oddiy sandbox klientidagi `no response` server ishlamayotganini isbotlamaydi. Avval sandbox tashqarisida readiness va mavjud listener/PIDni tekshiring; ikkinchi serverni ishga tushirmang. Shu chegaradan tashqarida qayta ishga tushirishdan keyin readiness hamda marked TEST/nonowner runtime guard o‘tdi; firewall, parol va bazaning sxemasi o‘zgartirilmadi. Bu Codex jarayon muhiti talabi, ilovaning DB ruxsatlarini kengaytirish emas.
+
 Backend katalogidan:
 
 ```powershell

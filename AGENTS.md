@@ -1,3 +1,9 @@
+## User-selected Codex model
+
+User model policy (2026-10-13, latest instruction): All Codex lead agents, specialist agents, implementers, reviewers, re-reviewers and skill-driven subagents must use model gpt-6.1-sol with reasoning effort medium. Explicitly specify model="gpt-6.1-sol" and reasoning_effort="medium" on every supported dispatch; for thread tools use model="gpt-6.1-sol" and thinking="medium". This supersedes the earlier 2026-10-13 ultra policy. Do not substitute another model or effort based on task complexity or skill recommendations. Include this policy in every child-agent brief. If the required model/effort cannot be selected, report that limitation rather than silently substituting. This policy concerns Codex agents, not the application's local AI inference or specialized image/audio generation tools. Only a later explicit user instruction may change this policy.
+
+--- project-doc ---
+
 # Codex — AI Employee and Project Monitoring
 
 These instructions apply to all Codex work in this repository.

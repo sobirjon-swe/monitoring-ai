@@ -12,6 +12,7 @@ use App\Http\Controllers\IdentityMappingController;
 use App\Http\Controllers\IngestionController;
 use App\Http\Controllers\LifecycleEvidenceController;
 use App\Http\Controllers\LifecycleTaskController;
+use App\Http\Controllers\ManagementController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\ProjectController;
@@ -83,4 +84,13 @@ Route::prefix('/v1/projects/{project}/ba')->whereUuid('project')->group(function
     }
     Route::get('/queue', [BaController::class, 'read'])->defaults('ba_operation', 'queue');
     Route::get('/history/{clarification}', [BaController::class, 'read'])->whereUuid('clarification')->defaults('ba_operation', 'history');
+});
+
+Route::prefix('/v1/projects/{project}/management')->whereUuid('project')->group(function (): void {
+    Route::post('/actions', [ManagementController::class, 'write'])->defaults('management_operation', 'open');
+    foreach (['events' => 'event', 'support' => 'support', 'reviews' => 'review'] as $path => $operation) {
+        Route::post('/actions/{action}/'.$path, [ManagementController::class, 'write'])->whereUuid('action')->defaults('management_operation', $operation);
+    }
+    Route::get('/queue', [ManagementController::class, 'read'])->defaults('management_operation', 'queue');
+    Route::get('/history/{action}', [ManagementController::class, 'read'])->whereUuid('action')->defaults('management_operation', 'history');
 });

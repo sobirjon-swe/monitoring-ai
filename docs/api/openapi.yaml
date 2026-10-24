@@ -10670,6 +10670,775 @@
           }
         }
       }
+    },
+    "/api/v1/projects/{project}/management/actions": {
+      "post": {
+        "operationId": "openManagementAction",
+        "summary": "openManagementAction",
+        "description": "Local/testing synthetic only. Guard runs before bearer DB connection; then current role/project/department/source and original authority remain required through final PostgreSQL clock. Strict UTF8 object<=65536 bytes/depth16, duplicate decoded/unknown keys and object/list/type/control/secret/date errors reject. Reason<=2000 bytes, text/context<=4000, object_id<=200. Write query fields prohibited. Every known inapplicable control header rejects. Source envelopes require Expected-Source-Revision; human operations use body expected_revision. Support action_id must equal route. Management outcomes never close QA/BA or accept E03. Every DTO synthetic:true/AI unavailable; elapsed UTC only, business calendar unavailable. Closed operation schemas copied from published management-evidence-v1 definitions.",
+        "x-purposes": [
+          "management.action.manage",
+          "management.source.read"
+        ],
+        "x-required-role": "pm",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,100}$"
+            }
+          },
+          {
+            "name": "Expected-Source-Revision",
+            "in": "header",
+            "required": true,
+            "description": "Canonical decimal0..9007199254740991. Source-head CAS differs from envelope source_revision and body expected_revision.",
+            "schema": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,15})$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagementOpenEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorized replay",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagementMutation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New committed fact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagementMutation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Current role/purpose/scope or original authority denied"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped subject"
+          },
+          "409": {
+            "description": "State/hash/CAS conflict"
+          },
+          "413": {
+            "description": "Raw body over65536 bytes"
+          },
+          "422": {
+            "description": "Strict contract/control/query rejected"
+          },
+          "503": {
+            "description": "Local runtime or bounded graph unavailable; no mutation fact"
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/management/actions/{action}/events": {
+      "post": {
+        "operationId": "recordManagementEvent",
+        "summary": "recordManagementEvent",
+        "description": "Local/testing synthetic only. Guard runs before bearer DB connection; then current role/project/department/source and original authority remain required through final PostgreSQL clock. Strict UTF8 object<=65536 bytes/depth16, duplicate decoded/unknown keys and object/list/type/control/secret/date errors reject. Reason<=2000 bytes, text/context<=4000, object_id<=200. Write query fields prohibited. Every known inapplicable control header rejects. Source envelopes require Expected-Source-Revision; human operations use body expected_revision. Support action_id must equal route. Management outcomes never close QA/BA or accept E03. Every DTO synthetic:true/AI unavailable; elapsed UTC only, business calendar unavailable. Closed operation schemas copied from published management-evidence-v1 definitions.",
+        "x-purposes": [
+          "management.action.manage or management.support.assign or management.support.record",
+          "management.source.read"
+        ],
+        "x-required-role": "operation dependent pm/department_head/developer/qa/ba",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,100}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagementEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorized replay",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagementMutation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New committed fact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagementMutation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Current role/purpose/scope or original authority denied"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped subject"
+          },
+          "409": {
+            "description": "State/hash/CAS conflict"
+          },
+          "413": {
+            "description": "Raw body over65536 bytes"
+          },
+          "422": {
+            "description": "Strict contract/control/query rejected"
+          },
+          "503": {
+            "description": "Local runtime or bounded graph unavailable; no mutation fact"
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/management/actions/{action}/support": {
+      "post": {
+        "operationId": "recordManagementSupport",
+        "summary": "recordManagementSupport",
+        "description": "Local/testing synthetic only. Guard runs before bearer DB connection; then current role/project/department/source and original authority remain required through final PostgreSQL clock. Strict UTF8 object<=65536 bytes/depth16, duplicate decoded/unknown keys and object/list/type/control/secret/date errors reject. Reason<=2000 bytes, text/context<=4000, object_id<=200. Write query fields prohibited. Every known inapplicable control header rejects. Source envelopes require Expected-Source-Revision; human operations use body expected_revision. Support action_id must equal route. Management outcomes never close QA/BA or accept E03. Every DTO synthetic:true/AI unavailable; elapsed UTC only, business calendar unavailable. Closed operation schemas copied from published management-evidence-v1 definitions.",
+        "x-purposes": [
+          "management.support.record",
+          "management.source.read"
+        ],
+        "x-required-role": "developer/qa/ba/pm/department_head exact owner or helper; decline helper only; explicit recording/source/project scopes",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,100}$"
+            }
+          },
+          {
+            "name": "Expected-Source-Revision",
+            "in": "header",
+            "required": true,
+            "description": "Canonical decimal0..9007199254740991. Source-head CAS differs from envelope source_revision and body expected_revision.",
+            "schema": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,15})$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagementSupportEnvelope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorized replay",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagementMutation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New committed fact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagementMutation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Current role/purpose/scope or original authority denied"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped subject"
+          },
+          "409": {
+            "description": "State/hash/CAS conflict"
+          },
+          "413": {
+            "description": "Raw body over65536 bytes"
+          },
+          "422": {
+            "description": "Strict contract/control/query rejected"
+          },
+          "503": {
+            "description": "Local runtime or bounded graph unavailable; no mutation fact"
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/management/actions/{action}/reviews": {
+      "post": {
+        "operationId": "reviewManagementOutcome",
+        "summary": "reviewManagementOutcome",
+        "description": "Local/testing synthetic only. Guard runs before bearer DB connection; then current role/project/department/source and original authority remain required through final PostgreSQL clock. Strict UTF8 object<=65536 bytes/depth16, duplicate decoded/unknown keys and object/list/type/control/secret/date errors reject. Reason<=2000 bytes, text/context<=4000, object_id<=200. Write query fields prohibited. Every known inapplicable control header rejects. Source envelopes require Expected-Source-Revision; human operations use body expected_revision. Support action_id must equal route. Management outcomes never close QA/BA or accept E03. Every DTO synthetic:true/AI unavailable; elapsed UTC only, business calendar unavailable. Closed operation schemas copied from published management-evidence-v1 definitions.",
+        "x-purposes": [
+          "management.outcome.review",
+          "management.source.read"
+        ],
+        "x-required-role": "pm or authorized department_head; distinct employee",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,100}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagementReview"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorized replay",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagementMutation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New committed fact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagementMutation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Current role/purpose/scope or original authority denied"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped subject"
+          },
+          "409": {
+            "description": "State/hash/CAS conflict"
+          },
+          "413": {
+            "description": "Raw body over65536 bytes"
+          },
+          "422": {
+            "description": "Strict contract/control/query rejected"
+          },
+          "503": {
+            "description": "Local runtime or bounded graph unavailable; no mutation fact"
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/management/queue": {
+      "get": {
+        "operationId": "getManagementQueue",
+        "description": "Local/testing synthetic only. Guard runs before bearer DB connection; then current role/project/department/source and original authority remain required through final PostgreSQL clock. Strict UTF8 object<=65536 bytes/depth16, duplicate decoded/unknown keys and object/list/type/control/secret/date errors reject. Reason<=2000 bytes, text/context<=4000, object_id<=200. Write query fields prohibited. Every known inapplicable control header rejects. Source envelopes require Expected-Source-Revision; human operations use body expected_revision. Support action_id must equal route. Management outcomes never close QA/BA or accept E03. Every DTO synthetic:true/AI unavailable; elapsed UTC only, business calendar unavailable. Closed operation schemas copied from published management-evidence-v1 definitions. Reads reject request bodies/all five mutation-control headers and unknown query fields; department_id requires explicit project AND department read purposes. Whole-record privacy precedes LIMIT/count/cursor. Cursor binds tenant/actor/project/resource/action/department/limit/generation/revision.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "department_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            }
+          }
+        ],
+        "x-purposes": [
+          "management.read",
+          "management.source.read"
+        ],
+        "responses": {
+          "200": {
+            "description": "Permitted complete records, or bounded unknown empty page/null count/no cursor; absent or hidden history200. HEAD empty body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagementPage"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "403": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "404": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "409": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "422": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "503": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          }
+        }
+      },
+      "head": {
+        "operationId": "headManagementQueue",
+        "description": "Local/testing synthetic only. Guard runs before bearer DB connection; then current role/project/department/source and original authority remain required through final PostgreSQL clock. Strict UTF8 object<=65536 bytes/depth16, duplicate decoded/unknown keys and object/list/type/control/secret/date errors reject. Reason<=2000 bytes, text/context<=4000, object_id<=200. Write query fields prohibited. Every known inapplicable control header rejects. Source envelopes require Expected-Source-Revision; human operations use body expected_revision. Support action_id must equal route. Management outcomes never close QA/BA or accept E03. Every DTO synthetic:true/AI unavailable; elapsed UTC only, business calendar unavailable. Closed operation schemas copied from published management-evidence-v1 definitions. Reads reject request bodies/all five mutation-control headers and unknown query fields; department_id requires explicit project AND department read purposes. Whole-record privacy precedes LIMIT/count/cursor. Cursor binds tenant/actor/project/resource/action/department/limit/generation/revision.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "department_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            }
+          }
+        ],
+        "x-purposes": [
+          "management.read",
+          "management.source.read"
+        ],
+        "responses": {
+          "200": {
+            "description": "Permitted complete records, or bounded unknown empty page/null count/no cursor; absent or hidden history200. HEAD empty body."
+          },
+          "401": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "403": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "404": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "409": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "422": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "503": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project}/management/history/{action}": {
+      "get": {
+        "operationId": "getManagementHistory",
+        "description": "Local/testing synthetic only. Guard runs before bearer DB connection; then current role/project/department/source and original authority remain required through final PostgreSQL clock. Strict UTF8 object<=65536 bytes/depth16, duplicate decoded/unknown keys and object/list/type/control/secret/date errors reject. Reason<=2000 bytes, text/context<=4000, object_id<=200. Write query fields prohibited. Every known inapplicable control header rejects. Source envelopes require Expected-Source-Revision; human operations use body expected_revision. Support action_id must equal route. Management outcomes never close QA/BA or accept E03. Every DTO synthetic:true/AI unavailable; elapsed UTC only, business calendar unavailable. Closed operation schemas copied from published management-evidence-v1 definitions. Reads reject request bodies/all five mutation-control headers and unknown query fields; department_id requires explicit project AND department read purposes. Whole-record privacy precedes LIMIT/count/cursor. Cursor binds tenant/actor/project/resource/action/department/limit/generation/revision.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "department_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            }
+          }
+        ],
+        "x-purposes": [
+          "management.read",
+          "management.source.read"
+        ],
+        "responses": {
+          "200": {
+            "description": "Permitted complete records, or bounded unknown empty page/null count/no cursor; absent or hidden history200. HEAD empty body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagementPage"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "403": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "404": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "409": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "422": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "503": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          }
+        }
+      },
+      "head": {
+        "operationId": "headManagementHistory",
+        "description": "Local/testing synthetic only. Guard runs before bearer DB connection; then current role/project/department/source and original authority remain required through final PostgreSQL clock. Strict UTF8 object<=65536 bytes/depth16, duplicate decoded/unknown keys and object/list/type/control/secret/date errors reject. Reason<=2000 bytes, text/context<=4000, object_id<=200. Write query fields prohibited. Every known inapplicable control header rejects. Source envelopes require Expected-Source-Revision; human operations use body expected_revision. Support action_id must equal route. Management outcomes never close QA/BA or accept E03. Every DTO synthetic:true/AI unavailable; elapsed UTC only, business calendar unavailable. Closed operation schemas copied from published management-evidence-v1 definitions. Reads reject request bodies/all five mutation-control headers and unknown query fields; department_id requires explicit project AND department read purposes. Whole-record privacy precedes LIMIT/count/cursor. Cursor binds tenant/actor/project/resource/action/department/limit/generation/revision.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "department_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            }
+          }
+        ],
+        "x-purposes": [
+          "management.read",
+          "management.source.read"
+        ],
+        "responses": {
+          "200": {
+            "description": "Permitted complete records, or bounded unknown empty page/null count/no cursor; absent or hidden history200. HEAD empty body."
+          },
+          "401": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "403": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "404": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "409": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "422": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "503": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          }
+        }
+      }
     }
   },
   "components": {
@@ -14251,6 +15020,1133 @@
           "coverage_status",
           "reason_codes"
         ]
+      },
+      "ManagementDef_reference": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "lifecycle"
+              },
+              "task_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "relation": {
+                "enum": [
+                  "blocks",
+                  "context"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "task_version_id",
+              "criterion_id",
+              "criterion_version_id",
+              "relation"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "qa_handoff_event"
+              },
+              "task_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "relation": {
+                "enum": [
+                  "blocks",
+                  "context"
+                ]
+              },
+              "qa_handoff_event_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "kind",
+              "task_version_id",
+              "criterion_id",
+              "criterion_version_id",
+              "relation",
+              "qa_handoff_event_id"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "qa_defect_event"
+              },
+              "task_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "relation": {
+                "enum": [
+                  "blocks",
+                  "context"
+                ]
+              },
+              "qa_defect_event_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "kind",
+              "task_version_id",
+              "criterion_id",
+              "criterion_version_id",
+              "relation",
+              "qa_defect_event_id"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "qa_execution_version"
+              },
+              "task_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "relation": {
+                "enum": [
+                  "blocks",
+                  "context"
+                ]
+              },
+              "qa_execution_version_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "kind",
+              "task_version_id",
+              "criterion_id",
+              "criterion_version_id",
+              "relation",
+              "qa_execution_version_id"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "ba_request_version"
+              },
+              "task_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "relation": {
+                "enum": [
+                  "blocks",
+                  "context"
+                ]
+              },
+              "ba_request_version_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "kind",
+              "task_version_id",
+              "criterion_id",
+              "criterion_version_id",
+              "relation",
+              "ba_request_version_id"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "ba_answer_version"
+              },
+              "task_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "relation": {
+                "enum": [
+                  "blocks",
+                  "context"
+                ]
+              },
+              "ba_answer_version_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "kind",
+              "task_version_id",
+              "criterion_id",
+              "criterion_version_id",
+              "relation",
+              "ba_answer_version_id"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "ba_review"
+              },
+              "task_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "criterion_version_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "relation": {
+                "enum": [
+                  "blocks",
+                  "context"
+                ]
+              },
+              "ba_review_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "kind",
+              "task_version_id",
+              "criterion_id",
+              "criterion_version_id",
+              "relation",
+              "ba_review_id"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "ManagementDef_action.open": {
+        "type": "object",
+        "properties": {
+          "owner_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "references": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/ManagementDef_reference"
+            }
+          }
+        },
+        "required": [
+          "owner_id",
+          "reason",
+          "references"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_action.revise": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "const": "action.revise"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "action": {
+            "$ref": "#/components/schemas/ManagementDef_action.open"
+          }
+        },
+        "required": [
+          "operation",
+          "expected_revision",
+          "action"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_action.reopen": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "const": "action.reopen"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "action": {
+            "$ref": "#/components/schemas/ManagementDef_action.open"
+          }
+        },
+        "required": [
+          "operation",
+          "expected_revision",
+          "action"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_action.withdraw": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "const": "action.withdraw"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "operation",
+          "expected_revision",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_assignment.set": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "const": "assignment.set"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "owner_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "helper_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "department_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "operation",
+          "expected_revision",
+          "owner_id",
+          "helper_id",
+          "department_id",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_context.add": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "const": "context.add"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "context": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "operation",
+          "expected_revision",
+          "context"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_support.record": {
+        "type": "object",
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "action_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "assignment_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assignment_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "references": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/ManagementDef_reference"
+            }
+          },
+          "predecessor_support_id": {
+            "type": "null"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "outcome": {
+            "enum": [
+              "completed",
+              "partial",
+              "unresolved"
+            ]
+          }
+        },
+        "required": [
+          "action_id",
+          "expected_revision",
+          "action_version_id",
+          "action_hash",
+          "assignment_id",
+          "assignment_hash",
+          "references",
+          "predecessor_support_id",
+          "text",
+          "outcome"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_support.correct": {
+        "type": "object",
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "action_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "assignment_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assignment_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "references": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/ManagementDef_reference"
+            }
+          },
+          "predecessor_support_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "outcome": {
+            "enum": [
+              "completed",
+              "partial",
+              "unresolved"
+            ]
+          }
+        },
+        "required": [
+          "action_id",
+          "expected_revision",
+          "action_version_id",
+          "action_hash",
+          "assignment_id",
+          "assignment_hash",
+          "references",
+          "predecessor_support_id",
+          "text",
+          "outcome"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_support.retract": {
+        "type": "object",
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "action_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "assignment_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assignment_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "references": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/ManagementDef_reference"
+            }
+          },
+          "predecessor_support_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "action_id",
+          "expected_revision",
+          "action_version_id",
+          "action_hash",
+          "assignment_id",
+          "assignment_hash",
+          "references",
+          "predecessor_support_id",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_support.decline": {
+        "type": "object",
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "action_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "assignment_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assignment_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "references": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/ManagementDef_reference"
+            }
+          },
+          "predecessor_support_id": {
+            "type": "null"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "action_id",
+          "expected_revision",
+          "action_version_id",
+          "action_hash",
+          "assignment_id",
+          "assignment_hash",
+          "references",
+          "predecessor_support_id",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_outcome.confirm": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "const": "outcome.confirm"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "action_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "assignment_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assignment_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "support_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "support_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "references_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "operation",
+          "expected_revision",
+          "action_version_id",
+          "action_hash",
+          "assignment_id",
+          "assignment_hash",
+          "support_id",
+          "support_hash",
+          "references_hash",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_outcome.reject": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "const": "outcome.reject"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "action_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "assignment_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assignment_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "support_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "support_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "references_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "operation",
+          "expected_revision",
+          "action_version_id",
+          "action_hash",
+          "assignment_id",
+          "assignment_hash",
+          "support_id",
+          "support_hash",
+          "references_hash",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_outcome.revoke": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "const": "outcome.revoke"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "action_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "assignment_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assignment_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "support_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "support_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "references_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "predecessor_review_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "operation",
+          "expected_revision",
+          "action_version_id",
+          "action_hash",
+          "assignment_id",
+          "assignment_hash",
+          "support_id",
+          "support_hash",
+          "references_hash",
+          "reason",
+          "predecessor_review_id"
+        ],
+        "additionalProperties": false
+      },
+      "ManagementDef_envelope": {
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "const": "management-evidence-v1"
+          },
+          "operation": {
+            "enum": [
+              "action.open",
+              "support.record",
+              "support.correct",
+              "support.retract",
+              "support.decline"
+            ]
+          },
+          "source_instance_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "source_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "occurred_at": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$"
+          },
+          "source_updated_at": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$"
+          },
+          "body": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "schema_version",
+          "operation",
+          "source_instance_id",
+          "object_id",
+          "source_revision",
+          "occurred_at",
+          "source_updated_at",
+          "body"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "operation": {
+                "const": "action.open"
+              },
+              "body": {
+                "$ref": "#/components/schemas/ManagementDef_action.open"
+              }
+            }
+          },
+          {
+            "properties": {
+              "operation": {
+                "const": "support.record"
+              },
+              "body": {
+                "$ref": "#/components/schemas/ManagementDef_support.record"
+              }
+            }
+          },
+          {
+            "properties": {
+              "operation": {
+                "const": "support.correct"
+              },
+              "body": {
+                "$ref": "#/components/schemas/ManagementDef_support.correct"
+              }
+            }
+          },
+          {
+            "properties": {
+              "operation": {
+                "const": "support.retract"
+              },
+              "body": {
+                "$ref": "#/components/schemas/ManagementDef_support.retract"
+              }
+            }
+          },
+          {
+            "properties": {
+              "operation": {
+                "const": "support.decline"
+              },
+              "body": {
+                "$ref": "#/components/schemas/ManagementDef_support.decline"
+              }
+            }
+          }
+        ]
+      },
+      "ManagementOpenEnvelope": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ManagementDef_envelope"
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "action.open"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "ManagementSupportEnvelope": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ManagementDef_envelope"
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "support.record",
+                  "support.correct",
+                  "support.retract",
+                  "support.decline"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "ManagementEvent": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ManagementDef_action.revise"
+          },
+          {
+            "$ref": "#/components/schemas/ManagementDef_action.reopen"
+          },
+          {
+            "$ref": "#/components/schemas/ManagementDef_action.withdraw"
+          },
+          {
+            "$ref": "#/components/schemas/ManagementDef_assignment.set"
+          },
+          {
+            "$ref": "#/components/schemas/ManagementDef_context.add"
+          }
+        ]
+      },
+      "ManagementReview": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ManagementDef_outcome.confirm"
+          },
+          {
+            "$ref": "#/components/schemas/ManagementDef_outcome.reject"
+          },
+          {
+            "$ref": "#/components/schemas/ManagementDef_outcome.revoke"
+          }
+        ]
+      },
+      "ManagementMutation": {
+        "type": "object",
+        "required": [
+          "receipt_id",
+          "action_id",
+          "event_id",
+          "revision",
+          "replayed",
+          "synthetic",
+          "ai_interpretation"
+        ],
+        "properties": {
+          "receipt_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "event_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer"
+          },
+          "replayed": {
+            "type": "boolean"
+          },
+          "synthetic": {
+            "const": true
+          },
+          "ai_interpretation": {
+            "const": "unavailable"
+          },
+          "current_outcome": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "completed",
+              "partial",
+              "unresolved",
+              null
+            ]
+          },
+          "coverage_status": {
+            "enum": [
+              "complete",
+              "unknown"
+            ]
+          }
+        }
+      },
+      "ManagementPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "synthetic",
+          "ai_interpretation"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "object"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "visible_record_count": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "synthetic": {
+            "const": true
+          },
+          "ai_interpretation": {
+            "const": "unavailable"
+          }
+        }
       }
     }
   },
