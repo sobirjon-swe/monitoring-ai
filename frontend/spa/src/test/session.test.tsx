@@ -1,0 +1,15 @@
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { describe,it,expect,vi } from 'vitest';
+import { SessionProvider,useSession } from '../auth/SessionProvider';
+import { LoginPage } from '../auth/LoginPage';
+import { ApiClient } from '../api/client';
+import { t } from '../i18n';
+const active={authenticated:true,csrf_token:'csrf',user:{id:'u',tenant_id:'t',employee_id:'e',display_name:'Private Person'},expires_at:'2026-10-25T00:00:00Z'};
+const json=(data:unknown)=>new Response(JSON.stringify({data}));
+function Probe(){const s=useSession();return <><span>{s.state.status==='authenticated'?s.state.session.user.display_name:s.state.status}</span><span data-testid="generation">{s.scopeGeneration}</span><button onClick={()=>void s.logout()}>Logout</button><button onClick={()=>s.selectProject({id:'p',name:'P',revision:1})}>Switch</button><LoginPage locale="en"/></>}
+describe('session boundary',()=>{
+ it('clears the live token immediately on submit and never stores it',async()=>{let finish!:(r:Response)=>void; const api=new ApiClient(vi.fn().mockResolvedValueOnce(json({authenticated:false,csrf_token:'c'})).mockImplementationOnce(()=>new Promise(r=>{finish=r}))); render(<SessionProvider client={api}><Probe/></SessionProvider>); await screen.findByText('anonymous'); const input=screen.getByLabelText('Development token') as HTMLInputElement; fireEvent.change(input,{target:{value:'opaque-secret'}}); fireEvent.submit(input.closest('form')!); expect(input.value).toBe(''); expect(localStorage.getItem('token')).toBeNull(); expect(sessionStorage.getItem('token')).toBeNull(); await act(async()=>finish(json(active))); });
+ it('drops an old session response after uncertain logout',async()=>{let finish!:(r:Response)=>void; const api=new ApiClient(vi.fn().mockImplementationOnce(()=>new Promise(r=>{finish=r})).mockRejectedValueOnce(new Error('offline'))); render(<SessionProvider client={api}><Probe/></SessionProvider>); fireEvent.click(screen.getByText('Logout')); await act(async()=>finish(json(active))); await waitFor(()=>expect(screen.queryByText('Private Person')).toBeNull()); });
+ it('increments scope on switch and clears immediately on 401',async()=>{const api=new ApiClient(vi.fn().mockResolvedValueOnce(json(active)).mockResolvedValue(json({authenticated:false,csrf_token:'c'}))); render(<SessionProvider client={api}><Probe/></SessionProvider>); await screen.findByText('Private Person'); const before=Number(screen.getByTestId('generation').textContent); fireEvent.click(screen.getByText('Switch')); expect(Number(screen.getByTestId('generation').textContent)).toBeGreaterThan(before); act(()=>api.onUnauthorized?.()); expect(screen.queryByText('Private Person')).toBeNull(); });
+ it('translates every system key and formats placeholders safely',()=>{expect(t('uz','login')).toBe('Kirish'); expect(t('ru','login')).toBe('Войти'); expect(t('en','login')).toBe('Sign in'); expect(t('en','requestId',{id:'safe-id'})).toContain('safe-id');});
+});

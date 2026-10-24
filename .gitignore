@@ -36,3 +36,6 @@ Thumbs.db
 /tmp/
 /.local/
 /.superpowers/
+
+# Local React workspace build
+/backend/public/ui-assets/

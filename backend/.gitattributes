@@ -1,5 +1,8 @@
 * text=auto eol=lf
 
+# The runtime allowlist verifies this manifest by its exact SHA256 bytes.
+tests/Fixtures/browser-demo-v1.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
 *.blade.php diff=html
 *.css diff=css
 *.html diff=html

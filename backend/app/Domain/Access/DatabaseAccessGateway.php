@@ -45,6 +45,9 @@ class DatabaseAccessGateway implements AccessGateway
         }
         $allowed = $this->context->run($actor->tenantId, function () use ($actor, $purpose, $scope): bool {
             $instant = now();
+            if ($purpose === 'project.read' && isset($scope['project_id'])) {
+                return app(ProjectReadScope::class)->apply(DB::table('projects'), $actor, $instant)->where('projects.id', $scope['project_id'])->exists();
+            }
             $user = DB::table('users')->where('id', $actor->id)->where('status', 'active')->first();
             if ($user === null || ! DB::table('tenants')->where('id', $actor->tenantId)->where('status', 'active')->exists()) {
                 return false;

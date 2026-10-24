@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Monitoring AI local foundation, synthetic ingestion, lifecycle, developer and QA evidence",
-    "version": "1.4.0",
-    "description": "JSON syntax is valid YAML1.2. Local/testing loopback opaque bearer tokens only; production SSO and UI not implemented. Tenant/project scopes and current grants/membership are server-controlled. No T07 HTTP/model endpoint: analysis contracts are synthetic-only internal client. Responses may contain UTC PostgreSQL timestamp text, not uniformly RFC3339. HEAD uses the same read permissions and handler as GET and has an empty body; only POST/PATCH mutate. UTC timestamps preserve up to six fractional digits through validation, timestamptz(6) storage and event/access-time bindings. Periods remain [valid_from,valid_to) at microsecond precision. E02 I1/I2 provide synthetic-v1 manual-source connector bindings and bounded durable receipt/outbox acceptance. No real source API, webhook verification, raw receipt read, settings update, production worker identity or external AI inference. I3 local outbox processing and I4 projection/status are implemented and independently reviewed. Whole-unit code review found no Critical or Important blockers; dedicated dev incremental migrations000007/000008 and rollback-scoped synthetic acceptance/replay/CLI projection smoke were verified by the lead. Scoped metadata re-review approved. This synthetic foundation does not establish full E02 or production readiness. Source freshness remains unknown. E03 deterministic synthetic lifecycle implements versioned requirements/tasks, reviewed receipt links, synthetic QA, immutable baselines/human decisions, exact progress and selective durable applicability invalidation. R6 final whole-unit/scoped review, ten dev incrementals000009–000014, rollback smoke and218-test verification passed; no full E03/AC06 or production readiness claim. Lifecycle transport rejects extra authority fields, duplicate keys, decoded NUL and object/array ambiguity; max65536 bytes/depth16. No inference or live CI. E05-01 adds synthetic typed QA/build/environment/plan/selection/execution/defect/handoff transport and guarded local maintenance only. QA execution coverage and human decisions remain separate from E03 acceptance/progress and release approval. All AI unavailable; E04 native runner stays disabled. No live source, UI, inference or deployment. R6 final verification/review state is tracked in docs/acceptance/e05-01.md."
+    "title": "Monitoring AI local foundation, synthetic evidence and F01 browser reads",
+    "version": "1.5.0",
+    "description": "JSON syntax is valid YAML1.2. Local/testing loopback API uses opaque Bearer credentials; F01 browser reads use separately verified server sessions. Production SSO and F02 mutation UI remain unimplemented. Tenant/project scopes and current grants/membership are server-controlled. No T07 HTTP/model endpoint: analysis contracts are synthetic-only internal client. Responses may contain UTC PostgreSQL timestamp text, not uniformly RFC3339. HEAD uses the same read permissions and handler as GET and has an empty body; only POST/PATCH mutate. UTC timestamps preserve up to six fractional digits through validation, timestamptz(6) storage and event/access-time bindings. Periods remain [valid_from,valid_to) at microsecond precision. E02 I1/I2 provide synthetic-v1 manual-source connector bindings and bounded durable receipt/outbox acceptance. No real source API, webhook verification, raw receipt read, settings update, production worker identity or external AI inference. I3 local outbox processing and I4 projection/status are implemented and independently reviewed. Whole-unit code review found no Critical or Important blockers; dedicated dev incremental migrations000007/000008 and rollback-scoped synthetic acceptance/replay/CLI projection smoke were verified by the lead. Scoped metadata re-review approved. This synthetic foundation does not establish full E02 or production readiness. Source freshness remains unknown. E03 deterministic synthetic lifecycle implements versioned requirements/tasks, reviewed receipt links, synthetic QA, immutable baselines/human decisions, exact progress and selective durable applicability invalidation. R6 final whole-unit/scoped review, ten dev incrementals000009–000014, rollback smoke and218-test verification passed; no full E03/AC06 or production readiness claim. Lifecycle transport rejects extra authority fields, duplicate keys, decoded NUL and object/array ambiguity; max65536 bytes/depth16. No inference or live CI. E05-01 adds synthetic typed QA/build/environment/plan/selection/execution/defect/handoff transport and guarded local maintenance only. QA execution coverage and human decisions remain separate from E03 acceptance/progress and release approval. All AI unavailable; E04 native runner stays disabled. No live source, inference or deployment. F01 local read UI is implemented; final browser acceptance remains separate. R6 final verification/review state is tracked in docs/acceptance/e05-01.md. F01 adds anonymous session/CSRF bootstrap, strict token-once login, browser-only logout, scoped project discovery/capability hints and ten existing read aliases. Browser routes reject Authorization headers; Bearer API behavior is unchanged. Browser API has no business mutations. See docs/contracts/browser-session-v1.md and docs/acceptance/frontend-f01.md; final integrated gate remains pending."
   },
   "servers": [
     {
@@ -11439,6 +11439,1487 @@
           }
         }
       }
+    },
+    "/browser/v1/session": {
+      "get": {
+        "operationId": "browserSession",
+        "summary": "Bootstrap anonymous CSRF or resolve current browser identity",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "No-store JSON; HEAD has an empty body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowserSessionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or no-longer-valid browser credential; no Bearer fallback.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current authority or origin denied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Closed request validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Local runtime unavailable or configuration refused.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "Reject any Authorization header. Previously bound invalid identity returns401 and clears binding; next bootstrap may be anonymous200. File server session and host-only HttpOnly SameSite=Lax cookie. Local loopbackHTTP only; no-store. Browser and Bearer identities never fall back to each other."
+      }
+    },
+    "/browser/v1/login": {
+      "post": {
+        "operationId": "browserLogin",
+        "summary": "Exchange an existing local token once for a server session",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "No-store JSON; HEAD has an empty body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowserSessionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or no-longer-valid browser credential; no Bearer fallback.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current authority or origin denied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Closed request validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Local runtime unavailable or configuration refused.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Raw login document exceeds1024bytes or token exceeds512bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "419": {
+            "description": "CSRF token mismatch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Sixth attempt in the current client minute.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "description": "Bootstrap the cookie and CSRF first. Installed Laravel origin-or-token CSRF applies; frontend sends X-CSRF-TOKEN. Exact single-member JSON; no query parameters, duplicate keys, controls or non-JSON structural whitespace. Failed login removes prior binding. Rotate ID/CSRF only after successful credential proof. Five attempts per configured local client per minute.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-CSRF-TOKEN",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Required when trusted same-origin Fetch Metadata does not satisfy origin-or-token middleware."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BrowserLoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/browser/v1/logout": {
+      "post": {
+        "operationId": "browserLogout",
+        "summary": "Invalidate only this browser session",
+        "security": [],
+        "responses": {
+          "401": {
+            "description": "Missing or no-longer-valid browser credential; no Bearer fallback.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current authority or origin denied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Closed request validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Local runtime unavailable or configuration refused.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Browser binding/CSRF invalidated; underlying Bearer token is unchanged."
+          },
+          "419": {
+            "description": "CSRF token mismatch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-CSRF-TOKEN",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Required when trusted same-origin Fetch Metadata does not satisfy origin-or-token middleware."
+          }
+        ],
+        "description": "Origin-or-token CSRF protected. Obtain a fresh anonymous bootstrap afterward. No Authorization header."
+      }
+    },
+    "/browser/v1/projects": {
+      "get": {
+        "operationId": "browserProjects",
+        "summary": "List only currently authorized projects, fixed25 rows",
+        "security": [
+          {
+            "BrowserSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No-store JSON; HEAD has an empty body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowserProjectPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or no-longer-valid browser credential; no Bearer fallback.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current authority or origin denied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Closed request validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Local runtime unavailable or configuration refused.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 1024
+            }
+          }
+        ],
+        "description": "No GET body/unknown queries. UUID ordering; no hidden total. Recheck project.read/membership/policy/grant on every continuation."
+      }
+    },
+    "/browser/v1/projects/{project}/capabilities": {
+      "get": {
+        "operationId": "browserCapabilities",
+        "summary": "Return bounded current read-purpose presentation hints",
+        "security": [
+          {
+            "BrowserSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No-store JSON; HEAD has an empty body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowserCapabilities"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or no-longer-valid browser credential; no Bearer fallback.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current authority or origin denied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Closed request validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Local runtime unavailable or configuration refused.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "description": "Requires project.read. Hints never authorize an endpoint; source/object/department checks still apply. No query/body."
+      }
+    },
+    "/browser/v1/projects/{project}/requirements": {
+      "get": {
+        "operationId": "browserLifecycleGetRequirements",
+        "summary": "Get requirements",
+        "description": "Browser session read-only alias; rejects any Authorization header. Exact authoritative DTO/default/query/privacy semantics, no-store and empty HEAD body. Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. GET/HEAD nonmutating; HEAD same authorization, empty body. data is an array; cursor is last returned id, no next_cursor wrapper.",
+        "x-purpose": "requirements.read",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded lifecycle metadata wrapped in data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "requirement_id",
+                          "version",
+                          "draft_revision",
+                          "content_hash",
+                          "approved_at"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "requirement_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "version": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "draft_revision": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "content_hash": {
+                            "type": "string"
+                          },
+                          "approved_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "403": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "404": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "409": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "413": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "422": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          }
+        },
+        "security": [
+          {
+            "BrowserSession": []
+          }
+        ]
+      }
+    },
+    "/browser/v1/projects/{project}/lifecycle-tasks": {
+      "get": {
+        "operationId": "browserLifecycleGetLifecycleTasks",
+        "summary": "Get lifecycle-tasks",
+        "description": "Browser session read-only alias; rejects any Authorization header. Exact authoritative DTO/default/query/privacy semantics, no-store and empty HEAD body. Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. GET/HEAD nonmutating; HEAD same authorization, empty body. data is an array; cursor is last returned id, no next_cursor wrapper.",
+        "x-purpose": "requirements.read",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded lifecycle metadata wrapped in data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "revision",
+                          "version_id",
+                          "title",
+                          "assignee_id",
+                          "estimate_basis",
+                          "remaining_effort",
+                          "expected_test_keys",
+                          "status",
+                          "content_hash",
+                          "effective_at"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "revision": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "version_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "assignee_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "estimate_basis": {
+                            "type": "string"
+                          },
+                          "remaining_effort": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "expected_test_keys": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "content_hash": {
+                            "type": "string"
+                          },
+                          "effective_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "403": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "404": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "409": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "413": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "422": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          }
+        },
+        "security": [
+          {
+            "BrowserSession": []
+          }
+        ]
+      }
+    },
+    "/browser/v1/projects/{project}/progress": {
+      "get": {
+        "operationId": "browserLifecycleGetProgress",
+        "summary": "Get progress",
+        "description": "Browser session read-only alias; rejects any Authorization header. Exact authoritative DTO/default/query/privacy semantics, no-store and empty HEAD body. Server-derived tenant/actor; UUID paths; explicit current project purpose. Metadata only. Sanitized401/403/404/409/413/422; stale revision/generation/pointer409. GET/HEAD nonmutating; HEAD same authorization, empty body. Only optional baseline_id query is allowed. Source access checked independently. Exact integer numerator/denominator; basis points=floor(accepted*10000/total), null when unavailable. Frozen snapshots additionally have as_of. ingestion.read is independently required for authorized source eligibility/favorable delivery.",
+        "x-purpose": "progress.read",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "baseline_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bounded lifecycle metadata wrapped in data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "accepted_weight",
+                        "total_weight",
+                        "percentage_basis_points",
+                        "baseline_id",
+                        "policy_id",
+                        "coverage_reason_codes",
+                        "previous_snapshot",
+                        "schedule_coverage"
+                      ],
+                      "x-exact-fields": [
+                        "status",
+                        "accepted_weight",
+                        "total_weight",
+                        "percentage_basis_points",
+                        "baseline_id",
+                        "policy_id",
+                        "coverage_reason_codes",
+                        "previous_snapshot",
+                        "schedule_coverage"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "available",
+                            "partial",
+                            "unavailable"
+                          ]
+                        },
+                        "accepted_weight": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "total_weight": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "percentage_basis_points": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "minimum": 0,
+                          "maximum": 10000
+                        },
+                        "baseline_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "uuid"
+                        },
+                        "policy_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "uuid"
+                        },
+                        "coverage_reason_codes": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "previous_snapshot": {
+                          "type": [
+                            "object",
+                            "null"
+                          ]
+                        },
+                        "schedule_coverage": {
+                          "type": "object",
+                          "required": [
+                            "status",
+                            "reason_codes",
+                            "cycle_task_ids",
+                            "missing_estimate_task_ids"
+                          ]
+                        },
+                        "as_of": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "403": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "404": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "409": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "413": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          },
+          "422": {
+            "description": "Sanitized error with request_id; no source payload or authority proof"
+          }
+        },
+        "security": [
+          {
+            "BrowserSession": []
+          }
+        ]
+      }
+    },
+    "/browser/v1/projects/{project}/qa/verification": {
+      "get": {
+        "x-qa-control-headers": [],
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Scoped UUID absent or route UUID malformed"
+          },
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/QaVerification"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            },
+            "description": "Permission-filtered synthetic QA DTO; current verification unavailable for closed projects, authorized immutable metadata history retained"
+          },
+          "403": {
+            "description": "Current/original authority or source/department access denied; no retained ID/content leaked"
+          },
+          "409": {
+            "description": "CAS/replay conflict, closed project, stale pins, terminal observed input or ineligible human decision"
+          },
+          "422": {
+            "description": "Invalid JSON/schema/control headers/unknown query/page/cursor bounds; generic response only"
+          },
+          "401": {
+            "description": "No existing local bearer subject"
+          }
+        },
+        "summary": "Read QA verification",
+        "description": "Browser session read-only alias; rejects any Authorization header. Exact authoritative DTO/default/query/privacy semantics, no-store and empty HEAD body. GET/HEAD have no body and no QA control headers; unknown query fields422. qa.read+qa.source.read project purposes, optional department requires separate qa.department.read/current membership. Filter all actual named/linked employees before pages/counts; department global selection/denominator/completion/excluded/omitted data withheld, uniform unknown reasons. Current queue additionally includes current definition reviewer; immutable history keeps original pins. Cursors bind tenant/caller/project/resource/subject/department and revoke before next delivery. Default50/max100/cursor128. QA verification is criterion execution coverage, not acceptance/release/employee hours or score. AI unavailable.",
+        "x-additional-department-purpose": "qa.department.read",
+        "operationId": "browserReadQaverification",
+        "x-purposes": [
+          "qa.read",
+          "qa.source.read"
+        ],
+        "security": [
+          {
+            "BrowserSession": []
+          }
+        ]
+      }
+    },
+    "/browser/v1/projects/{project}/qa/queue": {
+      "get": {
+        "x-qa-control-headers": [],
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            },
+            "required": false
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Scoped UUID absent or route UUID malformed"
+          },
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/QaPage"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            },
+            "description": "Permission-filtered synthetic QA DTO; current verification unavailable for closed projects, authorized immutable metadata history retained"
+          },
+          "403": {
+            "description": "Current/original authority or source/department access denied; no retained ID/content leaked"
+          },
+          "409": {
+            "description": "CAS/replay conflict, closed project, stale pins, terminal observed input or ineligible human decision"
+          },
+          "422": {
+            "description": "Invalid JSON/schema/control headers/unknown query/page/cursor bounds; generic response only"
+          },
+          "401": {
+            "description": "No existing local bearer subject"
+          }
+        },
+        "summary": "Read QA queue",
+        "description": "Browser session read-only alias; rejects any Authorization header. Exact authoritative DTO/default/query/privacy semantics, no-store and empty HEAD body. GET/HEAD have no body and no QA control headers; unknown query fields422. qa.read+qa.source.read project purposes, optional department requires separate qa.department.read/current membership. Filter all actual named/linked employees before pages/counts; department global selection/denominator/completion/excluded/omitted data withheld, uniform unknown reasons. Current queue additionally includes current definition reviewer; immutable history keeps original pins. Cursors bind tenant/caller/project/resource/subject/department and revoke before next delivery. Default50/max100/cursor128. QA verification is criterion execution coverage, not acceptance/release/employee hours or score. AI unavailable.",
+        "x-additional-department-purpose": "qa.department.read",
+        "operationId": "browserReadQaqueue",
+        "x-purposes": [
+          "qa.read",
+          "qa.source.read"
+        ],
+        "security": [
+          {
+            "BrowserSession": []
+          }
+        ]
+      }
+    },
+    "/browser/v1/projects/{project}/qa/history/{kind}/{subject}": {
+      "get": {
+        "x-qa-control-headers": [],
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            },
+            "required": false
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "kind",
+            "in": "path",
+            "schema": {
+              "enum": [
+                "build",
+                "environment",
+                "definition",
+                "plan",
+                "selection",
+                "execution",
+                "defect",
+                "handoff"
+              ]
+            },
+            "required": true
+          },
+          {
+            "name": "subject",
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Scoped UUID absent or route UUID malformed"
+          },
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/QaPage"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            },
+            "description": "Permission-filtered synthetic QA DTO; current verification unavailable for closed projects, authorized immutable metadata history retained"
+          },
+          "403": {
+            "description": "Current/original authority or source/department access denied; no retained ID/content leaked"
+          },
+          "409": {
+            "description": "CAS/replay conflict, closed project, stale pins, terminal observed input or ineligible human decision"
+          },
+          "422": {
+            "description": "Invalid JSON/schema/control headers/unknown query/page/cursor bounds; generic response only"
+          },
+          "401": {
+            "description": "No existing local bearer subject"
+          }
+        },
+        "summary": "Read QA history",
+        "description": "Browser session read-only alias; rejects any Authorization header. Exact authoritative DTO/default/query/privacy semantics, no-store and empty HEAD body. GET/HEAD have no body and no QA control headers; unknown query fields422. qa.read+qa.source.read project purposes, optional department requires separate qa.department.read/current membership. Filter all actual named/linked employees before pages/counts; department global selection/denominator/completion/excluded/omitted data withheld, uniform unknown reasons. Current queue additionally includes current definition reviewer; immutable history keeps original pins. Cursors bind tenant/caller/project/resource/subject/department and revoke before next delivery. Default50/max100/cursor128. QA verification is criterion execution coverage, not acceptance/release/employee hours or score. AI unavailable.",
+        "x-additional-department-purpose": "qa.department.read",
+        "operationId": "browserReadQahistory",
+        "x-purposes": [
+          "qa.read",
+          "qa.source.read"
+        ],
+        "security": [
+          {
+            "BrowserSession": []
+          }
+        ]
+      }
+    },
+    "/browser/v1/projects/{project}/ba/queue": {
+      "get": {
+        "operationId": "browserReadBaQueue",
+        "summary": "Read synthetic BA queue",
+        "x-purposes": [
+          "ba.read",
+          "ba.source.read"
+        ],
+        "description": "Browser session read-only alias; rejects any Authorization header. Exact authoritative DTO/default/query/privacy semantics, no-store and empty HEAD body. Bodyless GET/HEAD; unknown queries and all mutation control headers reject. Current whole-record privacy before LIMIT, exact original proofs and final clock. Counts cover only delivered authorized records. Missing/hidden history UUID returns authorized empty200 without existence disclosure. Unknown/withheld history has null count and no continuation. AI unavailable, synthetic parties not verified, elapsed UTC only; business age null/calendar_unavailable.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "description": "Opaque HMAC cursor scoped to tenant/actor/project/resource/department/limit and continuation generation/revision."
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Additional ba.department.read, department_head role and every named-person department membership; never replaces project/source authority."
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Current scope/purpose/source/role denied"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped mutation subject/project"
+          },
+          "409": {
+            "description": "CAS/hash/state/cursor conflict"
+          },
+          "413": {
+            "description": "POST over65536 bytes"
+          },
+          "422": {
+            "description": "Strict JSON/query/control/schema/secret validation rejected"
+          },
+          "503": {
+            "description": "Local runtime or bounded mutation graph unavailable"
+          },
+          "200": {
+            "description": "Authorized bounded page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BaQueuePage"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BrowserSession": []
+          }
+        ]
+      }
+    },
+    "/browser/v1/projects/{project}/ba/history/{clarification}": {
+      "get": {
+        "operationId": "browserReadBaHistory",
+        "summary": "Read synthetic BA history",
+        "x-purposes": [
+          "ba.read",
+          "ba.source.read"
+        ],
+        "description": "Browser session read-only alias; rejects any Authorization header. Exact authoritative DTO/default/query/privacy semantics, no-store and empty HEAD body. Bodyless GET/HEAD; unknown queries and all mutation control headers reject. Current whole-record privacy before LIMIT, exact original proofs and final clock. Counts cover only delivered authorized records. Missing/hidden history UUID returns authorized empty200 without existence disclosure. Unknown/withheld history has null count and no continuation. AI unavailable, synthetic parties not verified, elapsed UTC only; business age null/calendar_unavailable.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "clarification",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "description": "Opaque HMAC cursor scoped to tenant/actor/project/resource/department/limit and continuation generation/revision."
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Additional ba.department.read, department_head role and every named-person department membership; never replaces project/source authority."
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Current scope/purpose/source/role denied"
+          },
+          "404": {
+            "description": "Malformed route UUID or absent scoped mutation subject/project"
+          },
+          "409": {
+            "description": "CAS/hash/state/cursor conflict"
+          },
+          "413": {
+            "description": "POST over65536 bytes"
+          },
+          "422": {
+            "description": "Strict JSON/query/control/schema/secret validation rejected"
+          },
+          "503": {
+            "description": "Local runtime or bounded mutation graph unavailable"
+          },
+          "200": {
+            "description": "Authorized bounded page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BaHistoryPage"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BrowserSession": []
+          }
+        ]
+      }
+    },
+    "/browser/v1/projects/{project}/management/queue": {
+      "get": {
+        "operationId": "browserGetManagementQueue",
+        "description": "Browser session read-only alias; rejects any Authorization header. Exact authoritative DTO/default/query/privacy semantics, no-store and empty HEAD body. Local/testing synthetic only. Guard runs before bearer DB connection; then current role/project/department/source and original authority remain required through final PostgreSQL clock. Strict UTF8 object<=65536 bytes/depth16, duplicate decoded/unknown keys and object/list/type/control/secret/date errors reject. Reason<=2000 bytes, text/context<=4000, object_id<=200. Write query fields prohibited. Every known inapplicable control header rejects. Source envelopes require Expected-Source-Revision; human operations use body expected_revision. Support action_id must equal route. Management outcomes never close QA/BA or accept E03. Every DTO synthetic:true/AI unavailable; elapsed UTC only, business calendar unavailable. Closed operation schemas copied from published management-evidence-v1 definitions. Reads reject request bodies/all five mutation-control headers and unknown query fields; department_id requires explicit project AND department read purposes. Whole-record privacy precedes LIMIT/count/cursor. Cursor binds tenant/actor/project/resource/action/department/limit/generation/revision.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "department_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            }
+          }
+        ],
+        "x-purposes": [
+          "management.read",
+          "management.source.read"
+        ],
+        "responses": {
+          "200": {
+            "description": "Permitted complete records, or bounded unknown empty page/null count/no cursor; absent or hidden history200. HEAD empty body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagementPage"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "403": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "404": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "409": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "422": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "503": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          }
+        },
+        "security": [
+          {
+            "BrowserSession": []
+          }
+        ]
+      }
+    },
+    "/browser/v1/projects/{project}/management/history/{action}": {
+      "get": {
+        "operationId": "browserGetManagementHistory",
+        "description": "Browser session read-only alias; rejects any Authorization header. Exact authoritative DTO/default/query/privacy semantics, no-store and empty HEAD body. Local/testing synthetic only. Guard runs before bearer DB connection; then current role/project/department/source and original authority remain required through final PostgreSQL clock. Strict UTF8 object<=65536 bytes/depth16, duplicate decoded/unknown keys and object/list/type/control/secret/date errors reject. Reason<=2000 bytes, text/context<=4000, object_id<=200. Write query fields prohibited. Every known inapplicable control header rejects. Source envelopes require Expected-Source-Revision; human operations use body expected_revision. Support action_id must equal route. Management outcomes never close QA/BA or accept E03. Every DTO synthetic:true/AI unavailable; elapsed UTC only, business calendar unavailable. Closed operation schemas copied from published management-evidence-v1 definitions. Reads reject request bodies/all five mutation-control headers and unknown query fields; department_id requires explicit project AND department read purposes. Whole-record privacy precedes LIMIT/count/cursor. Cursor binds tenant/actor/project/resource/action/department/limit/generation/revision.",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "department_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            }
+          }
+        ],
+        "x-purposes": [
+          "management.read",
+          "management.source.read"
+        ],
+        "responses": {
+          "200": {
+            "description": "Permitted complete records, or bounded unknown empty page/null count/no cursor; absent or hidden history200. HEAD empty body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ManagementPage"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "403": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "404": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "409": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "422": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          },
+          "503": {
+            "description": "Safe denial; HEAD empty body, same authority and privacy as GET."
+          }
+        },
+        "security": [
+          {
+            "BrowserSession": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -11448,6 +12929,12 @@
         "scheme": "bearer",
         "bearerFormat": "opaque local tenant.token.secret",
         "description": "Local/testing loopback only. CLI explicit bootstrap, hash-only storage, eight-hour expiry."
+      },
+      "BrowserSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "monitoring-ai-session",
+        "description": "Verified current local cookie name via anonymous HEAD; configurable SESSION_COOKIE. Encrypted cookie identifies a server-only binding; HttpOnly, host-only, SameSite=Lax, loopbackHTTP Secure=false. Not accepted by Bearer API."
       }
     },
     "schemas": {
@@ -16145,6 +17632,212 @@
           },
           "ai_interpretation": {
             "const": "unavailable"
+          }
+        }
+      },
+      "BrowserAnonymousSession": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "authenticated",
+          "csrf_token"
+        ],
+        "properties": {
+          "authenticated": {
+            "const": false
+          },
+          "csrf_token": {
+            "type": "string"
+          }
+        }
+      },
+      "BrowserAuthenticatedSession": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "authenticated",
+          "csrf_token",
+          "user",
+          "expires_at"
+        ],
+        "properties": {
+          "authenticated": {
+            "const": true
+          },
+          "csrf_token": {
+            "type": "string"
+          },
+          "user": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tenant_id",
+              "employee_id",
+              "display_name"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "employee_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "display_name": {
+                "type": "string"
+              }
+            }
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Precise current token expiry capped by sliding120-minute server idle deadline."
+          }
+        }
+      },
+      "BrowserSessionResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/BrowserAnonymousSession"
+              },
+              {
+                "$ref": "#/components/schemas/BrowserAuthenticatedSession"
+              }
+            ]
+          }
+        }
+      },
+      "BrowserLoginRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 512,
+            "writeOnly": true,
+            "description": "Existing opaque local credential; byte limit512. Raw JSON max1024bytes. Never logged, persisted, flashed or returned.",
+            "minLength": 1
+          }
+        }
+      },
+      "BrowserProjectSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "revision"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "BrowserProjectPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "items",
+              "next_cursor"
+            ],
+            "properties": {
+              "items": {
+                "type": "array",
+                "maxItems": 25,
+                "items": {
+                  "$ref": "#/components/schemas/BrowserProjectSummary"
+                }
+              },
+              "next_cursor": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Signed actor/tenant-bound opaque continuation; never a grant."
+              }
+            }
+          }
+        }
+      },
+      "BrowserCapabilities": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "project_id",
+              "purposes",
+              "observed_at"
+            ],
+            "properties": {
+              "project_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "purposes": {
+                "type": "array",
+                "uniqueItems": true,
+                "maxItems": 9,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "project.read",
+                    "requirements.read",
+                    "progress.read",
+                    "qa.read",
+                    "qa.source.read",
+                    "ba.read",
+                    "ba.source.read",
+                    "management.read",
+                    "management.source.read"
+                  ]
+                }
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
           }
         }
       }

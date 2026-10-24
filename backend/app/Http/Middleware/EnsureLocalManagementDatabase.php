@@ -16,7 +16,7 @@ class EnsureLocalManagementDatabase
     {
         // Match the router's single path decode before token lookup can open a connection.
         $path = rawurldecode(rtrim($request->getPathInfo(), '/'));
-        if (preg_match('~\A/api/v1/projects/[^/]+/management(?:/|\z)~D', $path)) {
+        if (preg_match('~\A/(?:api|browser)/v1/projects/[^/]+/management(?:/|\z)~D', $path)) {
             try {
                 app(LocalManagementDatabase::class)->assertRuntime();
             } catch (Throwable) {

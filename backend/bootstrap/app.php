@@ -2,12 +2,18 @@
 
 use App\Http\Middleware\AssignRequestId;
 use App\Http\Middleware\AuthenticateLocalToken;
+use App\Http\Middleware\EnsureLocalBrowserRuntime;
 use App\Http\Middleware\EnsureLocalManagementDatabase;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -17,13 +23,23 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         api: __DIR__.'/../routes/api.php',
+        web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         then: function (): void {
+            Route::middleware('browser')->prefix('browser/v1')->group(__DIR__.'/../routes/browser.php');
             Route::get('/up', fn () => response()->json(['status' => 'ok']));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(AssignRequestId::class);
+        $middleware->append(EnsureLocalBrowserRuntime::class);
+        $middleware->group('browser', [
+            EncryptCookies::class,
+            AddQueuedCookiesToResponse::class,
+            StartSession::class,
+            PreventRequestForgery::class,
+            SubstituteBindings::class,
+        ]);
         $middleware->append(EnsureLocalManagementDatabase::class);
         $middleware->appendToGroup('api', AuthenticateLocalToken::class);
         $middleware->redirectGuestsTo(fn () => null);
