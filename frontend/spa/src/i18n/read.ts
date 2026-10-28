@@ -63,7 +63,7 @@ const text = {
   content_hash: ['Mazmun hashi', 'Хеш содержимого', 'Content hash'], draft_revision: ['Qoralama reviziyasi', 'Ревизия черновика', 'Draft revision'],
   approved_at: ['Tasdiqlangan sana', 'Дата утверждения', 'Approved at'], effective_at: ['Amal qilish sanasi', 'Дата действия', 'Effective at'],
   title: ['Nomi (manba)', 'Название (источник)', 'Title (source)'], question: ['Savol (manba)', 'Вопрос (источник)', 'Question (source)'], answer: ['Javob (manba)', 'Ответ (источник)', 'Answer (source)'],
-  reason: ['Izoh (manba)', 'Причина (источник)', 'Reason (source)'], context: ['Kontekst (manba)', 'Контекст (источник)', 'Context (source)'],
+  reason: ['Izoh (manba)', 'Причина (источник)', 'Reason (source)'], context: ['Kontekst (manba)', 'Контекст (источник)', 'Context (source)'], humanContext: ['Kontekst', 'Контекст', 'Context'],
   assignee_id: ['Ijrochi ID', 'ID исполнителя', 'Assignee ID'], owner_id: ['Mas’ul ID', 'ID ответственного', 'Owner ID'],
   helper_id: ['Ko‘makchi ID', 'ID помощника', 'Helper ID'], requester_id: ['So‘rovchi ID', 'ID заявителя', 'Requester ID'], reviewer_id: ['Tekshiruvchi ID', 'ID проверяющего', 'Reviewer ID'],
   expected_test_keys: ['Kutilgan test kalitlari', 'Ожидаемые ключи тестов', 'Expected test keys'],

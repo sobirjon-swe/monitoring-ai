@@ -3,6 +3,7 @@ import { parseLifecycle, parseProgress } from '../../api/readAdapters';
 import { readText } from '../../i18n/read';
 import { t } from '../../i18n';
 import { Fields, ReadBoundary, Reasons, Value, WorkspaceHeader, useRead, type WorkspaceProps } from '../readWorkspace';
+import { LifecycleGrid } from './LifecycleGrid';
 
 export function LifecycleWorkspace({projectId,scopeGeneration,locale='uz',view='overview'}:WorkspaceProps & {view?:'overview'|'requirements'|'tasks'}) {
   const [cursor,setCursor]=useState<string|null>(null);
@@ -32,8 +33,7 @@ export function LifecycleWorkspace({projectId,scopeGeneration,locale='uz',view='
       }
       return <>
         <p className="coverage">{readText(locale,view==='requirements'?'versionsOnly':'tasksOnly')}</p>
-        {!data.length && <p>{readText(locale,'empty')}</p>}
-        <div className="table-scroll" role="region" aria-label={t(locale,view)} tabIndex={0}><table><thead><tr><th>{readText(locale,'id')}</th><th>{readText(locale,view==='requirements'?'version':'title')}</th><th>{readText(locale,'details')}</th></tr></thead><tbody>{data.map(row=><tr key={String(row.id)}><td className="record-id">{String(row.id)}</td><td>{view==='requirements'?String(row.version):String(row.title)}</td><td><details><summary>{readText(locale,'details')}</summary><Fields record={row} fields={view==='requirements'?['requirement_id','version','draft_revision','content_hash','approved_at']:['version_id','revision','status','assignee_id','estimate_basis','remaining_effort','expected_test_keys','content_hash','effective_at']} locale={locale}/></details></td></tr>)}</tbody></table></div>
+        <LifecycleGrid key={`${scopeGeneration}:${projectId}:${view}:${cursor ?? ''}`} data={data} view={view==='tasks'?'tasks':'requirements'} locale={locale}/>
         {data.length===20 && <button onClick={()=>setCursor(String(data[data.length-1].id))}>{t(locale,'more')}</button>}
       </>;
     }}</ReadBoundary>

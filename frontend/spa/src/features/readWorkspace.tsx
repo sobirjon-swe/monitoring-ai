@@ -51,9 +51,9 @@ export function ReadBoundary<T>({state,retry,locale,children}:{state:ReadState<T
   </div>;
   return children(state.data);
 }
-export function WorkspaceHeader({locale,title,projectId}:{locale:Locale;title:string;projectId:string}) {
+export function WorkspaceHeader({locale,title,projectId,writable=false}:{locale:Locale;title:string;projectId:string;writable?:boolean}) {
   const {project}=useSession();
-  return <><p className="eyebrow">{t(locale,'readOnly')}</p><h1 tabIndex={-1}>{title}</h1>
+  return <>{!writable && <p className="eyebrow">{t(locale,'readOnly')}</p>}<h1 tabIndex={-1}>{title}</h1>
     <p className="project-context">{readText(locale,'project')}: <strong>{project?.name}</strong> <span className="record-id">{projectId}</span></p>
     <p className="muted">{readText(locale,'timezone')}</p><p className="privacy-note">{readText(locale,'privacy')}</p></>;
 }
@@ -84,11 +84,11 @@ export function Value({value,field,locale}:{value:Json|undefined;field:string;lo
   }
   return <Fields record={value} fields={Object.keys(value)} locale={locale}/>;
 }
-export function Fields({record,fields,locale}:{record:ReadRecord;fields:string[];locale:Locale}) {
+export function Fields({record,fields,locale,labels}:{record:ReadRecord;fields:string[];locale:Locale;labels?:Record<string,string>}) {
   const supplied=fields.filter(key=>Object.hasOwn(record,key));
   const technical=supplied.filter(isTechnicalField);
   const primary=supplied.filter(key=>!isTechnicalField(key));
-  const rows=(keys:string[])=><dl className="record-fields">{keys.map(key=><div key={key}><dt>{fieldText(locale,key)}</dt><dd><Value value={record[key]} field={key} locale={locale}/></dd></div>)}</dl>;
+  const rows=(keys:string[])=><dl className="record-fields">{keys.map(key=><div key={key}><dt>{labels?.[key] ?? fieldText(locale,key)}</dt><dd><Value value={record[key]} field={key} locale={locale}/></dd></div>)}</dl>;
   return <>
     {primary.length>0 && rows(primary)}
     {technical.length>0 && <details className="technical-details"><summary>{readText(locale,'technicalDetails')}</summary>{rows(technical)}</details>}

@@ -3,7 +3,7 @@
   "info": {
     "title": "Monitoring AI local foundation, synthetic evidence and F01 browser reads",
     "version": "1.5.0",
-    "description": "JSON syntax is valid YAML1.2. Local/testing loopback API uses opaque Bearer credentials; F01 browser reads use separately verified server sessions. Production SSO and F02 mutation UI remain unimplemented. Tenant/project scopes and current grants/membership are server-controlled. No T07 HTTP/model endpoint: analysis contracts are synthetic-only internal client. Responses may contain UTC PostgreSQL timestamp text, not uniformly RFC3339. HEAD uses the same read permissions and handler as GET and has an empty body; only POST/PATCH mutate. UTC timestamps preserve up to six fractional digits through validation, timestamptz(6) storage and event/access-time bindings. Periods remain [valid_from,valid_to) at microsecond precision. E02 I1/I2 provide synthetic-v1 manual-source connector bindings and bounded durable receipt/outbox acceptance. No real source API, webhook verification, raw receipt read, settings update, production worker identity or external AI inference. I3 local outbox processing and I4 projection/status are implemented and independently reviewed. Whole-unit code review found no Critical or Important blockers; dedicated dev incremental migrations000007/000008 and rollback-scoped synthetic acceptance/replay/CLI projection smoke were verified by the lead. Scoped metadata re-review approved. This synthetic foundation does not establish full E02 or production readiness. Source freshness remains unknown. E03 deterministic synthetic lifecycle implements versioned requirements/tasks, reviewed receipt links, synthetic QA, immutable baselines/human decisions, exact progress and selective durable applicability invalidation. R6 final whole-unit/scoped review, ten dev incrementals000009–000014, rollback smoke and218-test verification passed; no full E03/AC06 or production readiness claim. Lifecycle transport rejects extra authority fields, duplicate keys, decoded NUL and object/array ambiguity; max65536 bytes/depth16. No inference or live CI. E05-01 adds synthetic typed QA/build/environment/plan/selection/execution/defect/handoff transport and guarded local maintenance only. QA execution coverage and human decisions remain separate from E03 acceptance/progress and release approval. All AI unavailable; E04 native runner stays disabled. No live source, inference or deployment. F01 local read UI is implemented; final browser acceptance remains separate. R6 final verification/review state is tracked in docs/acceptance/e05-01.md. F01 adds anonymous session/CSRF bootstrap, strict token-once login, browser-only logout, scoped project discovery/capability hints and ten existing read aliases. Browser routes reject Authorization headers; Bearer API behavior is unchanged. Browser API has no business mutations. See docs/contracts/browser-session-v1.md and docs/acceptance/frontend-f01.md; final integrated gate remains pending."
+    "description": "JSON syntax is valid YAML1.2. Local/testing loopback API uses opaque Bearer credentials; F01 browser reads use separately verified server sessions. Production SSO remains unimplemented; F02-01 browser attempt implementation is present with final acceptance pending. Tenant/project scopes and current grants/membership are server-controlled. No T07 HTTP/model endpoint: analysis contracts are synthetic-only internal client. Responses may contain UTC PostgreSQL timestamp text, not uniformly RFC3339. HEAD uses the same read permissions and handler as GET and has an empty body; only POST/PATCH mutate. UTC timestamps preserve up to six fractional digits through validation, timestamptz(6) storage and event/access-time bindings. Periods remain [valid_from,valid_to) at microsecond precision. E02 I1/I2 provide synthetic-v1 manual-source connector bindings and bounded durable receipt/outbox acceptance. No real source API, webhook verification, raw receipt read, settings update, production worker identity or external AI inference. I3 local outbox processing and I4 projection/status are implemented and independently reviewed. Whole-unit code review found no Critical or Important blockers; dedicated dev incremental migrations000007/000008 and rollback-scoped synthetic acceptance/replay/CLI projection smoke were verified by the lead. Scoped metadata re-review approved. This synthetic foundation does not establish full E02 or production readiness. Source freshness remains unknown. E03 deterministic synthetic lifecycle implements versioned requirements/tasks, reviewed receipt links, synthetic QA, immutable baselines/human decisions, exact progress and selective durable applicability invalidation. R6 final whole-unit/scoped review, ten dev incrementals000009–000014, rollback smoke and218-test verification passed; no full E03/AC06 or production readiness claim. Lifecycle transport rejects extra authority fields, duplicate keys, decoded NUL and object/array ambiguity; max65536 bytes/depth16. No inference or live CI. E05-01 adds synthetic typed QA/build/environment/plan/selection/execution/defect/handoff transport and guarded local maintenance only. QA execution coverage and human decisions remain separate from E03 acceptance/progress and release approval. All AI unavailable; E04 native runner stays disabled. No live source, inference or deployment. F01 local read UI is implemented; final browser acceptance remains separate. R6 final verification/review state is tracked in docs/acceptance/e05-01.md. F01 adds anonymous session/CSRF bootstrap, strict token-once login, browser-only logout, scoped project discovery/capability hints and ten existing read aliases. Browser routes reject Authorization headers; Bearer API behavior is unchanged. Browser API includes the narrowly scoped F02-01 BA context attempt protocol; see docs/acceptance/f02-01-ba-context.md. See docs/contracts/browser-session-v1.md and docs/acceptance/frontend-f01.md; final integrated gate remains pending."
   },
   "servers": [
     {
@@ -11440,6 +11440,322 @@
         }
       }
     },
+      "/browser/v1/projects/{project}/ba/clarifications/{clarification}/attempt": {
+        "post": {
+          "security": [
+            {
+              "BrowserSession": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "project",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            {
+              "name": "clarification",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          ],
+          "description": "Session-bound F02-01 protocol; authorization and original proof are rechecked. Query and BA control headers forbidden. See docs/acceptance/f02-01-ba-context.md.",
+          "operationId": "claimBrowserBaAttempt",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "clarification_id",
+                    "expected_revision",
+                    "kind",
+                    "context"
+                  ],
+                  "properties": {
+                    "clarification_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "expected_revision": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740991
+                    },
+                    "kind": {
+                      "const": "context.add"
+                    },
+                    "context": {
+                      "type": "string",
+                      "description": "Nonblank; maximum 4000 UTF-8 bytes; secret gate applies."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Claim replay."
+            },
+            "201": {
+              "description": "New claim."
+            },
+            "401": {
+              "description": "Request rejected or unavailable."
+            },
+            "403": {
+              "description": "Request rejected or unavailable."
+            },
+            "404": {
+              "description": "Request rejected or unavailable."
+            },
+            "409": {
+              "description": "Request rejected or unavailable."
+            },
+            "413": {
+              "description": "Request rejected or unavailable."
+            },
+            "419": {
+              "description": "Request rejected or unavailable."
+            },
+            "422": {
+              "description": "Request rejected or unavailable."
+            },
+            "503": {
+              "description": "Request rejected or unavailable."
+            }
+          }
+        },
+        "get": {
+          "security": [
+            {
+              "BrowserSession": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "project",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            {
+              "name": "clarification",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          ],
+          "description": "Session-bound F02-01 protocol; authorization and original proof are rechecked. Query and BA control headers forbidden. See docs/acceptance/f02-01-ba-context.md.",
+          "operationId": "showBrowserBaAttempt",
+          "responses": {
+            "200": {
+              "description": "JSON data envelope."
+            },
+            "401": {
+              "description": "Request rejected or unavailable."
+            },
+            "403": {
+              "description": "Request rejected or unavailable."
+            },
+            "404": {
+              "description": "Request rejected or unavailable."
+            },
+            "409": {
+              "description": "Request rejected or unavailable."
+            },
+            "413": {
+              "description": "Request rejected or unavailable."
+            },
+            "419": {
+              "description": "Request rejected or unavailable."
+            },
+            "422": {
+              "description": "Request rejected or unavailable."
+            },
+            "503": {
+              "description": "Request rejected or unavailable."
+            }
+          }
+        }
+      },
+      "/browser/v1/projects/{project}/ba/clarifications/{clarification}/attempt/execute": {
+        "post": {
+          "security": [
+            {
+              "BrowserSession": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "project",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            {
+              "name": "clarification",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          ],
+          "description": "Session-bound F02-01 protocol; authorization and original proof are rechecked. Query and BA control headers forbidden. See docs/acceptance/f02-01-ba-context.md.",
+          "operationId": "executeBrowserBaAttempt",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "attempt_id"
+                  ],
+                  "properties": {
+                    "attempt_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "JSON data envelope."
+            },
+            "401": {
+              "description": "Request rejected or unavailable."
+            },
+            "403": {
+              "description": "Request rejected or unavailable."
+            },
+            "404": {
+              "description": "Request rejected or unavailable."
+            },
+            "409": {
+              "description": "Request rejected or unavailable."
+            },
+            "413": {
+              "description": "Request rejected or unavailable."
+            },
+            "419": {
+              "description": "Request rejected or unavailable."
+            },
+            "422": {
+              "description": "Request rejected or unavailable."
+            },
+            "503": {
+              "description": "Request rejected or unavailable."
+            }
+          }
+        }
+      },
+      "/browser/v1/projects/{project}/ba/clarifications/{clarification}/attempt/ack": {
+        "post": {
+          "security": [
+            {
+              "BrowserSession": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "project",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            {
+              "name": "clarification",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          ],
+          "description": "Session-bound F02-01 protocol; authorization and original proof are rechecked. Query and BA control headers forbidden. See docs/acceptance/f02-01-ba-context.md.",
+          "operationId": "ackBrowserBaAttempt",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "attempt_id"
+                  ],
+                  "properties": {
+                    "attempt_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": "Completed attempt closed."
+            },
+            "401": {
+              "description": "Request rejected or unavailable."
+            },
+            "403": {
+              "description": "Request rejected or unavailable."
+            },
+            "404": {
+              "description": "Request rejected or unavailable."
+            },
+            "409": {
+              "description": "Request rejected or unavailable."
+            },
+            "413": {
+              "description": "Request rejected or unavailable."
+            },
+            "419": {
+              "description": "Request rejected or unavailable."
+            },
+            "422": {
+              "description": "Request rejected or unavailable."
+            },
+            "503": {
+              "description": "Request rejected or unavailable."
+            }
+          }
+        }
+      },
     "/browser/v1/session": {
       "get": {
         "operationId": "browserSession",

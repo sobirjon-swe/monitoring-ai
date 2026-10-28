@@ -1,0 +1,26 @@
+{
+  "version": "ba-context-demo-v1",
+  "synthetic": true,
+  "tenant_id": "f0200000-0000-4000-8000-000000000001",
+  "project_id": "f0200000-0000-4000-8000-000000000002",
+  "policy_id": "f0200000-0000-4000-8000-000000000003",
+  "source_id": "f0200000-0000-4000-8000-000000000004",
+  "department_id": "f0200000-0000-4000-8000-000000000005",
+  "source_version": 1,
+  "writer": {
+    "name": "Synthetic BA writer",
+    "role": "ba",
+    "employee_id": "f0200000-0000-4000-8000-000000000010",
+    "user_id": "f0200000-0000-4000-8000-000000000011",
+    "subject_id": "f0200000-0000-4000-8000-000000000012",
+    "token_id": "f0200000-0000-4000-8000-000000000013",
+    "grants": ["project.read", "ba.read", "ba.source.read", "ba.request.manage"]
+  },
+  "producer": {
+    "name": "Synthetic BA source producer",
+    "role": "ba",
+    "employee_id": "f0200000-0000-4000-8000-000000000020",
+    "user_id": "f0200000-0000-4000-8000-000000000021",
+    "grants": ["ba.fixture.manage", "ba.request.manage", "ba.source.read"]
+  }
+}

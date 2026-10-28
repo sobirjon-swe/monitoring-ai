@@ -37,7 +37,7 @@ class BrowserReadTransportTest extends ManagementTestCase
             $expected[$path] = $this->withToken($this->token)->get('/api/v1/projects/'.$f['project'].'/'.$path)->assertOk()->json('data');
         }
         $this->flushHeaders();
-        $this->postJson('/browser/v1/login', ['token' => $this->token])->assertOk();
+        $this->loginBrowser();
         $this->get('/browser/v1/projects')->assertOk()->assertJsonPath('data.items.0.id', $f['project']);
         foreach ($paths as $path) {
             $url = '/browser/v1/projects/'.$f['project'].'/'.$path;
@@ -54,7 +54,7 @@ class BrowserReadTransportTest extends ManagementTestCase
         $f = $this->browserInputs(['project.read']);
         $url = '/browser/v1/projects/'.$f['project'];
         $this->get($url.'/requirements')->assertUnauthorized();
-        $this->postJson('/browser/v1/login', ['token' => $this->token])->assertOk();
+        $this->loginBrowser();
         $this->get($url.'/requirements')->assertForbidden();
         $this->get('/browser/v1/projects?cursor=invalid')->assertUnprocessable();
         $this->get('/browser/v1/projects?limit=99')->assertUnprocessable();
@@ -71,7 +71,7 @@ class BrowserReadTransportTest extends ManagementTestCase
         $qa = $this->managementQaExecutionFixture();
         $action = app(ManagementActionService::class)->open($this->actor(), $this->p, $this->managementEnvelope('action.open', $this->actionInput()), 'browser-action', 0);
         $paths = ['requirements', 'lifecycle-tasks', 'progress', 'qa/verification', 'qa/queue', 'qa/history/defect/'.$qa['defect']['id'], 'ba/queue', 'ba/history/'.$ba['clarification_id'], 'management/queue', 'management/history/'.$action['action_id']];
-        $this->postJson('/browser/v1/login', ['token' => $this->token])->assertOk();
+        $this->loginBrowser();
         foreach ($paths as $path) {
             $api = $this->withToken($this->token)->get('/api/v1/projects/'.$this->p.'/'.$path)->assertOk();
             $this->flushHeaders();

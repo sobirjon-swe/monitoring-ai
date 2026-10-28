@@ -56,3 +56,20 @@ it('supports Escape for keyboard history close',async()=>{
   expect(close).toHaveBeenCalledOnce();
   await screen.findByText('No records in this authorized page.');
 });
+for (const [locale, human, source] of [['uz','Kontekst','Kontekst (manba)'],['ru','Контекст','Контекст (источник)'],['en','Context','Context (source)']] as const) {
+  it(`labels only human BA context events without source attribution in ${locale}`,async()=>{
+    setup.context={isCurrent:()=>true,client:new ApiClient(async()=>wire(page([
+      {clarification_id:project,id:project,revision:1,kind:'context.add',context:'Human note'},
+      {clarification_id:project,id:second,revision:2,kind:'request.revise',context:'Source note'},
+    ])))};
+    render(<RecordHistory {...props} locale={locale} locator={{domain:'ba',id:project}}/>);
+    const humanValue=await screen.findByText('Human note');
+    expect(humanValue.closest('div')?.querySelector('dt')?.textContent).toBe(human);
+    expect(screen.getByText('Source note').closest('div')?.querySelector('dt')?.textContent).toBe(source);
+  });
+}
+it('keeps management context labeled as source context',async()=>{
+  setup.context={isCurrent:()=>true,client:new ApiClient(async()=>wire({...page([{action_id:project,event_id:project,revision:1,operation:'context.add',state:'open',support_status:'pending',review_status:'pending',underlying_dependency_status:[],reason_codes:[],current_reason_codes:[],reference_results:[],context:'Management note'}]),reasons:[]}))};
+  render(<RecordHistory {...props} locator={{domain:'management',id:project}}/>);
+  expect((await screen.findByText('Management note')).closest('div')?.querySelector('dt')?.textContent).toBe('Context (source)');
+});

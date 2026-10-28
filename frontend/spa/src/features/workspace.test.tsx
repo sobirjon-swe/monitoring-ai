@@ -97,13 +97,43 @@ it('shows a task source title as text and its exact immutable version',async()=>
   open('tasks');
   expect(await screen.findByText('<script>original</script>')).toBeTruthy();
   expect(document.querySelector('script')).toBeNull();
-  expect(screen.getByText('Blocked')).toBeTruthy();
+  expect(screen.getByText('Blocked',{selector:'dd'})).toBeTruthy();
 });
 it('uses each lifecycle list last UUID cursor and no invented page wrapper',async()=>{
   replies.requirements=Array.from({length:20},(_,index)=>({id:`11111111-1111-4111-8111-${String(index+1).padStart(12,'0')}`,requirement_id:projectId,version:1,draft_revision:1,content_hash:'a'.repeat(64),approved_at:'2026-10-24T00:00:00Z'}));
   open('requirements');
   fireEvent.click(await screen.findByRole('button',{name:'Load more'}));
   await waitFor(()=>expect(requests.some(path=>path.endsWith('requirements?limit=20&cursor=11111111-1111-4111-8111-000000000020'))).toBe(true));
+});
+it('filters only the loaded page while advancing using its original last row',async()=>{
+  replies.requirements=Array.from({length:20},(_,index)=>({id:`11111111-1111-4111-8111-${String(index+1).padStart(12,'0')}`,requirement_id:projectId,version:index+1,draft_revision:1,content_hash:'a'.repeat(64),approved_at:'2026-10-24T00:00:00Z'}));
+  open('requirements');
+  const search=await screen.findByRole('searchbox',{name:'Search this page'});
+  fireEvent.change(search,{target:{value:'000000000001'}});
+  expect(screen.queryByText('11111111-1111-4111-8111-000000000020')).toBeNull();
+  fireEvent.click(screen.getByRole('button',{name:'Load more'}));
+  await waitFor(()=>expect(requests.some(path=>path.endsWith('requirements?limit=20&cursor=11111111-1111-4111-8111-000000000020'))).toBe(true));
+});
+it('sorts only the current page and restores original order',async()=>{
+  replies.requirements=[2,1].map(index=>({id:`11111111-1111-4111-8111-${String(index).padStart(12,'0')}`,requirement_id:projectId,version:index,draft_revision:1,content_hash:'a'.repeat(64),approved_at:'2026-10-24T00:00:00Z'}));
+  open('requirements');
+  const select=await screen.findByRole('combobox',{name:'Sort this page'});
+  fireEvent.change(select,{target:{value:'asc'}});
+  let rows=screen.getAllByRole('row').slice(1);
+  expect(rows[0].textContent).toContain('000000000001');
+  fireEvent.change(select,{target:{value:'original'}});
+  rows=screen.getAllByRole('row').slice(1);
+  expect(rows[0].textContent).toContain('000000000002');
+});
+it('filters tasks by status and shows an explicit page-only empty result',async()=>{
+  replies['lifecycle-tasks']=['blocked','active'].map((status,index)=>({id:`11111111-1111-4111-8111-${String(index+1).padStart(12,'0')}`,version_id:projectId,revision:2,title:index?'Second task':'First task',assignee_id:projectId,estimate_basis:'planned',remaining_effort:null,expected_test_keys:[],status,content_hash:'b'.repeat(64),effective_at:'2026-10-24T00:00:00Z'}));
+  open('tasks');
+  const status=await screen.findByRole('combobox',{name:'Status on this page'});
+  fireEvent.change(status,{target:{value:'blocked'}});
+  expect(screen.getByText('First task')).toBeTruthy();
+  expect(screen.queryByText('Second task')).toBeNull();
+  fireEvent.change(screen.getByRole('searchbox',{name:'Search this page'}),{target:{value:'no match'}});
+  expect(screen.getByText('No matching records on this page.')).toBeTruthy();
 });
 it('localizes an unknown server reason without turning it into complete coverage',async()=>{
   replies['ba/queue']={...page([],'unknown'),reason_codes:['new_server_reason_with_long_label']};

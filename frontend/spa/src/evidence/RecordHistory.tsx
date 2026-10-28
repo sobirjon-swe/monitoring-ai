@@ -20,7 +20,7 @@ export function RecordHistory({projectId,scopeGeneration,locator,locale,onClose,
       <PageCoverage page={page} locale={locale}/>
       {!page.items.length && <p>{readText(locale,'empty')}</p>}
       {page.items.map((row,index)=><article className="record-card" key={`${row.id??row.event_id??index}:${row.revision??row.source_revision}`}>
-        <Fields record={row} fields={historyFields[locator.domain]} locale={locale}/>
+        <Fields record={row} fields={historyFields[locator.domain]} locale={locale} labels={locator.domain==='ba' && row.kind==='context.add'?{context:readText(locale,'humanContext')}:undefined}/>
       </article>)}
       {page.next_cursor && <button onClick={()=>setCursor(page.next_cursor)}>{t(locale,'more')}</button>}
     </>}</ReadBoundary>

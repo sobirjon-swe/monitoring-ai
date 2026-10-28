@@ -55,14 +55,14 @@ function ProjectWorkspace(props: { projectId: string; scopeGeneration: number; l
   const visibleSections = state.status === 'ready' ? sections.filter(key => purposes[key].every(purpose => state.data.purposes.includes(purpose))) : [];
   return <WorkspaceShell {...props} visibleSections={visibleSections}>
     <ReadBoundary state={state} retry={retry} locale={locale}>{() => visibleSections.includes(section) ?
-      <DomainWorkspace key={section} projectId={projectId} scopeGeneration={scopeGeneration} locale={locale} section={section} /> :
+      <DomainWorkspace key={section} projectId={projectId} scopeGeneration={scopeGeneration} locale={locale} section={section} canWriteBa={state.status==='ready' && state.data.purposes.includes('ba.request.manage')} /> :
       <section><h1>{t(locale, section)}</h1><p>{t(locale, 'forbidden')}</p><p>{t(locale, 'permissionHints')}</p>{visibleSections.map(key => <button key={key} onClick={() => props.onNavigate(key)}>{t(locale, key)}</button>)}</section>
     }</ReadBoundary>
   </WorkspaceShell>;
 }
-function DomainWorkspace({ section, ...props }: { projectId: string; scopeGeneration: number; locale: Locale; section: WorkspaceSection }) {
+function DomainWorkspace({ section, canWriteBa, ...props }: { projectId: string; scopeGeneration: number; locale: Locale; section: WorkspaceSection; canWriteBa:boolean }) {
   if (section === 'qa') return <QaWorkspace {...props} />;
-  if (section === 'ba') return <BaWorkspace {...props} />;
+  if (section === 'ba') return <BaWorkspace {...props} canWrite={canWriteBa} />;
   if (section === 'management') return <ManagementWorkspace {...props} />;
   return <LifecycleWorkspace {...props} view={section} />;
 }

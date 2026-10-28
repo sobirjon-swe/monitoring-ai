@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BaController;
+use App\Http\Controllers\BrowserBaAttemptController;
 use App\Http\Controllers\BrowserProjectController;
 use App\Http\Controllers\BrowserSessionController;
 use App\Http\Controllers\LifecycleTaskController;
@@ -28,6 +29,10 @@ Route::middleware(AuthenticateBrowserSession::class)->group(function (): void {
         Route::get('qa/history/{kind}/{subject}', [QaController::class, 'read'])->whereUuid('subject')->defaults('qa_operation', 'history');
         Route::get('ba/queue', [BaController::class, 'read'])->defaults('ba_operation', 'queue');
         Route::get('ba/history/{clarification}', [BaController::class, 'read'])->whereUuid('clarification')->defaults('ba_operation', 'history');
+        Route::post('ba/clarifications/{clarification}/attempt', [BrowserBaAttemptController::class, 'claim'])->whereUuid('clarification');
+        Route::get('ba/clarifications/{clarification}/attempt', [BrowserBaAttemptController::class, 'show'])->whereUuid('clarification');
+        Route::post('ba/clarifications/{clarification}/attempt/execute', [BrowserBaAttemptController::class, 'execute'])->whereUuid('clarification');
+        Route::post('ba/clarifications/{clarification}/attempt/ack', [BrowserBaAttemptController::class, 'ack'])->whereUuid('clarification');
         Route::get('management/queue', [ManagementController::class, 'read'])->defaults('management_operation', 'queue');
         Route::get('management/history/{action}', [ManagementController::class, 'read'])->whereUuid('action')->defaults('management_operation', 'history');
     });

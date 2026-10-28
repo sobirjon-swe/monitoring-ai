@@ -55,6 +55,15 @@ abstract class AccessTestCase extends PostgresTestCase
         });
     }
 
+    protected function loginBrowser(): void
+    {
+        $this->withCredentials();
+        $initial = $this->getJson('/browser/v1/session')->assertOk();
+        $this->withUnencryptedCookie(config('session.cookie'), $initial->getCookie(config('session.cookie'), false)->getValue());
+        $response = $this->postJson('/browser/v1/login', ['token' => $this->token])->assertOk();
+        $this->withUnencryptedCookie(config('session.cookie'), $response->getCookie(config('session.cookie'), false)->getValue());
+    }
+
     protected function project(): string
     {
         return app(TenantContext::class)->run($this->tenant, function (): string {

@@ -18,6 +18,9 @@ final class BrowserSessionController
     {
         $this->noAuthorization($request);
         $bound = $request->session()->has(BrowserSessionService::BINDING);
+        if (! $bound && ! $this->sessions->initialize($request->session())) {
+            throw new AuthenticationException;
+        }
         $verified = $this->sessions->resolve($request->session());
         if ($bound && $verified === null) {
             throw new AuthenticationException;
@@ -28,6 +31,10 @@ final class BrowserSessionController
 
     public function login(Request $request, BrowserLoginPayload $payload): mixed
     {
+        $replacement = $this->sessions->beginReplacement($request->session());
+        if ($replacement === false) {
+            throw new AuthenticationException;
+        }
         $request->session()->forget(BrowserSessionService::BINDING);
         $this->noAuthorization($request);
         $key = 'browser.login.'.hash('sha256', (string) config('browser.client'));
@@ -38,7 +45,7 @@ final class BrowserSessionController
         if ($request->query() || ! $request->isJson()) {
             throw ValidationException::withMessages(['payload' => 'Invalid request.']);
         }
-        $verified = $this->sessions->start($request->session(), $payload->token($request->getContent()));
+        $verified = $this->sessions->start($request->session(), $payload->token($request->getContent()), $replacement);
         if ($verified === null) {
             throw new AuthenticationException;
         }

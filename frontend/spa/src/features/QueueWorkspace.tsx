@@ -5,8 +5,9 @@ import { RecordHistory } from '../evidence/RecordHistory';
 import { t } from '../i18n';
 import { readText } from '../i18n/read';
 import { Fields, PageCoverage, ReadBoundary, Reasons, useRead, type WorkspaceProps } from './readWorkspace';
+import { BaAttemptPanel } from './ba/BaAttemptPanel';
 
-export function QueueWorkspace({projectId,scopeGeneration,locale='uz',domain,onFailure}:WorkspaceProps & {domain:Domain;onFailure?:(error:ApiError)=>void}) {
+export function QueueWorkspace({projectId,scopeGeneration,locale='uz',domain,onFailure,canWrite=false}:WorkspaceProps & {domain:Domain;onFailure?:(error:ApiError)=>void;canWrite?:boolean}) {
   const [cursor,setCursor]=useState<string|null>(null);
   const [locator,setLocator]=useState<HistoryLocator|null>(null);
   const [denied,setDenied]=useState<ApiError|null>(null);
@@ -30,6 +31,7 @@ export function QueueWorkspace({projectId,scopeGeneration,locale='uz',domain,onF
         <Reasons codes={(domain==='ba'?row.reasons:row.reason_codes) as string[]??[]} locale={locale}/>
         {domain==='management' && <Reasons codes={row.current_reason_codes as string[]} locale={locale}/>}
         <button aria-label={`${readText(locale,'history')}: ${recordLocator.id}`} onClick={event=>{origin.current=event.currentTarget;setLocator(recordLocator);}}>{readText(locale,'history')}</button>
+        {domain==='ba' && canWrite && <BaAttemptPanel projectId={projectId} clarificationId={recordLocator.id} revision={row.revision as number} scopeGeneration={scopeGeneration} locale={locale} queuePath={`/browser/v1/projects/${projectId}/ba/queue?${query}`} onRefresh={()=>{setLocator(null);retry();}} onDenied={onDenied}/>}
       </article>;
     })}</div>
     {page.next_cursor && <button onClick={()=>{setLocator(null);setCursor(page.next_cursor);}}>{t(locale,'more')}</button>}

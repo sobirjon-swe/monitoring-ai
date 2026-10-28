@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 
 final class BrowserProjectReader
 {
-    public const PURPOSES = ['project.read', 'requirements.read', 'progress.read', 'qa.read', 'qa.source.read', 'ba.read', 'ba.source.read', 'management.read', 'management.source.read'];
+    public const PURPOSES = ['project.read', 'requirements.read', 'progress.read', 'qa.read', 'qa.source.read', 'ba.read', 'ba.source.read', 'ba.request.manage', 'management.read', 'management.source.read'];
 
     public function __construct(private readonly TenantContext $context, private readonly ProjectReadScope $scope) {}
 
