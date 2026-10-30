@@ -53,12 +53,16 @@ export function ReadBoundary<T>({state,retry,locale,children}:{state:ReadState<T
 }
 export function WorkspaceHeader({locale,title,projectId,writable=false}:{locale:Locale;title:string;projectId:string;writable?:boolean}) {
   const {project}=useSession();
-  return <>{!writable && <p className="eyebrow">{t(locale,'readOnly')}</p>}<h1 tabIndex={-1}>{title}</h1>
-    <p className="project-context">{readText(locale,'project')}: <strong>{project?.name}</strong> <span className="record-id">{projectId}</span></p>
-    <p className="muted">{readText(locale,'timezone')}</p><p className="privacy-note">{readText(locale,'privacy')}</p></>;
+  return <div className="workspace-heading">
+    <div className="heading-row"><h1 tabIndex={-1}>{title}</h1>{!writable && <span className="badge">{t(locale,'readOnly')}</span>}</div>
+    <div className="context-meta"><p className="project-context">{readText(locale,'project')}: <strong>{project?.name}</strong></p><p className="muted">{readText(locale,'timezone')}</p>
+      <details className="context-details"><summary>{readText(locale,'technicalDetails')}</summary><span className="record-id">{projectId}</span></details>
+    </div>
+    <p className="privacy-note">{readText(locale,'privacy')}</p>
+  </div>;
 }
 export function Reasons({codes,locale}:{codes:string[];locale:Locale}) {
-  return codes.length>0?<ul className="reason-list">{[...new Set(codes)].map(code=><li key={code}>{readText(locale,code)} <code>{code}</code></li>)}</ul>:null;
+  return codes.length>0?<ul className="reason-list">{[...new Set(codes)].map(code=><li key={code}>{readText(locale,code)} <code className="technical-code">{code}</code></li>)}</ul>:null;
 }
 export function PageCoverage({page,locale}:{page:Page;locale:Locale}) {
   return <div className={`coverage coverage-${page.coverage_status}`} role="status">

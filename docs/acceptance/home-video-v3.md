@@ -1,0 +1,13 @@
+# Home v3 implementation — 2026-10-30
+
+User explicitly approved video-reference-home-v3.png and requested implementation in existing React. Scoped to overview; existing capability-based navigation stays real. No unimplemented Employees/Roles links added.
+
+Implemented neutral #101010 sidebar / #151515 main / #1b1b1b panels, 256px desktop sidebar (216px tablet), 32px page padding, 16px horizontal / 24px vertical composition spacing, 14px panel radius, lighter 38px snapshot-month title, three factual summary panels, main progress and coverage columns, selected-project table, retained baseline/policy/prior snapshot/schedule disclosures. Mobile reflows at 760/480px. Shell rules only apply to selected-project overview.
+
+Material difference from mockup: API supplies current accepted/total weights and coverage, not time-series/project totals/attention queues. No illustrative counts or graph were shipped. The empty time-series state is explicit, month uses as_of and Tashkent timezone. Data availability is not acceptance completion. This is implementation, not claimed pixel-perfect verification.
+
+Verification: full frontend 114 tests passed after one pre-existing timing-sensitive BA acknowledgement test failed on a prior run and passed both its isolated rerun and full rerun. Additional zero-progress coverage regression test subsequently passed (four overview tests). Final typecheck/build passed; existing ReUI use-no-memo warnings remain. Runtime /app/overview HTTP200. QA API + management guard backend tests:12 passed,797 assertions with512MiB. An attempted broader backend run did not pass: it exhausted default128MiB in BaContract and showed additional failures; no whole-backend green claim.
+
+Independent source reviewer found the availability/acceptance table-label confusion; fixed and covered by regression test. No other scoped findings. Windows browser activation failed twice (failed to activate captured window). A headless screenshot attempt was blocked by automatic approval review. No final desktop/mobile browser screenshot or pixel comparison was achieved. Visual acceptance remains open; do not present generated mockup as running screenshot.
+
+Local startup: unrelated LMS process held55432 as a bound socket, so Monitoring PostgreSQL uses55433. Ignored env/db config updated; QA_LOCAL_PORT explicitly configurable with55432 default; guard role/marker/loopback/ownership checks unchanged and guard tests passed. Startup script reads local configured port and refuses occupied sockets. Demo provisioning services still contain55432-only checks; renewing expired demo access is not completed or bypassed. Existing credential expiry is preserved. No commit/push/deployment.

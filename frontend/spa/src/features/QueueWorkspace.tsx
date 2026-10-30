@@ -26,8 +26,9 @@ export function QueueWorkspace({projectId,scopeGeneration,locale='uz',domain,onF
     <div className="record-grid">{page.items.map(row=>{
       const recordLocator=locatorFor(domain,row);
       return <article key={recordLocator.id} className="record-card">
-        <h3 className="record-id">{recordLocator.id}</h3>
-        <Fields record={row} fields={queueFields[domain]} locale={locale}/>
+        <h3 className="source-heading">{typeof row.question==='string' ? row.question : typeof row.reason==='string' && row.reason ? row.reason : t(locale,domain)}</h3>
+        <details className="technical-details"><summary>{readText(locale,'technicalDetails')}</summary><p className="record-id">{recordLocator.id}</p></details>
+        <Fields record={row} fields={queueFields[domain].filter(field=>field!=='question' && !(field==='reason' && typeof row.reason==='string' && row.reason))} locale={locale}/>
         <Reasons codes={(domain==='ba'?row.reasons:row.reason_codes) as string[]??[]} locale={locale}/>
         {domain==='management' && <Reasons codes={row.current_reason_codes as string[]} locale={locale}/>}
         <button aria-label={`${readText(locale,'history')}: ${recordLocator.id}`} onClick={event=>{origin.current=event.currentTarget;setLocator(recordLocator);}}>{readText(locale,'history')}</button>

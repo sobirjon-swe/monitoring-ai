@@ -1,0 +1,51 @@
+/* Approved video-reference-home-v3: neutral shell, isolated to overview. */
+.overview-frame {
+  --background: #151515;
+  --sidebar: #101010;
+  --surface: #1b1b1b;
+  --surface-hover: #262626;
+  --surface-selected: #282828;
+  --border: #303030;
+  --text: #f1f1f1;
+  --muted: #aaaaaa;
+  --accent: #e5e5e5;
+  --accent-hover: #ffffff;
+  --accent-ink: #151515;
+  --focus: #b5caff;
+  --sidebar-width: 256px;
+  --content-width: 1440px;
+  background: var(--background);
+  color: var(--text);
+}
+.overview-frame .sidebar { padding: 28px 16px; }
+.overview-frame .brand { padding: 0 12px; font-size: 18px; font-weight: 550; letter-spacing: -.02em; }
+.overview-frame .brand-mark { color: #f1f1f1; }
+.overview-frame .brand em { color: inherit; }
+.overview-frame .project-name { margin: 36px 12px 16px; color: var(--muted); font-size: 13px; font-weight: 400; }
+.overview-frame .sidebar nav { gap: 4px; }
+.overview-frame .sidebar nav a { min-height: 44px; padding: 10px 12px; font-weight: 400; }
+.overview-frame .sidebar nav a[aria-current] { color: #f1f1f1; background: #282828; border-color: #3b3b3b; font-weight: 500; }
+.overview-frame .sidebar-button { margin-top: 32px; font-weight: 400; }
+.overview-frame .workspace-column > header { background: #151515; border-bottom: 0; min-height: 64px; padding: 12px 32px; gap: 16px; }
+.overview-frame .shell-context strong { font-weight: 450; }
+.overview-frame .locales button[aria-pressed="true"] { background: #282828; border-color: #3b3b3b; color: #f1f1f1; }
+.overview-frame main { padding: 8px 32px 32px; }
+.overview-frame .workspace-heading { margin-bottom: 24px; }
+.overview-frame .heading-row h1 { font-size: 16px; font-weight: 450; letter-spacing: 0; }
+.overview-frame .heading-row .badge { font-size: 12px; color: #bdbdbd; background: #242424; }
+.overview-frame .context-meta { font-size: 13px; gap: 8px 16px; }
+.overview-frame .privacy-note { font-size: 13px; line-height: 1.5; margin: 8px 0 0; max-width: 100ch; }
+.overview-frame .context-details { margin: 0; }
+.overview-frame .context-details summary { min-height: 0; padding: 0; }
+.overview-frame button { font-weight: 500; }
+.overview-frame ::selection { background: #454545; color: #fff; }
+@media (max-width: 1000px) and (min-width: 761px) {
+  .overview-frame { --sidebar-width: 216px; }
+  .overview-frame main { padding: 12px 24px 24px; }
+  .overview-frame .workspace-column > header { padding-inline: 24px; }
+}
+@media (max-width: 760px) {
+  .overview-frame { grid-template-columns: minmax(0, 1fr); }
+  .overview-frame main { padding: 16px; }
+  .overview-frame .workspace-column > header { padding: 12px 16px; }
+}
