@@ -121,10 +121,15 @@ class BaApiTest extends BaTestCase
         $this->startApi();
         $envelope = $this->baEnvelope('request.open', $this->requestInput());
         $counts = $this->baCounts();
-        config(['database.connections.pgsql.port' => '55433']);
-        $this->source('/clarifications', $envelope)->assertStatus(503)->assertDontSee('55433');
-        $this->get($this->url('/queue'))->assertStatus(503);
-        config(['database.connections.pgsql.port' => '55432']);
+        $originalPort = config('database.connections.pgsql.port');
+        $invalidPort = (int) config('qa.local_port') === 55433 ? '55434' : '55433';
+        try {
+            config(['database.connections.pgsql.port' => $invalidPort]);
+            $this->source('/clarifications', $envelope)->assertStatus(503)->assertDontSee($invalidPort);
+            $this->get($this->url('/queue'))->assertStatus(503);
+        } finally {
+            config(['database.connections.pgsql.port' => $originalPort]);
+        }
         $this->assertSame($counts, $this->baCounts());
     }
 

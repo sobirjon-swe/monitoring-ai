@@ -23,7 +23,8 @@ final class BaDemoFixtureService
     public function provision(BaDemoManifest $manifest, string $secretHash, CarbonInterface $expiresAt): array
     {
         if (! app()->environment('testing') || DB::transactionLevel() < 1 || config('database.connections.pgsql.database') !== 'monitoring_ai_test'
-            || config('qa.runtime_role') !== 'monitoring_ai_app' || config('qa.local_port') !== 55432
+            || config('qa.runtime_role') !== 'monitoring_ai_app'
+            || ! is_int(config('qa.local_port')) || config('qa.local_port') < 1 || config('qa.local_port') > 65535
             || config('qa.database_marker') !== 'monitoring-ai-local-v1:'
             || config('qa.local_databases') !== ['local' => 'monitoring_ai_dev', 'testing' => 'monitoring_ai_test']
             || ! preg_match('/\A[a-f0-9]{64}\z/D', $secretHash)

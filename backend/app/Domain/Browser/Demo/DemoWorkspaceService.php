@@ -38,7 +38,8 @@ class DemoWorkspaceService
     {
         $expected = app()->environment('testing') ? 'monitoring_ai_test' : 'monitoring_ai_dev';
         if (config('database.connections.pgsql.database') !== $expected || config('qa.runtime_role') !== 'monitoring_ai_app'
-            || config('qa.local_port') !== 55432 || config('qa.database_marker') !== 'monitoring-ai-local-v1:'
+            || ! is_int(config('qa.local_port')) || config('qa.local_port') < 1 || config('qa.local_port') > 65535
+            || config('qa.database_marker') !== 'monitoring-ai-local-v1:'
             || config('qa.local_databases') !== ['local' => 'monitoring_ai_dev', 'testing' => 'monitoring_ai_test']) {
             throw new LogicException('Synthetic setup runtime refused.');
         }

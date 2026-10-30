@@ -20,7 +20,7 @@ if (! $app->environment('testing') || $identity->database !== 'monitoring_ai_tes
 }
 foreach (['pgsql', 'pgsql_migration'] as $connection) {
     $config = config('database.connections.'.$connection);
-    if (! in_array($config['host'], ['127.0.0.1', 'localhost', '::1'], true) || (int) $config['port'] !== 55432 || ! in_array($config['url'] ?? null, [null, ''], true) || ! empty($config['read']) || ! empty($config['write'])) {
+    if (! in_array($config['host'], ['127.0.0.1', 'localhost', '::1'], true) || (int) $config['port'] !== (int) config('qa.local_port') || ! in_array($config['url'] ?? null, [null, ''], true) || ! empty($config['read']) || ! empty($config['write'])) {
         exit(90);
     }
 }

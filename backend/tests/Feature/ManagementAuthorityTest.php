@@ -207,7 +207,7 @@ class ManagementAuthorityTest extends ManagementTestCase
         $this->assertSame('monitoring_ai_test', $identity->db);
         $this->assertSame('monitoring_ai_migrator', $identity->login);
         $this->assertSame('monitoring_ai_owner', $identity->role);
-        $this->assertSame(55432, (int) $identity->port);
+        $this->assertSame((int) config('qa.local_port'), (int) $identity->port);
         $this->assertFalse($identity->rolsuper || $identity->rolbypassrls);
         $this->assertStringStartsWith('monitoring-ai-local-v1:', $identity->marker);
         $this->assertTrue($migration->table('migrations')->where('migration', '2026_10_09_000038_enforce_management_atomic_lineage')->exists());

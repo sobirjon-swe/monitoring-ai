@@ -1,5 +1,7 @@
 # AI monitoring hujjatlari
 
+2026-10-30: foydalanuvchi lokal MVP branchlari va yangi React bosh sahifasini `main`ga integratsiya qilishni tasdiqladi. Branchlar ketma-ketligi, lokal portga moslik tuzatishlari va yakuniy tekshiruvlar [integratsiya hisobotida](operations/branch-integration-2026-10-30.md). Oldingi sanalardagi branch/commit ruxsati haqidagi yozuvlar o‘sha vaqtdagi tarixiy holatni ifodalaydi. Real AI, F02 writer UAT va production deploy ochiq qoladi.
+
 2026-10-28 F02-01: BA context.add browser attempt implementatsiyasi mavjud; synthetic writer workspace token-himoya qarori va tekshiruvi kutilmoqda. DEV browser/API UAT va yakuniy qabul tasdiqlanmagan. [Kontrakt va dalillar](acceptance/f02-01-ba-context.md), [inventar](operations/f02-workflow-inventory.md), [cleanup](operations/f02-attempt-cleanup.md). F01 `89f7453` bilan commit/push qilingan; joriy branch `ba-workflow-frontend`.
 
 2026-10-24 joriy holat: E05-03 `85cb84c` bilan commit qilingan. `frontend-api-integration` branchida tasdiqlangan React F01 read workspace, token → server sessiyasi, ruxsatli loyiha tanlash va E03/QA/BA/boshqaruv o‘qish ekranlari tayyor. Olti rolning sun’iy DEV workspace’i, haqiqiy brauzer/API/ruxsat/sessiya sinovlari, PHP906/24073 va SPA79/type/build tekshiruvlari o‘tgan. **F01 lokal o‘qish bosqichi qabul qilingan:** bitta yakuniy mustaqil umumiy review tasdiqlangan, ochiq kod kamchiligi yo‘q. To‘liq platforma/F02 hali tugamagan. F01 commit qilinmagan; push/merge/deploy ruxsati yo‘q.

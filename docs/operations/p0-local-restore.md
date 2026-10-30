@@ -10,7 +10,7 @@ Loyiha ildizidan PowerShell orqali:
 ./scripts/start-local.ps1
 ```
 
-Brauzer: http://127.0.0.1:18080/app. PostgreSQL loopback manzilida; `monitoring_ai_dev` va `monitoring_ai_test` ajratilgan. 2026-10-30 kuni eski 55432 port boshqa jarayonda band bo‘lgani sabab lokal port 55433 ga ko‘chirildi. Startup portni ignored `.local/db-config.json`dan oladi; `DB_PORT` va `QA_LOCAL_PORT` shu portga mos bo‘lishi kerak. Startup mavjud boshqa socketni to‘xtatmaydi, migratsiya yoki credential yaratmaydi. Demo setup yordamchilaridagi 55432 cheklovi hali saqlangan; ular yangi portda qayta ishga tushirilgan deb hisoblanmaydi. Windows avtomatik ishga tushirish sozlanmagan.
+Brauzer: http://127.0.0.1:18080/app. PostgreSQL loopback manzilida; `monitoring_ai_dev` va `monitoring_ai_test` ajratilgan. 2026-10-30 kuni eski 55432 port boshqa jarayonda band bo‘lgani sabab lokal port 55433 ga ko‘chirildi. Startup portni ignored `.local/db-config.json`dan oladi; `DB_PORT` va `QA_LOCAL_PORT` shu portga mos bo‘lishi kerak. Startup mavjud boshqa socketni to‘xtatmaydi, migratsiya yoki credential yaratmaydi. Demo fixture xizmatlari ham trusted QA portini hisobga oladi; haqiqiy server porti/rol/baza himoyalari saqlangan. Alohida F02 BA setup authority hali o'chiq va avtomatik yoqilmaydi. Windows avtomatik ishga tushirish sozlanmagan.
 
 Runtime fayllari shu checkoutning `.local/tools/` katalogida: PHP 8.5.12, Composer 2.11.0, PostgreSQL 17.11, Node 22.23.4/npm 10.9.9. Dependencylar mavjud lock fayllaridan o‘rnatilgan. Model/inference o‘chiq. Boshqa loyiha bazasi va servislari o‘zgartirilmagan.
 

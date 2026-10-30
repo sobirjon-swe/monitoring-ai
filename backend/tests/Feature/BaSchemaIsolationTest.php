@@ -282,9 +282,18 @@ class BaSchemaIsolationTest extends BaTestCase
         $this->party($wrong, 'other', 0);
     }
 
-    public function test_all_twelve_foundation_tables_force_rls_and_runtime_owns_none(): void
+    public function test_all_ba_tables_force_rls_and_runtime_owns_none(): void
     {
-        $this->assertSame(12, (int) DB::scalar("select count(*) from pg_class where left(relname,3)='ba_' and relkind='r' and relrowsecurity and relforcerowsecurity"));
+        $tables = DB::select("select c.relname,c.relrowsecurity,c.relforcerowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and left(c.relname,3)='ba_' and c.relkind='r' order by c.relname");
+        $this->assertSame([
+            'ba_answer_versions', 'ba_clarifications', 'ba_demo_receipts', 'ba_events',
+            'ba_receipts', 'ba_request_bindings', 'ba_request_links', 'ba_request_versions',
+            'ba_reviews', 'ba_scope_obligations', 'ba_source_heads', 'ba_source_party_versions',
+            'ba_terminal_applicability',
+        ], array_column($tables, 'relname'));
+        foreach ($tables as $table) {
+            $this->assertTrue($table->relrowsecurity && $table->relforcerowsecurity, $table->relname.' must force RLS');
+        }
         $this->assertFalse((bool) DB::scalar("select exists(select 1 from pg_class c join pg_roles r on r.oid=c.relowner where left(c.relname,3)='ba_' and c.relkind='r' and r.rolname=current_user)"));
         $this->assertFalse((bool) DB::scalar('select rolsuper or rolbypassrls from pg_roles where rolname=current_user'));
     }

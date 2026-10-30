@@ -20,6 +20,16 @@ abstract class PostgresTestCase extends TestCase
         $this->assertSame('monitoring_ai_test', DB::scalar('select current_database()'));
         $this->assertSame('monitoring_ai_app', DB::scalar('select current_user'));
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('tenants'), 'Tenant foundation must be migrated in the dedicated test database.');
+        // Retained concurrency evidence lives in ignored, checkout-local folders.
+        // Fresh checkouts do not contain these generated directories.
+        foreach ([
+            '../.local',
+            '../.superpowers/sdd/2026-10-06-e05-qa-handoff-plan',
+            '../.superpowers/sdd/2026-10-07-e05-ba-clarification-plan',
+            '../.superpowers/sdd/2026-10-09-e05-management-support-plan',
+        ] as $directory) {
+            app('files')->ensureDirectoryExists(base_path($directory));
+        }
     }
 
     protected function ownerConnection(): Connection

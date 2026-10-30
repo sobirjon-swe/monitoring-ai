@@ -47,7 +47,7 @@ class BrowserDemoSetupTest extends PostgresTestCase
         $this->assertSame('published', $result['status']);
         $this->assertCount(6, $result['personas']);
         $journal = json_decode(file_get_contents($path), true);
-        file_put_contents(base_path('../.superpowers/sdd/2026-10-24-frontend-api-integration-plan/task-5-schema-inventory.json'), json_encode(array_keys($journal['snapshot']), JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
+        $this->assertNotEmpty($journal['snapshot']);
         foreach ($journal['credentials'] as $credential) {
             $this->assertFalse(str_contains(json_encode($result), $credential['token']), 'Service return must never contain a credential.');
             $this->assertTrue(app(LocalTokenAuthenticator::class)->authenticate($credential['token']) !== null);
