@@ -94,3 +94,19 @@ Buttons, inputs, selects, textareas, navigation rows, language buttons, and disc
 Keyboard controls use a 3px focus outline with a 3px offset. Programmatically focused headings use a 3px outline with a 4px offset. When the skip link focuses the main region, a fine outline marks its heading rather than surrounding the entire content area. The skip link becomes visible on focus. Text selection uses teal with dark text, caret color follows the accent, and supported scrollbars use the neutral palette. Reduced-motion preferences disable smooth scrolling.
 
 These are implementation conventions, not an accessibility certification. Review keyboard operation, contrast, zoom, localization, long content, and actual unavailable/error states when changing shared components.
+
+## Employees and roles — approved glass revision, 2026-10-30
+
+User approved employees-glass-v2b.png and roles-glass-v2.png before implementation. This supersedes the earlier dark sidebar proposal for these two routes only. Scoped `.people-shell` uses smoky translucent panels over burgundy/olive/steel-blue/amber radial backgrounds; orange #ff6a14 actions, #f6f3f1 text, #d0cbc7 secondary text and rgba(240,231,222,.23) borders. Offline Segoe UI remains. Desktop padding24/28px, panel radius20px, control radius13px, minimum control height46px, 36px page headings. Two horizontal header rows replace the sidebar on these pages. At760px tables become labeled cards; navigation can scroll locally. Dialog focus is trapped and returns to its opener or stable main-content after refresh. Actual screenshots: docs/design-mockups/people-roles-running/.
+
+## Universal liquid glass — 2026-11-02 (current)
+
+User approved universal-liquid-glass-board-v1.png and full React migration. This supersedes the separate overview/base/people visual worlds above. All8 routes, login and project selection now share WorkspaceShell and layout/universalGlass.css, loaded after base styles. Domain/API/session/capability code remains unchanged. Earlier no-gradient/sidebar-only rules are historical and no longer apply to this approved glass direction.
+
+Static burgundy/olive/steel-blue/amber backdrop on #151516. Semantic text #f6f3f1, muted #d0cbc7, border rgba(240,231,222,.23), surface rgba(45,41,42,.86). Orange #ff6a14 uses dark #211308 primary ink; warning/error surfaces retain distinct written semantics. Panels20px, controls13px, hitareas46px; Segoe UI offline. Two-row glass chrome with full-width locally scrolling capability nav; route label20px on ordinary screens, page h1 dominant; people headings retain approved hierarchy. Main content max1600px, desktop outer28px/mobile12px. Overview month22–24px. Actual record, history, queue and form composition retained.
+
+Blur is limited to major surfaces; opaque baseline works without filter. Reduced transparency removes backdrop gradients/filter; reduced motion respects existing rules. Native modified links preserved; route/project transition focuses main, nav resizing reveals active link without stealing focus. See docs/acceptance/universal-liquid-glass.md for evidence and limitations.
+
+## Chart dashboard — 2026-11-02
+
+Approved charts-uzbek-demo-v1 world now implemented in ChartOverviewWorkspace, SummaryCharts and charts.css. Four panels compose via scoped grid with independent request boundaries; loading/error wrappers span fullwidth. Overview-only compact nav/context removes duplicate headings, first charts439px in actualdesktop; shared other routes unchanged. QA ratios side-by-side desktop/singlecolumnmobile; directlabels/values and native HTML progress preserve noncolor meaning. No external chartlibrary installed. Knownzero includes awaitedverification0; unknowncounts notplotted. Scope-attestedDEMO/AI context remains visible throughoutmetricloading. See docs/acceptance/charts-uzbek-demo.md.

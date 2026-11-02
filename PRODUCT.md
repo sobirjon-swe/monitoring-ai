@@ -23,3 +23,15 @@ User supplied the Damir Sokolovsky dashboard refinement video and the post recom
 ## Open decisions
 
 Real source systems, local model provisioning, production SSO and future industry-specific criteria remain separate work. Real finance and server deployment need their own activation scope.
+
+## Delivered employees and roles slice — 2026-10-30
+
+The two administration pages are now implemented against the local backend. Tenant catalog administrators create descriptive work roles. Effective project PMs assign existing active catalog roles to existing members of their authorized project. Catalog labels never grant permissions or replace historical functional role codes. Search, filters, pagination, localized states and creation/assignment forms are delivered; edit/archive and end-assignment UI remain open. See docs/acceptance/employees-roles.md. Earlier proposed-only statements describe the prior refinement scope.
+
+## Universal glass migration — 2026-11-02
+
+Approved liquid glass styling now covers auth, project picker and all existing workspace routes with one shared visual system. This change adds no permissions, data fields, APIs, AI, connectors or domain workflows. Existing bounded local admin/PM access was renewed with explicit user approval for8hours under exactly the previous scopes; original expired rows remain. Protected credential output is local only.
+
+## Chart dashboard and Uzbek demonstration — 2026-11-02
+
+Current overview includes backend-derived acceptedweight/task/QA/dependency charts. New isolated localdemo has12fictionalUzbeknames and3ITprojects with native lifecycle/QA/BA/support evidence. These are explicitly synthetic; no employee ranking/workhour inference/liveintegration/AI added. Current original-authority eligibility and project-scoped permissions still apply. Details: docs/acceptance/charts-uzbek-demo.md and docs/operations/local-uzbek-demo.md.

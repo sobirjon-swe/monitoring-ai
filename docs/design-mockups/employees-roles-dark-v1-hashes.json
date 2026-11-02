@@ -1,0 +1,17 @@
+[
+  {
+    "sha256": "2E905CA20D66AC979073C632F8A15D02FB901A9F6F2E3204C07D8B4BD689F4C3",
+    "file": "employees-dark-v1.png",
+    "status": "proposed-awaiting-approval"
+  },
+  {
+    "sha256": "2ADF76FC9E5D402CA3597CF9502F7267BBD9605A598805295FC4E20CBC80ABB8",
+    "file": "roles-dark-v1c.png",
+    "status": "proposed-awaiting-approval"
+  },
+  {
+    "sha256": "4A6DCE000774FC6245DD044E8B50EE637E64C271835EE63917D93CCABC9AAC13",
+    "file": "people-roles-permissions-v1.svg",
+    "status": "proposed-awaiting-approval"
+  }
+]

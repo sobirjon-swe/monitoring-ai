@@ -29,7 +29,7 @@ it('permits a deliberate receipt acknowledgement when partial history does not s
   client.request.mockResolvedValue({...history,coverage_status:'partial',visible_record_count:null,reason_codes:['coverage_limit']});
   await openReview();await screen.findByText(/Event is not visible on this page/);
   expect(screen.getByText(/acknowledge the receipt without seeing the event/)).toBeTruthy();
-  expect((screen.getByRole('button',{name:'Acknowledge receipt'}) as HTMLButtonElement).disabled).toBe(false);
+  await waitFor(()=>expect((screen.getByRole('button',{name:'Acknowledge receipt'}) as HTMLButtonElement).disabled).toBe(false));
 });
 it('blocks acknowledgement on history errors and clears the parent on denial',async()=>{
   client.request.mockRejectedValue(new ApiError('forbidden',403));await openReview();

@@ -1,0 +1,134 @@
+{
+  "version": "uzbek-demo-v1",
+  "synthetic": true,
+  "tenant_id": "f1200000-0000-4000-8000-000000000001",
+  "policy_id": "f1200000-0000-4000-8000-000000000002",
+  "source_id": "f1200000-0000-4000-8000-000000000003",
+  "technical_department_id": "f1200000-0000-4000-8000-000000000004",
+  "ba_department_id": "f1200000-0000-4000-8000-000000000005",
+  "interactive_hours": 8,
+  "projects": [
+    {
+      "id": "f1200000-0000-4000-8000-000000000010",
+      "name": "Savdo CRM",
+      "baseline": true
+    },
+    {
+      "id": "f1200000-0000-4000-8000-000000000011",
+      "name": "Ombor boshqaruvi",
+      "baseline": true
+    },
+    {
+      "id": "f1200000-0000-4000-8000-000000000012",
+      "name": "Mijozlar portali",
+      "baseline": false
+    }
+  ],
+  "people": [
+    {
+      "employee_id": "f1200000-0000-4000-8000-000000000100",
+      "name": "Azizbek Karimov",
+      "role": "pm",
+      "catalog_role": "Loyiha menejeri"
+    },
+    {
+      "employee_id": "f1200000-0000-4000-8000-000000000101",
+      "name": "Madina Rasulova",
+      "role": "ba",
+      "catalog_role": "Biznes tahlilchi"
+    },
+    {
+      "employee_id": "f1200000-0000-4000-8000-000000000102",
+      "name": "Sardor Ismoilov",
+      "role": "developer",
+      "catalog_role": "Backend dasturchi"
+    },
+    {
+      "employee_id": "f1200000-0000-4000-8000-000000000103",
+      "name": "Dilnoza Qodirova",
+      "role": "qa",
+      "catalog_role": "QA muhandisi"
+    },
+    {
+      "employee_id": "f1200000-0000-4000-8000-000000000104",
+      "name": "Jasur Tursunov",
+      "role": "developer",
+      "catalog_role": "Frontend dasturchi"
+    },
+    {
+      "employee_id": "f1200000-0000-4000-8000-000000000105",
+      "name": "Shahnoza Ergasheva",
+      "role": "developer",
+      "catalog_role": "Dizayner"
+    },
+    {
+      "employee_id": "f1200000-0000-4000-8000-000000000106",
+      "name": "Behzod Rahimov",
+      "role": "department_head",
+      "catalog_role": "DevOps muhandisi"
+    },
+    {
+      "employee_id": "f1200000-0000-4000-8000-000000000107",
+      "name": "Zilola Akbarova",
+      "role": "qa",
+      "catalog_role": "QA muhandisi"
+    },
+    {
+      "employee_id": "f1200000-0000-4000-8000-000000000108",
+      "name": "Otabek Mirzayev",
+      "role": "developer",
+      "catalog_role": "Backend dasturchi"
+    },
+    {
+      "employee_id": "f1200000-0000-4000-8000-000000000109",
+      "name": "Nigora Saidova",
+      "role": "ba",
+      "catalog_role": "Biznes tahlilchi"
+    },
+    {
+      "employee_id": "f1200000-0000-4000-8000-000000000110",
+      "name": "Diyorbek Abdullayev",
+      "role": "developer",
+      "catalog_role": "Frontend dasturchi"
+    },
+    {
+      "employee_id": "f1200000-0000-4000-8000-000000000111",
+      "name": "Mohira Yusupova",
+      "role": "ba",
+      "catalog_role": "Texnik yozuvchi"
+    }
+  ],
+  "interactive": [
+    {
+      "key": "pm",
+      "user_id": "f1200000-0000-4000-8000-000000000200",
+      "employee_id": "f1200000-0000-4000-8000-000000000100",
+      "subject_id": "f1200000-0000-4000-8000-000000000300",
+      "token_id": "f1200000-0000-4000-8000-000000000400"
+    },
+    {
+      "key": "admin",
+      "user_id": "f1200000-0000-4000-8000-000000000201",
+      "employee_id": "f1200000-0000-4000-8000-000000000106",
+      "subject_id": "f1200000-0000-4000-8000-000000000301",
+      "token_id": "f1200000-0000-4000-8000-000000000401"
+    }
+  ],
+  "technical": [
+    {
+      "key": "source",
+      "user_id": "f1200000-0000-4000-8000-000000000500",
+      "employee_id": "f1200000-0000-4000-8000-000000000102"
+    },
+    {
+      "key": "reviewer",
+      "user_id": "f1200000-0000-4000-8000-000000000501",
+      "employee_id": "f1200000-0000-4000-8000-000000000103"
+    },
+    {
+      "key": "assigner",
+      "user_id": "f1200000-0000-4000-8000-000000000502",
+      "employee_id": "f1200000-0000-4000-8000-000000000106"
+    }
+  ]
+}

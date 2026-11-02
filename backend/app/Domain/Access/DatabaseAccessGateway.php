@@ -21,7 +21,7 @@ class DatabaseAccessGateway implements AccessGateway
 
     public const MANAGEMENT_DEPARTMENT_PURPOSES = ['management.department.read', 'management.department.manage'];
 
-    public const PURPOSES = [...self::MANAGEMENT_PURPOSES, ...self::MANAGEMENT_DEPARTMENT_PURPOSES, ...self::BA_PURPOSES, 'ba.department.read', ...self::QA_PURPOSES, 'qa.department.read', ...self::DEVELOPER_PURPOSES, ...self::LIFECYCLE_PURPOSES, 'organization.read', 'organization.manage', 'project.create', 'project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'identity.read', 'identity.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process'];
+    public const PURPOSES = [...self::MANAGEMENT_PURPOSES, ...self::MANAGEMENT_DEPARTMENT_PURPOSES, ...self::BA_PURPOSES, 'ba.department.read', ...self::QA_PURPOSES, 'qa.department.read', ...self::DEVELOPER_PURPOSES, ...self::LIFECYCLE_PURPOSES, 'employees.read', 'role_catalog.read', 'role_catalog.manage', 'organization.read', 'organization.manage', 'project.create', 'employees.read', 'project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'identity.read', 'identity.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process'];
 
     public function __construct(private readonly TenantContext $context) {}
 
@@ -40,6 +40,9 @@ class DatabaseAccessGateway implements AccessGateway
         if (isset($scope['project_id'], $scope['department_id'])) {
             throw new AccessDeniedHttpException;
         }
+        if (in_array($purpose, ['role_catalog.manage', 'role_catalog.read'], true) && (isset($scope['project_id']) || isset($scope['department_id']))) {
+            throw new AccessDeniedHttpException;
+        }
         if (in_array($purpose, ['qa.department.read', 'ba.department.read', ...self::MANAGEMENT_DEPARTMENT_PURPOSES], true) && (! isset($scope['department_id']) || isset($scope['project_id']))) {
             throw new AccessDeniedHttpException;
         }
@@ -54,7 +57,7 @@ class DatabaseAccessGateway implements AccessGateway
             }
             $project = $scope['project_id'] ?? null;
             $department = $scope['department_id'] ?? null;
-            if (in_array($purpose, ['project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process', ...self::LIFECYCLE_PURPOSES, ...self::DEVELOPER_PURPOSES, ...self::QA_PURPOSES, ...self::BA_PURPOSES, ...self::MANAGEMENT_PURPOSES], true) && $project === null) {
+            if (in_array($purpose, ['employees.read', 'project.read', 'project.manage', 'roles.read', 'roles.manage', 'membership.manage', 'analysis.context', 'connector.manage', 'ingestion.accept', 'ingestion.read', 'ingestion.process', ...self::LIFECYCLE_PURPOSES, ...self::DEVELOPER_PURPOSES, ...self::QA_PURPOSES, ...self::BA_PURPOSES, ...self::MANAGEMENT_PURPOSES], true) && $project === null) {
                 return false;
             }
             if ($project !== null && ($user->employee_id === null || ! DB::table('project_memberships')

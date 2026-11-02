@@ -3,6 +3,7 @@
 namespace App\Domain\Ba;
 
 use App\Domain\Access\TrustedActor;
+use App\Support\ReadDeliveryFence;
 use App\Support\TenantContext;
 use Closure;
 use Illuminate\Support\Facades\DB;
@@ -81,6 +82,9 @@ final class BaCoordination
                 $proofs[$key]['required'] = true;
             }
             $this->authority->assertEffective($proofs, DB::scalar('select clock_timestamp()'));
+            if (app()->bound(ReadDeliveryFence::class)) {
+                app(ReadDeliveryFence::class)->capture($actor, $project, $proofs, fn (string $at) => $this->authority->assertEffective($proofs, $at));
+            }
             // Do not issue SQL on an aborted transaction: rollback restores local settings on failure.
             DB::select("select set_config('app.ba_authority_closed','',true),set_config('app.ba_proofs','',true),set_config('app.ba_required_keys','',true)");
 

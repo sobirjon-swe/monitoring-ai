@@ -211,3 +211,6 @@ for(const domain of ['qa','ba','management']) {
     await waitFor(()=>expect(requests.some(path=>path.endsWith(`${domain}/queue?limit=${domain==='qa'?50:20}&cursor=opaque%2Bcursor%3D`))).toBe(true));
   });
 }
+it('uses only validated capability provenance to label progress when summary is unavailable',async()=>{replies.capabilities={...(replies.capabilities as object),synthetic:true};statuses['dashboard-summary']=503;open('overview');await screen.findByText('18 / 30');expect(screen.getByText(/DEMO/)).toBeTruthy();expect(screen.getByText(/AI interpretation unavailable/)).toBeTruthy();});
+it.each([null,false,undefined])('never infers demo provenance from project names or unknown capability metadata %s',async synthetic=>{replies.capabilities={...(replies.capabilities as object),synthetic};open('overview');await screen.findByText('18 / 30');expect(screen.queryByText(/DEMO/)).toBeNull();});
+it('rejects malformed capability provenance before requesting dashboard metrics',async()=>{replies.capabilities={...(replies.capabilities as object),synthetic:'true'};open('overview');await screen.findByText('The response could not be verified.');expect(requests.some(path=>path.endsWith('/progress'))).toBe(false);});

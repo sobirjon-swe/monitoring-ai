@@ -34,7 +34,7 @@ function NavigableProject() {
     {project?<h1>{section} content</h1>:<button onClick={()=>selectProject({id:'11111111-1111-4111-8111-111111111111',name:'Synthetic project',revision:1})}>Choose project</button>}
   </WorkspaceShell>;
 }
-it('focuses replacement main after keyboard drawer navigation removes inert',async()=>{
+it('focuses replacement main after keyboard inline navigation',async()=>{
   const user=userEvent.setup();
   const attempts:{inert:boolean;drawerOpen:boolean}[]=[];
   const nativeFocus=HTMLElement.prototype.focus;
@@ -49,8 +49,8 @@ it('focuses replacement main after keyboard drawer navigation removes inert',asy
     const client=new ApiClient(async()=>new Response(JSON.stringify({data:{authenticated:false,csrf_token:'c'}})));
     render(<SessionProvider client={client}><NavigableProject/></SessionProvider>);
     await user.click(screen.getByRole('button',{name:'Choose project'}));
-    await user.click(screen.getByRole('button',{name:'Navigation'}));
-    expect(document.getElementById('main-content')?.closest('[inert]')).not.toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.getElementById('main-content')?.closest('[inert]')).toBeNull();
     const qa=screen.getByRole('link',{name:'QA verification'});
     qa.focus();
     attempts.length=0;

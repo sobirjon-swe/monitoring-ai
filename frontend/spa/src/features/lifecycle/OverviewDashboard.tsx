@@ -47,7 +47,7 @@ function DashboardIcon({kind = 'document'}: {kind?: 'document'|'chart'|'database
   </svg>;
 }
 
-export function OverviewDashboard({data,locale,projectId}: {data:Progress;locale:Locale;projectId:string}) {
+export function OverviewDashboard({data,locale,projectId,compact=false}: {data:Progress;locale:Locale;projectId:string;compact?:boolean}) {
   const {project} = useSession();
   const c = copy[locale];
   const available = data.status !== 'unavailable' && data.baseline_id !== null && data.total_weight !== null && data.total_weight > 0 && data.percentage_basis_points !== null;
@@ -58,18 +58,18 @@ export function OverviewDashboard({data,locale,projectId}: {data:Progress;locale
   const unknown = readText(locale,'unavailable');
 
   return <div className="overview-dashboard">
-    <div className="overview-title-row"><h2>{month}</h2><span className="overview-date"><DashboardIcon kind="calendar"/>{validDate ? <time dateTime={data.as_of}>{formatDate(locale,data.as_of!)}</time> : c.snapshot}</span></div>
-    <div className="overview-stat-grid">
+    {!compact && <div className="overview-title-row"><h2>{month}</h2><span className="overview-date"><DashboardIcon kind="calendar"/>{validDate ? <time dateTime={data.as_of}>{formatDate(locale,data.as_of!)}</time> : c.snapshot}</span></div>}
+    {!compact && <div className="overview-stat-grid">
       <article className="overview-panel overview-stat"><div><h3>{c.accepted}</h3><DashboardIcon kind="document"/></div><strong>{available ? data.accepted_weight : '—'}</strong><p>{c.weight}</p></article>
       <article className="overview-panel overview-stat"><div><h3>{c.total}</h3><DashboardIcon kind="chart"/></div><strong>{available ? data.total_weight : '—'}</strong><p>{readText(locale,'baseline')}</p></article>
       <article className="overview-panel overview-stat overview-stat-status"><div><h3>{c.coverage}</h3><DashboardIcon kind="database"/></div><strong>{status}</strong><p>{c.snapshot}</p></article>
     </div>
-    <div className="overview-main-grid">
+    }<div className="overview-main-grid">
       <section className="overview-panel overview-progress" aria-labelledby="overview-progress-title">
-        <h3 id="overview-progress-title">{c.progress}</h3>
+        <header className="overview-acceptance-header"><h3 id="overview-progress-title">{c.progress}</h3>{compact && validDate && <time className="overview-accepted-date" dateTime={data.as_of}>{formatDate(locale,data.as_of!)}</time>}</header>{compact && <p className="chart-note">{c.coverage}: <strong>{status}</strong></p>}
         <div className="overview-progress-value"><strong>{available ? `${data.percentage_basis_points!/100}%` : unknown}</strong><span>{available ? `${data.accepted_weight} / ${data.total_weight}` : c.basis}</span></div>
         {available && <div className="overview-progress-track"><progress max={10000} value={data.percentage_basis_points!} aria-label={readText(locale,'acceptedWeight')}/><div className="overview-progress-legend"><span><i/>{c.accepted}</span><span><i/>{c.remaining}</span></div><p>{c.basis}</p></div>}
-        <div className="overview-trend"><h4>{c.trend}</h4><div className="overview-empty"><DashboardIcon kind="chart"/><strong>{c.noTrend}</strong><p>{c.noTrendDetail}</p></div></div>
+        {!compact && <div className="overview-trend"><h4>{c.trend}</h4><div className="overview-empty"><DashboardIcon kind="chart"/><strong>{c.noTrend}</strong><p>{c.noTrendDetail}</p></div></div>}
       </section>
       <aside className="overview-panel overview-coverage" aria-labelledby="overview-coverage-title">
         <h3 id="overview-coverage-title">{c.attention}</h3>

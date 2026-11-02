@@ -1,8 +1,9 @@
+import {parseRole,parseAssignment,isId,type CreateRole,type AssignRole,type CatalogRole,type Assignment} from './peopleRoles';
 export class ApiError extends Error {
  constructor(public readonly code:string, public readonly status=0, public readonly requestId?:string){super(code);this.name='ApiError';}
 }
 const uuid='[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}';
-const projectPath=new RegExp(`^/browser/v1/projects/${uuid}/(?:capabilities|requirements|lifecycle-tasks|progress|qa/(?:verification|queue|history/(?:[a-z_]+)/${uuid})|ba/(?:queue|history/${uuid})|management/(?:queue|history/${uuid}))$`);
+const projectPath=new RegExp(`^/browser/v1/projects/${uuid}/(?:capabilities|employees|role-catalog|requirements|lifecycle-tasks|progress|dashboard-summary|qa/(?:verification|queue|history/(?:[a-z_]+)/${uuid})|ba/(?:queue|history/${uuid})|management/(?:queue|history/${uuid}))$`);
 const uuidValue=new RegExp(`^${uuid}$`);
 type BaSlot={attempt_id:string;state:'claimed'|'completed'};
 export type BaResult={receipt_id:string;clarification_id:string;event_id:string;replayed:boolean};
@@ -27,14 +28,26 @@ export class ApiClient {
   return v as BaResult;
  }
  async ackBaAttempt(project:string,clarification:string,attempt:string):Promise<void>{if(!uuidValue.test(attempt))throw new ApiError('invalid_request');await this.send(this.baPath(project,clarification)+'/ack',{method:'POST',body:{attempt_id:attempt}},true,204);}
+ async createCatalogRole(body:CreateRole):Promise<CatalogRole>{
+  if(!isId(body.request_id)||!body.name.trim()||body.name.length>120||body.description.length>2000)throw new ApiError('invalid_request');
+  return parseRole(await this.send('/browser/v1/role-catalog',{method:'POST',body},'people',[200,201]));
+ }
+ async assignCatalogRole(project:string,body:AssignRole):Promise<Assignment>{
+  if(!isId(project))throw new ApiError('invalid_path');
+  if(!isId(body.employee_id)||!isId(body.role_catalog_id)||!isId(body.request_id)||!Number.isSafeInteger(body.expected_role_revision)||body.expected_role_revision<0)throw new ApiError('invalid_request');
+  return parseAssignment(await this.send(`/browser/v1/projects/${project}/catalog-role-assignments`,{method:'POST',body},'people',[200,201]));
+ }
  async request<T>(path:string,options:{method?:string;body?:unknown;signal?:AbortSignal}={}):Promise<T>{return this.send(path,options,false);}
- private async send<T>(path:string,options:{method?:string;body?:unknown;signal?:AbortSignal},coordinator:boolean,expectedStatus?:number|number[]):Promise<T>{
+ private async send<T>(path:string,options:{method?:string;body?:unknown;signal?:AbortSignal},coordinator:boolean|'people',expectedStatus?:number|number[]):Promise<T>{
   // Parse only after rejecting separators/encoding that could normalize into a different route.
   if(!path.startsWith('/browser/v1/') || /[\\#\s]/.test(path) || /%(?:2f|5c|2e)/i.test(path.split('?')[0]) || path.split('?')[0].includes('..'))throw new ApiError('invalid_path');
   const [route,query,...extra]=path.split('?');
-  if(extra.length || !(coordinator || ['/browser/v1/session','/browser/v1/login','/browser/v1/logout','/browser/v1/projects'].includes(route) || projectPath.test(route)))throw new ApiError('invalid_path');
+  const assignmentPath=new RegExp(`^/browser/v1/projects/${uuid}/catalog-role-assignments$`);
+  if(extra.length || !(coordinator || ['/browser/v1/session','/browser/v1/login','/browser/v1/logout','/browser/v1/projects','/browser/v1/role-catalog'].includes(route) || projectPath.test(route) || assignmentPath.test(route)))throw new ApiError('invalid_path');
   const method=options.method??'GET';
-  if(!['GET','POST'].includes(method) || (method==='POST' && !coordinator && !['/browser/v1/login','/browser/v1/logout'].includes(route)) || (method==='GET' && ['/browser/v1/login','/browser/v1/logout'].includes(route)) || (method==='GET' && options.body!==undefined) || (query && (coordinator || ['/browser/v1/session','/browser/v1/login','/browser/v1/logout'].includes(route))))throw new ApiError('invalid_request');
+  if(route.endsWith('/dashboard-summary') && (path.includes('?') || method!=='GET'))throw new ApiError('invalid_request');
+  if(coordinator==='people' && !(method==='POST' && (route==='/browser/v1/role-catalog'||assignmentPath.test(route))))throw new ApiError('invalid_request');
+  if(!['GET','POST'].includes(method) || (method==='POST' && !coordinator && !['/browser/v1/login','/browser/v1/logout'].includes(route)) || (method==='GET' && (['/browser/v1/login','/browser/v1/logout','/browser/v1/role-catalog'].includes(route)||assignmentPath.test(route))) || (method==='GET' && options.body!==undefined) || (query && (coordinator || ['/browser/v1/session','/browser/v1/login','/browser/v1/logout'].includes(route))))throw new ApiError('invalid_request');
   const originatingSessionEpoch=this.sessionEpoch;
   let response:Response;
   try{response=await this.fetcher(path,{method,credentials:'same-origin',cache:'no-store',redirect:'error',headers:{Accept:'application/json',...(method==='POST'?{'Content-Type':'application/json','X-CSRF-TOKEN':this.csrf}:{})},body:options.body===undefined?undefined:JSON.stringify(options.body),signal:options.signal});}

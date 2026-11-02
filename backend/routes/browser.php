@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\BaController;
 use App\Http\Controllers\BrowserBaAttemptController;
+use App\Http\Controllers\BrowserDashboardSummaryController;
 use App\Http\Controllers\BrowserProjectController;
 use App\Http\Controllers\BrowserSessionController;
 use App\Http\Controllers\LifecycleTaskController;
 use App\Http\Controllers\ManagementController;
+use App\Http\Controllers\PeopleRolesController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\QaController;
 use App\Http\Controllers\RequirementController;
@@ -20,6 +22,7 @@ Route::middleware(AuthenticateBrowserSession::class)->group(function (): void {
     Route::get('projects', [BrowserProjectController::class, 'index']);
     Route::prefix('projects/{project}')->whereUuid('project')->group(function (): void {
         Route::get('capabilities', [BrowserProjectController::class, 'capabilities']);
+        Route::get('dashboard-summary', [BrowserDashboardSummaryController::class, 'show']);
         foreach (['requirements' => RequirementController::class, 'lifecycle-tasks' => LifecycleTaskController::class, 'progress' => ProgressController::class] as $path => $controller) {
             Route::get($path, [$controller, 'handle']);
         }
@@ -35,5 +38,16 @@ Route::middleware(AuthenticateBrowserSession::class)->group(function (): void {
         Route::post('ba/clarifications/{clarification}/attempt/ack', [BrowserBaAttemptController::class, 'ack'])->whereUuid('clarification');
         Route::get('management/queue', [ManagementController::class, 'read'])->defaults('management_operation', 'queue');
         Route::get('management/history/{action}', [ManagementController::class, 'read'])->whereUuid('action')->defaults('management_operation', 'history');
+    });
+});
+
+Route::middleware(AuthenticateBrowserSession::class)->group(function (): void {
+    Route::get('role-catalog', [PeopleRolesController::class, 'read'])->defaults('people_operation', 'catalog');
+    Route::post('role-catalog', [PeopleRolesController::class, 'write'])->defaults('people_operation', 'create');
+    Route::patch('role-catalog/{role}', [PeopleRolesController::class, 'write'])->whereUuid('role')->defaults('people_operation', 'update');
+    Route::prefix('projects/{project}')->whereUuid('project')->group(function (): void {
+        Route::get('employees', [PeopleRolesController::class, 'read'])->defaults('people_operation', 'employees');
+        Route::get('role-catalog', [PeopleRolesController::class, 'read'])->defaults('people_operation', 'catalog');
+        Route::post('catalog-role-assignments', [PeopleRolesController::class, 'write'])->defaults('people_operation', 'assign');
     });
 });

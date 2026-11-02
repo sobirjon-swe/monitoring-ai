@@ -5,10 +5,12 @@ namespace App\Domain\Browser;
 use App\Domain\Access\AccessGateway;
 use App\Domain\Access\ProjectReadScope;
 use App\Domain\Access\TrustedActor;
+use App\Domain\PeopleRoles\PeopleRolesService;
 use App\Support\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 final class BrowserProjectReader
 {
@@ -49,7 +51,21 @@ final class BrowserProjectReader
                     ->orWhere(fn ($q) => $q->where('g.purpose', 'project.read')->where('g.scope_type', 'tenant')))
                 ->distinct()->pluck('g.purpose')->all();
 
-            return ['project_id' => $project, 'purposes' => array_values(array_intersect(self::PURPOSES, $granted)), 'observed_at' => $instant->format('Y-m-d\TH:i:s.uP')];
+            $purposes = array_values(array_intersect(self::PURPOSES, $granted));
+            foreach (['employees.read', 'roles.read', 'role_catalog.manage', 'roles.assign'] as $purpose) {
+                try {
+                    if ($purpose === 'roles.read') {
+                        app(PeopleRolesService::class)->catalogAuthority($actor, $project);
+                    } else {
+                        app(PeopleRolesService::class)->authority($actor, $purpose, $purpose === 'role_catalog.manage' ? null : $project);
+                    }
+                    $purposes[] = $purpose;
+                } catch (AccessDeniedHttpException) {
+                    // Capability hints use the same current authority as the endpoint.
+                }
+            }
+
+            return ['project_id' => $project, 'purposes' => $purposes, 'observed_at' => $instant->format('Y-m-d\TH:i:s.uP'), 'synthetic' => DemoProvenance::synthetic($actor->tenantId, $project)];
         });
     }
 

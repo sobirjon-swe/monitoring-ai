@@ -1,0 +1,30 @@
+import {act,render,screen} from '@testing-library/react';
+import {it,expect,vi} from 'vitest';
+import {DashboardCharts} from './SummaryCharts';
+const session=vi.hoisted(()=>({client:{request:vi.fn()},isCurrent:vi.fn(()=>true)}));
+vi.mock('../../auth/SessionProvider',()=>({useSession:()=>session}));
+const first='11111111-1111-4111-8111-111111111111',second='22222222-2222-4222-8222-222222222222';
+const block=(basis:string)=>({basis,coverage_status:'unknown',counts:null,reason_codes:['scope_specific_reason']});
+const data=(project_id:string)=>({version:'dashboard-summary-v1',project_id,observed_at:'2026-11-02T00:00:00Z',synthetic:true,ai_interpretation:'unavailable',tasks:block('current_native_task_versions'),qa:block('approved_plan_criteria'),dependencies:{qa:block('current_authorized_qa_handoffs'),ba:block('current_authorized_ba_clarifications')}});
+it('hides old chart data immediately on scope change and discards late responses',async()=>{
+ let finish!:(value:unknown)=>void;
+ session.client.request.mockResolvedValueOnce(data(first)).mockImplementationOnce(()=>new Promise(resolve=>finish=resolve));
+ const {rerender}=render(<DashboardCharts projectId={first} scopeGeneration={1} locale="en"/>);
+ await screen.findByText(/DEMO/);
+ rerender(<DashboardCharts projectId={second} scopeGeneration={2} locale="en"/>);
+ expect(screen.queryByText(/DEMO/)).toBeNull();
+ await act(async()=>finish(data(first)));
+ expect(screen.queryByText(/DEMO/)).toBeNull();
+ expect(await screen.findByRole('alert')).toBeTruthy();
+});
+it('aborts obsolete chart reads before a late response can publish',async()=>{
+ let finish!:(value:unknown)=>void;
+ session.client.request.mockImplementationOnce(()=>new Promise(resolve=>finish=resolve)).mockResolvedValueOnce(data(second));
+ const {rerender}=render(<DashboardCharts projectId={first} scopeGeneration={1} locale="en"/>);
+ const signal=session.client.request.mock.calls.at(-1)?.[1].signal as AbortSignal;
+ rerender(<DashboardCharts projectId={second} scopeGeneration={2} locale="en"/>);
+ await screen.findByText(/DEMO/);
+ expect(signal.aborted).toBe(true);
+ await act(async()=>finish({...data(first),synthetic:false}));
+ expect(screen.getByText(/DEMO/)).toBeTruthy();
+});

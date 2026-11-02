@@ -1,0 +1,97 @@
+.people-grid {display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:start;}
+.people-grid.has-editor {grid-template-columns:minmax(0,1fr) minmax(340px,30%);}
+.people-content {padding:24px;min-height:570px;}
+.people-heading {display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px;}
+.people-heading>div {display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+.people-shell h2 {font-size:27px;font-weight:600;letter-spacing:-.025em;line-height:1.3;margin:0;}
+.people-shell .people-project {font-size:15px;padding:10px 18px;text-align:left;max-width:300px;overflow-wrap:anywhere;}
+.people-subtle {color:#d0cbc7;font-size:14px;line-height:1.6;}
+.people-filters {display:flex;gap:14px;margin:20px 0 12px;}
+.people-filters>label:first-child {flex:1;position:relative;}
+.people-filters>label:last-child {flex:0 1 250px;}
+.people-filters input {padding-left:50px;}
+.people-filters svg {position:absolute;top:14px;left:17px;width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;}
+.people-count {font-size:13px;color:#d0cbc7;margin:10px 0 14px;}
+.people-table-region {width:100%;overflow-x:auto;border:1px solid var(--border);border-radius:16px;scrollbar-color:#756759 transparent;}
+.people-table {width:100%;border-collapse:collapse;min-width:650px;font-size:15px;}
+.people-table th {text-align:left;font-weight:500;color:#e3dbd5;background:rgba(255,255,255,.035);padding:17px 20px;white-space:nowrap;}
+.people-table td {padding:16px 20px;border-top:1px solid rgba(255,255,255,.13);vertical-align:middle;overflow-wrap:anywhere;max-width:300px;}
+.people-table tr:hover td {background:rgba(255,255,255,.035);}
+.people-table tr.selected td {background:rgba(255,106,20,.15);}
+.people-table strong {font-weight:500;}
+.person-name {display:flex;align-items:center;gap:16px;}
+.person-avatar {width:48px;height:48px;flex:0 0 48px;border:1px solid rgba(255,255,255,.15);border-radius:50%;background:rgba(139,142,172,.27);display:inline-flex;align-items:center;justify-content:center;font-size:17px;color:#fff2e8;}
+.people-table tr:nth-child(3n+2) .person-avatar {background:rgba(131,99,144,.3);}
+.people-table tr:nth-child(3n) .person-avatar {background:rgba(170,96,52,.4);}
+.people-role-stack {display:flex;flex-direction:column;gap:6px;}
+.people-role-stack small {display:block;color:#d0cbc7;font-size:12px;margin-top:3px;}
+.people-role-stack details {font-size:12px;color:#d0cbc7;}
+.people-role-stack summary {min-height:30px;padding:4px 0;}
+.people-role-stack ul {margin:0;padding-left:18px;}
+.people-period {color:#ded7d2;font-size:13px;display:block;max-width:190px;}
+.people-status {padding:6px 13px;border:1px solid rgba(255,255,255,.17);border-radius:10px;background:rgba(255,255,255,.06);display:inline-block;font-size:14px;}
+.people-shell .people-arrow {padding:10px;min-width:46px;}
+.people-shell :is(.people-arrow,.people-editor-heading button) svg {width:23px;height:23px;display:block;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;}
+.people-shell .people-primary {background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:650;}
+.people-shell .people-primary:hover:not(:disabled) {background:#ff8138;border-color:#ff8138;}
+.people-pagination {display:flex;justify-content:flex-end;gap:12px;margin-top:16px;}
+.people-footnote {font-size:13px;line-height:1.6;color:#d0cbc7;margin:24px 0 0;max-width:75ch;}
+.people-empty {padding:48px 0;color:#e0d7d0;}
+.people-editor {padding:24px;position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-color:#756759 transparent;}
+.people-editor[hidden] {display:none;}
+.people-editor-heading {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px;}
+.people-editor-heading h2 {font-size:25px;}
+.people-shell .people-editor-heading button {padding:10px;flex-shrink:0;}
+.people-editor-person {display:flex;gap:16px;align-items:center;margin:0 0 28px;}
+.people-editor-person .person-avatar {background:rgba(170,96,52,.4);width:64px;height:64px;flex-basis:64px;font-size:22px;}
+.people-editor-person strong {font-size:20px;font-weight:500;overflow-wrap:anywhere;}
+.people-editor form>label,.people-dates label {display:block;font-size:15px;margin-bottom:20px;}
+.people-editor :is(input,textarea,select) {display:block;margin-top:8px;}
+.people-editor textarea {resize:vertical;}
+.people-editor-notice {border-top:1px solid var(--border);padding-top:20px;margin-top:24px;color:#e2d8d0;font-size:14px;line-height:1.65;}
+.people-dates summary {font-size:15px;min-height:44px;padding:12px 0;cursor:pointer;}
+.people-editor-actions {display:flex;gap:12px;margin-top:28px;}
+.people-editor-actions button {flex:1;}
+.people-editor [role="alert"] {color:#ffd3bb;line-height:1.6;font-size:14px;}
+@media (max-width:1100px) {
+ .people-grid.has-editor {grid-template-columns:minmax(0,1fr) 350px;}
+ .people-content {padding:20px;}
+ .people-heading>div {gap:12px;}
+ .people-shell h2 {font-size:24px;}
+}
+@media (max-width:760px) {
+ .people-shell .glass-header {padding:14px;gap:16px;flex-wrap:wrap;}
+ .people-content {padding:16px;min-height:450px;}
+ .people-heading>div {align-items:flex-start;gap:12px;}
+ .people-shell .people-project {max-width:100%;}
+ .people-filters {flex-direction:column;gap:10px;}
+ .people-filters>label:last-child {flex-basis:auto;}
+ .people-grid.has-editor {display:block;}
+ .people-grid.has-editor .people-content {display:none;}
+ .people-editor {position:relative;top:auto;padding:20px;max-height:none;min-height:500px;}
+ .people-editor-actions {flex-wrap:wrap;}
+ .people-table {min-width:650px;}
+ .people-table td,.people-table th {padding:14px;}
+}
+@media (prefers-reduced-motion:no-preference) {.people-shell button,.glass-nav a {transition:background-color .16s ease-out,border-color .16s ease-out;}}
+.people-role-filter {flex:0 1 250px;}
+.people-role-filter>button {margin-top:8px;}
+@media(max-width:760px){.people-role-filter {flex-basis:auto;}}
+/* On mobile each real table row becomes a labeled card; desktop stays tabular. */
+@media (max-width:760px) {
+ .people-table-region {overflow-x:visible;border:0;border-radius:0;}
+ .people-table {display:block;min-width:0;width:100%;}
+ .people-table thead {position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;}
+ .people-table tbody {display:grid;gap:14px;width:100%;}
+ .people-table tbody tr {display:grid;width:100%;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+ .people-table td {display:block;max-width:none;padding:12px 14px;border-top:1px solid rgba(255,255,255,.13);font-size:15px;}
+ .people-table td:first-child {border-top:0;padding-top:16px;padding-bottom:16px;}
+ .people-table td::before {content:attr(data-label);display:block;margin-bottom:6px;color:#d0cbc7;font-size:12px;font-weight:500;line-height:1.5;}
+ .people-table-employees td:first-child::before {display:none;}
+ .people-table td:last-child {display:flex;justify-content:space-between;align-items:center;gap:16px;}
+ .people-table td:last-child::before {margin:0;}
+ .people-table .person-name {gap:12px;}
+ .people-table .people-period {max-width:none;}
+ .people-table .people-role-stack small {font-size:12px;overflow-wrap:anywhere;}
+ .people-table .people-role-stack summary {min-height:44px;padding:12px 0;}
+}

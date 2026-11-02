@@ -3,6 +3,7 @@
 namespace App\Domain\Qa;
 
 use App\Domain\Access\TrustedActor;
+use App\Support\ReadDeliveryFence;
 use App\Support\TenantContext;
 use Closure;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +39,9 @@ final class QaCoordination
             DB::select("select set_config('app.qa_authority_closed','1',true)");
             $result = $work($proofs);
             $this->authority->assertEffective($proofs, DB::scalar('select clock_timestamp()'));
+            if (app()->bound(ReadDeliveryFence::class)) {
+                app(ReadDeliveryFence::class)->capture($actor, $project, $proofs, fn (string $at) => $this->authority->assertEffective($proofs, $at));
+            }
             DB::select("select set_config('app.qa_authority_closed','',true),set_config('app.qa_responsibility','',true)");
 
             return $result;

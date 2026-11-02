@@ -1,3 +1,4 @@
+import {PeopleWorkspace} from './features/people/PeopleWorkspace';
 import { useEffect, useState } from 'react';
 import { SessionProvider, useSession } from './auth/SessionProvider';
 import { LoginPage } from './auth/LoginPage';
@@ -41,6 +42,7 @@ function Workspace() {
   </WorkspaceShell>;
 }
 const purposes: Record<WorkspaceSection, string[]> = {
+  employees:['employees.read'], roles:['roles.read'],
   overview: ['progress.read'], requirements: ['requirements.read'], tasks: ['requirements.read'],
   qa: ['qa.read', 'qa.source.read'], ba: ['ba.read', 'ba.source.read'], management: ['management.read', 'management.source.read'],
 };
@@ -50,20 +52,22 @@ function ProjectWorkspace(props: { projectId: string; scopeGeneration: number; l
     const record = object(value);
     if (record.project_id !== projectId || typeof record.observed_at !== 'string') invalid();
     strings(record.purposes);
+    if(record.synthetic!==undefined && record.synthetic!==null && typeof record.synthetic!=='boolean') invalid();
     return record as unknown as Capabilities;
   });
   const visibleSections = state.status === 'ready' ? sections.filter(key => purposes[key].every(purpose => state.data.purposes.includes(purpose))) : [];
   return <WorkspaceShell {...props} visibleSections={visibleSections}>
     <ReadBoundary state={state} retry={retry} locale={locale}>{() => visibleSections.includes(section) ?
-      <DomainWorkspace key={section} projectId={projectId} scopeGeneration={scopeGeneration} locale={locale} section={section} canWriteBa={state.status==='ready' && state.data.purposes.includes('ba.request.manage')} /> :
+      <DomainWorkspace isDemo={state.status==='ready' && state.data.synthetic===true} key={section} projectId={projectId} scopeGeneration={scopeGeneration} locale={locale} section={section} canReadRoles={state.status==='ready'&&state.data.purposes.includes('roles.read')} canCreateRole={state.status==='ready'&&state.data.purposes.includes('role_catalog.manage')} canAssignRole={state.status==='ready'&&state.data.purposes.includes('roles.assign')} canWriteBa={state.status==='ready' && state.data.purposes.includes('ba.request.manage')} /> :
       <section><h1>{t(locale, section)}</h1><p>{t(locale, 'forbidden')}</p><p>{t(locale, 'permissionHints')}</p>{visibleSections.map(key => <button key={key} onClick={() => props.onNavigate(key)}>{t(locale, key)}</button>)}</section>
     }</ReadBoundary>
   </WorkspaceShell>;
 }
-function DomainWorkspace({ section, canWriteBa, ...props }: { projectId: string; scopeGeneration: number; locale: Locale; section: WorkspaceSection; canWriteBa:boolean }) {
+function DomainWorkspace({ section, isDemo, canWriteBa, canCreateRole, canAssignRole, canReadRoles, ...props }: { projectId: string; scopeGeneration: number; locale: Locale; section: WorkspaceSection; isDemo:boolean; canWriteBa:boolean; canCreateRole:boolean; canAssignRole:boolean;canReadRoles:boolean }) {
+  if (section==='employees'||section==='roles') return <PeopleWorkspace {...props} view={section} canCreate={canCreateRole} canAssign={canAssignRole} canReadRoles={canReadRoles}/>;
   if (section === 'qa') return <QaWorkspace {...props} />;
   if (section === 'ba') return <BaWorkspace {...props} canWrite={canWriteBa} />;
   if (section === 'management') return <ManagementWorkspace {...props} />;
-  return <LifecycleWorkspace {...props} view={section} />;
+  return <LifecycleWorkspace {...props} isDemo={isDemo} view={section} />;
 }
 export default function App() { return <SessionProvider><Workspace /></SessionProvider>; }
